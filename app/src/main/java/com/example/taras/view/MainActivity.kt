@@ -26,11 +26,9 @@ import com.example.taras.api.dataclass.championship_Team.TeamsChampionshipDataCl
 import com.example.taras.api.dataclass.driverData.DriverDetailDataClassItem
 import com.example.taras.ui.theme.TarasTheme
 import com.example.taras.viewmodel.F1DataViewModel
+import com.example.taras.viewmodel.NewsViewModel
 
 class MainActivity : ComponentActivity() {
-
-    private val apiF1DataInterface: ApiF1DataInterface by lazy { F1ApiObject.getApiservice() }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,9 +36,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val f1ViewModel: F1DataViewModel = F1DataViewModel()
+            val newsViewModel: NewsViewModel = NewsViewModel()
             val drivers by f1ViewModel.drivers.collectAsState()
             val teams by f1ViewModel.teams.collectAsState()
             val driverDetails by f1ViewModel.driverdetail.collectAsState()
+            val news by newsViewModel.news.collectAsState()
 
             TarasTheme {
             }
@@ -92,6 +92,19 @@ class MainActivity : ComponentActivity() {
                             Text(text = "Team: ${teamData.team_name}")
                             Text(text = "Points: ${teamData.points_current}")
                         }
+                    }
+                }
+
+                if (news.isNotEmpty()) {
+                    item {
+                        Text(
+                            text = "Latest News",
+                            modifier = Modifier.padding(16.dp),
+                            style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
+                        )
+                    }
+                    items(news) { newsItem ->
+                        NewsCard(item = newsItem)
                     }
                 }
             }

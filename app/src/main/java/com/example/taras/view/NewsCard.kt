@@ -1,7 +1,6 @@
 package com.example.taras.view
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
@@ -15,7 +14,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.prof18.rssparser.model.RssItem
+import com.example.taras.rss.RssItem
+import androidx.core.net.toUri
 
 @Composable
 fun NewsCard(item: RssItem) {
@@ -27,7 +27,7 @@ fun NewsCard(item: RssItem) {
             .padding(8.dp)
             .clickable {
                 item.link?.let {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(it))
+                    val intent = Intent(Intent.ACTION_VIEW, it.toUri())
                     context.startActivity(intent)
                 }
             }

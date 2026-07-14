@@ -2,8 +2,8 @@ package com.example.taras.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taras.rss.RssItem
 import com.example.taras.rss.RssRepository
-import com.prof18.rssparser.model.RssItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

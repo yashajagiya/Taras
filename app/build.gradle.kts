@@ -57,8 +57,8 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.converter.gson)
-    implementation("com.prof18.rssparser:rssparser:6.0.6")
+    implementation("com.fleeksoft.ksoup:ksoup:0.2.6")
+    implementation("com.fleeksoft.ksoup:ksoup-network:0.2.6")
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
-    //implementation("de.jensklingenberg.ktorfit:ktorfit-lib:2.7.5")
 }

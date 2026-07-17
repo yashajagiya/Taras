@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,21 +20,29 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.MaterialTheme.shapes
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.taras.api.taras.model.DriverDetail
+import com.example.taras.api.taras.model.TeamsImageResponse
 import com.example.taras.common.UiState
+import com.example.taras.rss.RssItem
 import com.example.taras.ui.theme.TarasTheme
 import com.example.taras.viewmodel.DriversViewModel
 import com.example.taras.viewmodel.TeamsViewModel
@@ -101,7 +110,7 @@ class MainActivity : ComponentActivity() {
                                         .padding(horizontal = 16.dp, vertical = 8.dp),
                                     colors = CardDefaults.cardColors(containerColor = driverColor),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                                    shape = androidx.compose.material3.MaterialTheme.shapes.medium
+                                    shape = shapes.medium
 
                                 ) {
                                     Row(
@@ -116,9 +125,11 @@ class MainActivity : ComponentActivity() {
                                             },
                                             contentDescription = null,
                                             modifier = Modifier
-                                                .height(150.dp)
-                                                .weight(1f),
-                                            contentScale = ContentScale.Fit,
+                                                .size(100.dp)
+                                                .clip(CircleShape)
+                                                .background(Color.White.copy(alpha = 0.2f)),
+                                            contentScale = ContentScale.Crop,
+                                            alignment = Alignment.TopCenter
                                         )
 
                                         Column(
@@ -128,11 +139,11 @@ class MainActivity : ComponentActivity() {
                                         ) {
                                             Text(
                                                 text = detail?.fullName ?: driverData.name,
-                                                style = androidx.compose.material3.MaterialTheme.typography.titleMedium
+                                                style = typography.titleMedium
                                             )
                                             Text(
                                                 text = detail?.teamName ?: driverData.teamName,
-                                                style = androidx.compose.material3.MaterialTheme.typography.bodySmall
+                                                style = typography.bodySmall
                                             )
                                             Row(
                                                 modifier = Modifier
@@ -142,11 +153,11 @@ class MainActivity : ComponentActivity() {
                                             ) {
                                                 Text(
                                                     text = "Pos: ${driverData.rank}",
-                                                    style = androidx.compose.material3.MaterialTheme.typography.labelLarge
+                                                    style = typography.labelLarge
                                                 )
                                                 Text(
                                                     text = "Pts: ${driverData.championshipPts.displayValue}",
-                                                    style = androidx.compose.material3.MaterialTheme.typography.labelLarge
+                                                    style = typography.labelLarge
                                                 )
                                             }
                                         }
@@ -209,7 +220,7 @@ class MainActivity : ComponentActivity() {
                                             containerColor = teamColor,
                                         ),
                                         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                                        shape = androidx.compose.material3.MaterialTheme.shapes.medium
+                                        shape = shapes.medium
                                     ) {
                                         Column(
                                             modifier = Modifier.padding(16.dp),
@@ -232,7 +243,7 @@ class MainActivity : ComponentActivity() {
                                                 Text(
                                                     text = teamData.team,
                                                     modifier = Modifier.padding(start = 8.dp),
-                                                    style = androidx.compose.material3.MaterialTheme.typography.titleMedium
+                                                    style = typography.titleMedium
                                                 )
                                             }
 
@@ -273,7 +284,7 @@ class MainActivity : ComponentActivity() {
                                     .height(200.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text("Loading Latest News...", style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
+                                Text("Loading Latest News...", style = typography.bodyMedium)
                             }
                         }
                     }
@@ -323,7 +334,7 @@ class MainActivity : ComponentActivity() {
                                         modifier = Modifier
                                             .background(
                                                 Color.Red.copy(alpha = 0.1f),
-                                                androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
+                                                RoundedCornerShape(4.dp)
                                             )
                                             .padding(horizontal = 6.dp, vertical = 2.dp)
                                     )
@@ -337,10 +348,25 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(bottom = 24.dp),
-                                    contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp),
+                                    contentPadding = PaddingValues(horizontal = 16.dp),
                                     pageSpacing = 12.dp
                                 ) { page ->
-                                    NewsCard(item = news[page])
+                                    val newsItem = news[page]
+                                    val defaultColor =colorScheme.surfaceVariant
+                                    
+                                    val driversList = (driverDetailsState as? UiState.Success)?.data ?: emptyList()
+                                    val teamsList = (teamsImagesState as? UiState.Success)?.data ?: emptyList()
+                                    
+                                    val newsColor = getNewsColor(
+                                        newsItem = newsItem,
+                                        drivers = driversList,
+                                        teams = teamsList,
+                                        defaultColor = defaultColor
+                                    )
+                                    NewsCard(
+                                        item = newsItem, 
+                                        containerColor = newsColor
+                                    )
                                 }
                             }
                         }
@@ -351,12 +377,69 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+fun getNewsColor(
+    newsItem: RssItem,
+    drivers: List<DriverDetail>,
+    teams: List<TeamsImageResponse>,
+    defaultColor: Color
+): Color {
+    val title = newsItem.title ?: ""
+    val description = newsItem.description ?: ""
+    val content = "$title $description"
+
+    // 1. Check for specific Team Names (High Priority)
+    val teamSpecialCases = mapOf(
+        "Mercedes" to "0x00D2BE",
+        "Ferrari" to "0xE10600",
+        "Red Bull" to "0x0600EF",
+        "McLaren" to "0xFF8700",
+        "Aston Martin" to "0x006F62",
+        "Alpine" to "0x0090FF",
+        "Williams" to "0x005AFF",
+        "Haas" to "0xFFFFFF",
+        "Sauber" to "0x52E252",
+        "RB" to "0x6692FF",
+        "AlphaTauri" to "0x4E7C9B",
+        "Racing Bulls" to "0x6692FF"
+    )
+
+    for ((name, colorHex) in teamSpecialCases) {
+        if (content.contains(name, ignoreCase = true)) {
+            return colorHex.toComposeColor()
+        }
+    }
+
+    // 2. Check API Team names
+    for (team in teams) {
+        if (content.contains(team.teamName, ignoreCase = true)) {
+            return team.teamColor.toComposeColor()
+        }
+    }
+
+    // 3. Check for Drivers (Low Priority)
+    for (driver in drivers) {
+        val lastName = driver.lastName
+        val fullName = driver.fullName
+        if ((!lastName.isNullOrBlank() && content.contains(lastName, ignoreCase = true)) ||
+            (!fullName.isNullOrBlank() && content.contains(fullName, ignoreCase = true))
+        ) {
+            return driver.teamColour?.toComposeColor() ?: defaultColor
+        }
+    }
+
+    return defaultColor
+}
+
 fun String.toComposeColor(): Color {
     return try {
-        // Remove the "0x" prefix and parse as base-16
-        Color(this.removePrefix("0x").toLong(16))
+        val hex = this.removePrefix("0x").removePrefix("#")
+        val colorLong = when (hex.length) {
+            6 -> ("FF$hex").toLong(16) // Add alpha FF for 6-digit hex
+            8 -> hex.toLong(16)
+            else -> return Color.Transparent
+        }
+        Color(colorLong)
     } catch (e: Exception) {
-        // Fallback color in case of a parsing error (e.g., malformed string)
         Color.Transparent
     }
 }

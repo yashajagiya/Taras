@@ -16,9 +16,9 @@ object NetworkModule {
         createRetrofit(ApiConstants.BASE_URL_OPEN_F1)
     }
 
-    val f1ApiDevRetrofit: Retrofit by lazy {
-        createRetrofit(ApiConstants.BASE_URL_F1_API_DEV)
-    }
+//    val f1ApiDevRetrofit: Retrofit by lazy {
+//        createRetrofit(ApiConstants.BASE_URL_F1_API_DEV)
+//    }
 
     val tarasGithubRetrofit: Retrofit by lazy {
         createRetrofit(ApiConstants.BASE_URL_TARAS_GITHUB)

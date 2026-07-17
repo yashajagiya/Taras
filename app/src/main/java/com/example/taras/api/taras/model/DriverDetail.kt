@@ -3,13 +3,15 @@ package com.example.taras.api.taras.model
 import com.google.gson.annotations.SerializedName
 
 data class DriverDetail(
-    @SerializedName("broadcast_name") val broadcastName: String,
-    @SerializedName("driver_number") val driverNumber: Int,
-    @SerializedName("first_name") val firstName: String,
-    @SerializedName("full_name") val fullName: String,
-    @SerializedName("headshot_url") val headshotUrl: String,
-    @SerializedName("last_name") val lastName: String,
-    @SerializedName("name_acronym") val nameAcronym: String,
-    @SerializedName("team_colour") val teamColor: String,
-    @SerializedName("team_name") val teamName: String
+    @SerializedName("driver_number") var driverNumber: Int? = null,
+    @SerializedName("broadcast_name") var broadcastName: String? = null,
+    @SerializedName("full_name") var fullName: String? = null,
+    @SerializedName("name_acronym") var nameAcronym: String? = null,
+    @SerializedName("team_name") var teamName: String? = null,
+    @SerializedName("team_colour") var teamColour: String? = null,
+    @SerializedName("first_name") var firstName: String? = null,
+    @SerializedName("last_name") var lastName: String? = null,
+    @SerializedName("headshot_url") var headshotUrl: String? = null,
+    @SerializedName("racing_number_mask") var racingNumberMask: String? = null
+
 )

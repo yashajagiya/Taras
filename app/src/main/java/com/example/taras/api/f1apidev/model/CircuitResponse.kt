@@ -7,7 +7,7 @@ data class CircuitResponse(
     val championship: Championship,
     val limit: Int,
     val offset: Int,
-    val races: List<Race>,
+    val races: List<CircuitRace>,
     val season: Int,
     val total: Int,
     val url: String
@@ -18,7 +18,7 @@ data class Championship(
     val name: String
 )
 
-data class Race(
+data class CircuitRace(
     val championshipId: String,
     val circuit: Circuit,
     @SerializedName("fast_lap") val fastLap: FastLap,

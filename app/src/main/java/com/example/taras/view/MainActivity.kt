@@ -20,7 +20,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.taras.common.UiState
 import com.example.taras.ui.theme.TarasTheme
 import com.example.taras.viewmodel.DriversViewModel
 import com.example.taras.viewmodel.TeamsViewModel
@@ -33,14 +35,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val driversViewModel: DriversViewModel = DriversViewModel()
-            val teamsViewModel: TeamsViewModel = TeamsViewModel()
-            val newsViewModel: NewsViewModel = NewsViewModel()
+            val driversViewModel: DriversViewModel = viewModel()
+            val teamsViewModel: TeamsViewModel = viewModel()
+            val newsViewModel: NewsViewModel = viewModel()
 
-            val drivers by driversViewModel.drivers.collectAsState()
-            val teams by teamsViewModel.teams.collectAsState()
-            val driverDetails by driversViewModel.driverDetails.collectAsState()
-            val news by newsViewModel.news.collectAsState()
+            val driversState by driversViewModel.drivers.collectAsState()
+            val teamsState by teamsViewModel.teams.collectAsState()
+            val driverDetailsState by driversViewModel.driverDetails.collectAsState()
+            val newsState by newsViewModel.news.collectAsState()
 
             TarasTheme {
             }
@@ -51,73 +53,101 @@ class MainActivity : ComponentActivity() {
                     .padding(top = 48.dp)
             ) {
 
-                if (drivers.isEmpty()) {
-                    item {
-                        Text(
-                            text = "No Details Found",
-                            modifier = Modifier.padding(16.dp)
-                        )
+                when (driversState) {
+                    is UiState.Loading -> {
+                        item { Text("Loading Drivers...", modifier = Modifier.padding(16.dp)) }
                     }
-                } else {
-                    items(drivers) { driverData ->
-                        val detail =
-                            driverDetails.find { it.driverNumber == driverData.driverNumber }
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                        ) {
-                            Row() {
-
-                                AsyncImage(model = detail?.headshotUrl,
-                                    contentDescription = null,
+                    is UiState.Error -> {
+                        item { Text("Something went wrong with drivers", modifier = Modifier.padding(16.dp)) }
+                    }
+                    is UiState.Success -> {
+                        val drivers = (driversState as UiState.Success).data
+                        if (drivers.isEmpty()) {
+                            item { Text("No Drivers Found", modifier = Modifier.padding(16.dp)) }
+                        } else {
+                            items(drivers) { driverData ->
+                                val detail = (driverDetailsState as? UiState.Success)?.data?.find { it.driverNumber == driverData.driverNumber }
+                                Card(
                                     modifier = Modifier
-                                        .height(70.dp),
-                                    contentScale = ContentScale.Fit,
-                                    alignment = Alignment.Center
-                                    )
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                                ) {
+                                    Row() {
+                                        AsyncImage(
+                                            model = if (detail?.headshotUrl.isNullOrEmpty()) {
+                                                "https://f1tv.formula1.com/static/favicon.ico"
+                                            } else {
+                                                detail.headshotUrl
+                                            },
+                                            contentDescription = null,
+                                            modifier = Modifier.height(70.dp),
+                                            contentScale = ContentScale.Fit,
+                                            alignment = Alignment.Center
+                                        )
 
-                                Column(modifier = Modifier.padding(16.dp)) {
-                                    Text(text = "Position: ${driverData.positionCurrent}")
-                                    Text(text = "Number: ${driverData.driverNumber}")
-                                    Text(text = "Name: ${detail?.fullName ?: "Api Problem"}")
-                                    Text(text = "Points: ${driverData.pointsCurrent}")
+                                        Column(modifier = Modifier.padding(16.dp)) {
+                                            Text(text = "Position: ${driverData.positionCurrent}")
+                                            Text(text = "Number: ${driverData.driverNumber}")
+                                            Text(text = "Name: ${detail?.fullName ?: "Api Problem"}")
+                                            Text(text = "Points: ${driverData.pointsCurrent}")
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                if (teams.isEmpty()) {
-                    item {
-                        Text(
-                            text = "No Details Found",
-                            modifier = Modifier.padding(16.dp)
-                        )
+
+                when (teamsState) {
+                    is UiState.Loading -> {
+                        item { Text("Loading Teams...", modifier = Modifier.padding(16.dp)) }
                     }
-                } else {
-                    items(teams) { teamData ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                        ) {
-                            Text(text = "Position: ${teamData.positionCurrent}")
-                            Text(text = "Team: ${teamData.teamName}")
-                            Text(text = "Points: ${teamData.pointsCurrent}")
+                    is UiState.Error -> {
+                        item { Text("Something went wrong with teams", modifier = Modifier.padding(16.dp)) }
+                    }
+                    is UiState.Success -> {
+                        val teams = (teamsState as UiState.Success).data
+                        if (teams.isEmpty()) {
+                            item { Text("No Teams Found", modifier = Modifier.padding(16.dp)) }
+                        } else {
+                            items(teams) { teamData ->
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                                ) {
+                                    Column(modifier = Modifier.padding(16.dp)) {
+                                        Text(text = "Position: ${teamData.positionCurrent}")
+                                        Text(text = "Team: ${teamData.teamName}")
+                                        Text(text = "Points: ${teamData.pointsCurrent}")
+                                    }
+                                }
+                            }
                         }
                     }
                 }
 
-                if (news.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "Latest News",
-                            modifier = Modifier.padding(16.dp),
-                            style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
-                        )
+                when (newsState) {
+                    is UiState.Loading -> {
+                        item { Text("Loading News...", modifier = Modifier.padding(16.dp)) }
                     }
-                    items(news) { newsItem ->
-                        NewsCard(item = newsItem)
+                    is UiState.Error -> {
+                        item { Text("Something went wrong with news", modifier = Modifier.padding(16.dp)) }
+                    }
+                    is UiState.Success -> {
+                        val news = (newsState as UiState.Success).data
+                        if (news.isNotEmpty()) {
+                            item {
+                                Text(
+                                    text = "Latest News",
+                                    modifier = Modifier.padding(16.dp),
+                                    style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
+                                )
+                            }
+                            items(news) { newsItem ->
+                                NewsCard(item = newsItem)
+                            }
+                        }
                     }
                 }
             }

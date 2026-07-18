@@ -1,7 +1,9 @@
 package com.example.taras.api.f1apidev.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class CircuitResponse(
     val api: String,
     val championship: Championship,
@@ -13,15 +15,17 @@ data class CircuitResponse(
     val url: String
 )
 
+@Serializable
 data class Championship(
     val id: String,
     val name: String
 )
 
+@Serializable
 data class CircuitRace(
     val championshipId: String,
     val circuit: Circuit,
-    @SerializedName("fast_lap") val fastLap: FastLap,
+    @SerialName("fast_lap") val fastLap: FastLap,
     val laps: Int,
     val raceId: String,
     val raceName: String,
@@ -32,18 +36,21 @@ data class CircuitRace(
     val winner: Winner?
 )
 
+@Serializable
 data class Circuit(
     val id: String,
     val name: String,
     val url: String
 )
 
+@Serializable
 data class FastLap(
     val driver: String,
     val lap: String,
     val time: String
 )
 
+@Serializable
 data class Schedule(
     val fp1: String,
     val fp2: String,
@@ -54,12 +61,14 @@ data class Schedule(
     val sprintRace: String?
 )
 
+@Serializable
 data class TeamWinner(
     val id: String,
     val name: String,
     val url: String
 )
 
+@Serializable
 data class Winner(
     val id: String,
     val name: String,

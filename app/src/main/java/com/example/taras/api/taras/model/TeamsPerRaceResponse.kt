@@ -1,11 +1,15 @@
 package com.example.taras.api.taras.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class TeamsPerRaceResponse(
     val displayName: String,
     val season: String,
     val entries: List<TeamsEntry>,
 )
 
+@Serializable
 data class TeamsEntry(
     val rank: Int,
     val team: String,
@@ -13,11 +17,13 @@ data class TeamsEntry(
     val races: List<Racedata>,
 )
 
+@Serializable
 data class Points(
     val value: Int,
     val displayValue: String,
 )
 
+@Serializable
 data class Racedata(
     val name: String,
     val displayName: String,

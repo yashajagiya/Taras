@@ -1,15 +1,17 @@
 package com.example.taras.api.taras.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RacesImageResponse(
 
-    @SerializedName("race_name")
+    @SerialName("race_name")
     val raceName: String,
-    @SerializedName("circuit_id")
+    @SerialName("circuit_id")
     val circuitId: String,
     val country: String,
     val city: String,
-    @SerializedName("track_image")
+    @SerialName("track_image")
     val trackImage: String,
 )

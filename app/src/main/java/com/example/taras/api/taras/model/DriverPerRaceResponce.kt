@@ -1,32 +1,37 @@
 package com.example.taras.api.taras.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class DriverPerRaceResponce(
     val displayName: String,
     val season: String,
     val entries: List<DriverEntry>,
 )
 
+@Serializable
 data class DriverEntry(
     val rank: Int,
-    @SerializedName("driver_number")
+    @SerialName("driver_number")
     val driverNumber: Int,
     val name: String,
     val shortName: String,
     val abbreviation: String,
-    @SerializedName("team_name")
+    @SerialName("team_name")
     val teamName: String,
     val nationality: String,
     val championshipPts: ChampionshipPts,
     val races: List<DriverPerRace>,
 )
 
+@Serializable
 data class ChampionshipPts(
     val value: Int,
     val displayValue: String,
 )
 
+@Serializable
 data class DriverPerRace(
     val name: String,
     val displayName: String,

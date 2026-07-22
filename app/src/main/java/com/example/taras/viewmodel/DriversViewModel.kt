@@ -3,19 +3,25 @@ package com.example.taras.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.taras.api.NetworkModule
+import com.example.taras.network_calls.NetworkModule
 //import com.example.taras.api.openf1.OpenF1Service
 //import com.example.taras.api.openf1.model.DriverStanding
-import com.example.taras.api.taras.TarasDataService
-import com.example.taras.api.taras.model.DriverDetail
-import com.example.taras.api.taras.model.DriverPerRaceResponce
-import com.example.taras.common.UiState
+import com.example.taras.network_calls.taras.TarasDataService
+import com.example.taras.network_calls.taras.model.DriverDetail
+import com.example.taras.network_calls.taras.model.DriverPerRaceResponce
+import com.example.taras.core.common.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import kotlin.time.Duration.Companion.milliseconds
 
 class DriversViewModel : ViewModel() {
     private val logTag = "DriversViewModel"
@@ -41,13 +47,49 @@ class DriversViewModel : ViewModel() {
     private val _driverDetails = MutableStateFlow<UiState<List<DriverDetail>>>(UiState.Loading)
     val driverDetails = _driverDetails.asStateFlow()
 
+    val combinedDrivers = combine(_drivers, _driverDetails) { driversState, detailsState ->
+        if (driversState is UiState.Success && detailsState is UiState.Success) {
+            val drivers = driversState.data.entries
+            val details = detailsState.data
+            val combined = drivers.map { driver ->
+                val detail = details.find { it.driverNumber == driver.driverNumber }
+                DriverUiModel(
+                    driverNumber = driver.driverNumber,
+                    rank = driver.rank,
+                    name = driver.name,
+                    teamName = detail?.teamName ?: driver.teamName,
+                    points = driver.championshipPts.displayValue,
+                    teamColor = detail?.teamColour,
+                    headshotUrl = detail?.headshotUrl,
+                    carNumberImage = detail?.racingNumberMask,
+                    fullName = detail?.fullName,
+                    nationality = driver.nationality
+                )
+            }
+            UiState.Success(combined)
+        } else if (driversState is UiState.Error || detailsState is UiState.Error) {
+            UiState.Error("Something went wrong")
+        } else {
+            UiState.Loading
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
+
+    val topthree = combinedDrivers.map { state ->
+        if (state is UiState.Success) {
+            UiState.Success(state.data.take(3))
+        } else {
+            state
+        }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
+
     init {
         fetchDriverData()
     }
 
-    private fun fetchDriverData() {
+    fun fetchDriverData() {
         viewModelScope.launch {
             _drivers.value = UiState.Loading
+            delay(1000.milliseconds)
 
 
             //  _driverDetails.value = UiState.Loading
@@ -102,5 +144,20 @@ class DriversViewModel : ViewModel() {
                 _driverDetails.value = UiState.Error("Something went wrong")
             }
         }
+
     }
 }
+
+
+data class DriverUiModel(
+    val driverNumber: Int,
+    val rank: Int,
+    val name: String,
+    val teamName: String,
+    val points: String,
+    val teamColor: String?,
+    val headshotUrl: String?,
+    val carNumberImage: String?,
+    val fullName: String?,
+    val nationality: String
+)

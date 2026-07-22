@@ -3,11 +3,17 @@
   <component name="PlanningModeManager">
     <option name="approvalStates">
       <map>
+        <entry key="06b2406b-7d62-40fe-b163-def0dcd315a6" value="false" />
         <entry key="20260714-013232-065b05ca-d586-4365-a968-e503d8b121db" value="true" />
         <entry key="20260714-232946-555b533c-760c-4485-bc0f-775b0e0484e3" value="true" />
         <entry key="20260717-012151-60b35d41-913f-4e3f-b41d-edc7cf901b8f" value="true" />
+        <entry key="399039ff-7208-4c0c-b81a-a05b24c6340f" value="false" />
         <entry key="3ca483e1-4f9a-426f-a159-da326ad4943a" value="false" />
         <entry key="776bdba3-eb53-41ee-8dec-82e78a06fce3" value="false" />
+        <entry key="b07099f6-3f3f-42c8-b3e2-f0d953e06b08" value="false" />
+        <entry key="c50cc117-0714-49b7-b112-c799ae4c4d43" value="false" />
+        <entry key="c75358c2-ce62-4db5-b23b-a06ac1bc24de" value="false" />
+        <entry key="d266cad3-552b-455b-8b01-5288b1db153e" value="false" />
         <entry key="d7133a69-a715-4d7f-98b0-79d9e19b70a4" value="false" />
       </map>
     </option>

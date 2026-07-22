@@ -2,14 +2,16 @@ package com.example.taras.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.taras.common.UiState
-import com.example.taras.rss.RssItem
-import com.example.taras.rss.RssRepository
+import com.example.taras.core.common.UiState
+import com.example.taras.network_calls.rss.RssItem
+import com.example.taras.network_calls.rss.RssRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 class NewsViewModel : ViewModel() {
     private val rssRepository = RssRepository()
@@ -20,7 +22,7 @@ class NewsViewModel : ViewModel() {
         fetchNews()
     }
 
-    private fun fetchNews() {
+    fun fetchNews() {
         viewModelScope.launch (Dispatchers.IO){
             _news.value = UiState.Loading
             try {

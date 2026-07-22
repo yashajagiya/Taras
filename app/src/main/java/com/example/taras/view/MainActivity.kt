@@ -4,29 +4,24 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
-import com.example.taras.api.apiClass.ApiF1DataInterface
-import com.example.taras.api.apiClass.F1ApiObject
-import com.example.taras.api.dataclass.championship_Driver.DriverschampionshipDataClassItem
-import com.example.taras.api.dataclass.championship_Team.TeamsChampionshipDataClassItem
-import com.example.taras.api.dataclass.driverData.DriverDetailDataClassItem
+import com.example.taras.core.common.UiState
+import com.example.taras.navigation.MainNavRoutes
+import com.example.taras.navigation.NAV_BAR_PARAMETER
+import com.example.taras.navigation.Navigator
 import com.example.taras.ui.theme.TarasTheme
-import com.example.taras.viewmodel.F1DataViewModel
-import com.example.taras.viewmodel.NewsViewModel
+import com.example.taras.view.scaffold.navigation_compose.nav_main.MainNavBar
+import com.example.taras.view.scaffold.navigation_compose.nav_main.MainNavHost
+import com.example.taras.view.scaffold.navigation_compose.nav_main.rememberNavigationState
+import com.example.taras.view.scaffold.topbar.topbarCompose
+
 
 class MainActivity : ComponentActivity() {
 
@@ -35,79 +30,108 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val f1ViewModel: F1DataViewModel = F1DataViewModel()
-            val newsViewModel: NewsViewModel = NewsViewModel()
-            val drivers by f1ViewModel.drivers.collectAsState()
-            val teams by f1ViewModel.teams.collectAsState()
-            val driverDetails by f1ViewModel.driverdetail.collectAsState()
-            val news by newsViewModel.news.collectAsState()
+            val navigationState = rememberNavigationState(
+                startRoute = MainNavRoutes.Paddock,
+                topLevelRoutes = NAV_BAR_PARAMETER.keys
+            )
+            val navigator = remember { Navigator(navigationState) }
 
             TarasTheme {
-            }
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    topBar = { topbarCompose() },
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 48.dp)
-            ) {
+                    bottomBar = {
+                        MainNavBar(
+                            selectedItem = navigationState.topLevelRoute,
+                            onSelectedItem = { navigator.navigate(it) }
+                        )
 
-                if (drivers.isEmpty()) {
-                    item {
-                        Text(
-                            text = "No Details Found",
-                            modifier = Modifier.padding(16.dp)
-                        )
                     }
-                } else {
-                    items(drivers) { driverData ->
-                        val detail =
-                            driverDetails.find { it.driver_number == driverData.driver_number }
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                        ) {
-                            Text(text = "Position: ${driverData.position_current}")
-                            Text(text = "Number: ${driverData.driver_number}")
-                            Text(text = "Name: ${detail?.full_name ?: "Api Problem"}")
-                            Text(text = "Points: ${driverData.points_current}")
-                        }
-                    }
-                }
-                if (teams.isEmpty()) {
-                    item {
-                        Text(
-                            text = "No Details Found",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                } else {
-                    items(teams) { teamData ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                        ) {
-                            Text(text = "Position: ${teamData.position_current}")
-                            Text(text = "Team: ${teamData.team_name}")
-                            Text(text = "Points: ${teamData.points_current}")
-                        }
-                    }
-                }
 
-                if (news.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "Latest News",
-                            modifier = Modifier.padding(16.dp),
-                            style = androidx.compose.material3.MaterialTheme.typography.headlineSmall
-                        )
-                    }
-                    items(news) { newsItem ->
-                        NewsCard(item = newsItem)
+                ) { innerPadding ->
+
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)) {
+                        MainNavHost(navigationState, navigator)
                     }
                 }
             }
+
+
+//
+//                        is UiState.Success -> {
+//                            val news = (newsState as UiState.Success).data
+//                            if (news.isNotEmpty()) {
+//                                item {
+//                                    Row(
+//                                        modifier = Modifier
+//                                            .fillMaxWidth()
+//                                            .padding(horizontal = 16.dp, vertical = 12.dp),
+//                                        verticalAlignment = Alignment.CenterVertically
+//                                    ) {
+//                                        Text(
+//                                            text = "📰",
+//                                            modifier = Modifier.padding(end = 8.dp)
+//                                        )
+//                                        Text(
+//                                            text = "Latest News",
+//                                            style = typography.titleLarge,
+//                                            fontWeight = FontWeight.Bold
+//                                        )
+//                                        Spacer(modifier = Modifier.weight(1f))
+//                                        Text(
+//                                            text = "LIVE",
+//                                            color = Color.Red,
+//                                            style = typography.labelSmall,
+//                                            fontWeight = FontWeight.Bold,
+//                                            modifier = Modifier
+//                                                .background(
+//                                                    Color.Red.copy(alpha = 0.1f),
+//                                                    RoundedCornerShape(4.dp)
+//                                                )
+//                                                .padding(horizontal = 6.dp, vertical = 2.dp)
+//                                        )
+//                                    }
+//                                }
+//
+//                                item {
+//                                    val pagerState = rememberPagerState(pageCount = { news.size })
+//                                    HorizontalPager(
+//                                        state = pagerState,
+//                                        modifier = Modifier
+//                                            .fillMaxWidth()
+//                                            .padding(bottom = 24.dp),
+//                                        contentPadding = PaddingValues(horizontal = 16.dp),
+//                                        pageSpacing = 12.dp
+//                                    ) { page ->
+//                                        val newsItem = news[page]
+//                                        val defaultColor = colorScheme.surfaceVariant
+//
+//                                        val driversList =
+//                                            (driverDetailsState as? UiState.Success)?.data
+//                                                ?: emptyList()
+//                                        val teamsList = (teamsImagesState as? UiState.Success)?.data
+//                                            ?: emptyList()
+//
+//                                        val newsColor = getNewsColor(
+//                                            newsItem = newsItem,
+//                                            drivers = driversList,
+//                                            teams = teamsList,
+//                                            defaultColor = defaultColor
+//                                        )
+//                                        NewsCard(
+//                                            item = newsItem,
+//                                            containerColor = newsColor
+//                                        )
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
         }
     }
 }
+

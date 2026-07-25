@@ -9,10 +9,10 @@ import com.example.taras.navigation.MainNavRoutes
 import com.example.taras.navigation.Navigator
 import com.example.taras.view.scaffold.navigation_compose.nav_screens.CircitData
 import com.example.taras.view.scaffold.navigation_compose.nav_screens.DriverProfile
+import com.example.taras.view.scaffold.navigation_compose.nav_screens.NavPaddockScreen
 import com.example.taras.view.scaffold.navigation_compose.nav_screens.naveCalendarScreen
 import com.example.taras.view.scaffold.navigation_compose.nav_screens.NaveF1DriversScreen
 import com.example.taras.view.scaffold.navigation_compose.nav_screens.NaveGridScreen
-import com.example.taras.view.scaffold.navigation_compose.nav_screens.NavePaddockScreen
 
 @Composable
 fun MainNavHost(
@@ -26,7 +26,7 @@ fun MainNavHost(
         entries = navigationState.toEntries(
             entryProvider {
                 entry<MainNavRoutes.Paddock> {
-                    NavePaddockScreen()
+                    NavPaddockScreen()
                 }
                 entry<MainNavRoutes.Grid> {
                     NaveGridScreen()

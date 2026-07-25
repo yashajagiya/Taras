@@ -74,7 +74,7 @@ class DriversViewModel : ViewModel() {
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
 
-    val topthree = combinedDrivers.map { state ->
+    val topThree = combinedDrivers.map { state ->
         if (state is UiState.Success) {
             UiState.Success(state.data.take(3))
         } else {
@@ -93,7 +93,6 @@ class DriversViewModel : ViewModel() {
 
 
             //  _driverDetails.value = UiState.Loading
-
 
             try {
                 supervisorScope {

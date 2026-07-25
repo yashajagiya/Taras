@@ -30,7 +30,7 @@ import com.example.taras.viewmodel.DriversViewModel
 fun DriverProfile(drievrNumber: String) {
 
     val driversViewModel: DriversViewModel = viewModel()
-    val drivertopthrree by driversViewModel.topthree.collectAsStateWithLifecycle()
+    val drivertopthrree by driversViewModel.topThree.collectAsStateWithLifecycle()
     val driverDetailsState by driversViewModel.driverDetails.collectAsStateWithLifecycle()
 
     var isRefreshing by remember { mutableStateOf(false) }

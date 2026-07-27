@@ -24,7 +24,10 @@ import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun CircitData(circitname: String) {
+fun CircuitData(
+    circuitName: String,
+    modifier: Modifier = Modifier
+) {
     var isRefreshing by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val pullToRefreshState = rememberPullToRefreshState()
@@ -52,7 +55,7 @@ fun CircitData(circitname: String) {
             color = Color.Transparent
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Text(text = "Circuit: $circitname")
+                Text(text = "Circuit: $circuitName")
             }
         }
     }

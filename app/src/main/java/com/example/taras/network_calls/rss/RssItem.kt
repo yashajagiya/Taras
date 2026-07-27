@@ -1,5 +1,8 @@
 package com.example.taras.network_calls.rss
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class RssItem(
     val title: String? = null,
     val link: String? = null,

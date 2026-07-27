@@ -1,7 +1,6 @@
 package com.example.taras.view.scaffold.navigation_compose.nav_screens
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -23,16 +22,45 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.taras.core.common.UiState
+import com.example.taras.network_calls.taras.model.DriverDetail
+import com.example.taras.viewmodel.DriverUiModel
 import com.example.taras.viewmodel.DriversViewModel
+import kotlinx.collections.immutable.ImmutableList
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class
+)
 @Composable
-fun DriverProfile(drievrNumber: String) {
-
-    val driversViewModel: DriversViewModel = viewModel()
+fun DriverProfile(
+    driverNumber: String,
+    modifier: Modifier = Modifier,
+    driversViewModel: DriversViewModel = viewModel()
+) {
     val drivertopthrree by driversViewModel.topThree.collectAsStateWithLifecycle()
     val driverDetailsState by driversViewModel.driverDetails.collectAsStateWithLifecycle()
 
+    DriverProfileContent(
+        driverNumber = driverNumber,
+        drivertopthrree = drivertopthrree,
+        driverDetailsState = driverDetailsState,
+        onRefresh = { driversViewModel.fetchDriverData() },
+        modifier
+    )
+}
+
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class
+)
+@Composable
+fun DriverProfileContent(
+    driverNumber: String,
+    drivertopthrree: UiState<ImmutableList<DriverUiModel>>,
+    driverDetailsState: UiState<ImmutableList<DriverDetail>>,
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     var isRefreshing by remember { mutableStateOf(false) }
     val pullToRefreshState = rememberPullToRefreshState()
 
@@ -46,7 +74,7 @@ fun DriverProfile(drievrNumber: String) {
         isRefreshing = isRefreshing,
         onRefresh = {
             isRefreshing = true
-            driversViewModel.fetchDriverData()
+            onRefresh()
         },
         state = pullToRefreshState,
         indicator = {
@@ -58,13 +86,14 @@ fun DriverProfile(drievrNumber: String) {
         }
     ) {
         Surface(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier,
             color = Color.Transparent
         ) {
             Box(contentAlignment = Alignment.Center) {
-
-                Text(text = "navigate to DriverProfile", modifier = Modifier.size(100.dp))
-
+                Text(
+                    text = "navigate to DriverProfile for $driverNumber",
+                    modifier = Modifier.size(100.dp)
+                )
             }
         }
     }

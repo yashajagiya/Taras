@@ -4,12 +4,14 @@ import androidx.compose.ui.graphics.Color
 import com.example.taras.network_calls.rss.RssItem
 import com.example.taras.network_calls.taras.model.DriverDetail
 import com.example.taras.network_calls.taras.model.TeamsImageResponse
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 fun getNewsColor(
     newsItem: RssItem,
     defaultColor: Color,
-    drivers: List<DriverDetail> = emptyList(),
-    teams: List<TeamsImageResponse> = emptyList()
+    drivers: ImmutableList<DriverDetail> = persistentListOf(),
+    teams: ImmutableList<TeamsImageResponse> = persistentListOf()
 ): Color {
     val title = newsItem.title ?: ""
     val description = newsItem.description ?: ""

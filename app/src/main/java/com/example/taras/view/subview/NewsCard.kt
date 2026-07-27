@@ -3,7 +3,6 @@ package com.example.taras.view.subview
 import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,7 +25,8 @@ import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import com.example.taras.core.common.UiState
 import com.example.taras.network_calls.rss.RssItem
-
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import androidx.compose.material3.CardDefaults
 import com.example.taras.core.helpercore.getNewsColor
 import com.example.taras.network_calls.taras.model.DriverDetail
@@ -35,10 +35,10 @@ import com.example.taras.network_calls.taras.model.TeamsImageResponse
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsCarousel(
-    newsState: UiState<List<RssItem>>,
+    newsState: UiState<ImmutableList<RssItem>>,
     modifier: Modifier = Modifier,
-    drivers: List<DriverDetail> = emptyList(),
-    teams: List<TeamsImageResponse> = emptyList()
+    drivers: ImmutableList<DriverDetail> = persistentListOf(),
+    teams: ImmutableList<TeamsImageResponse> = persistentListOf()
 ) {
     if (newsState !is UiState.Success) return
 
@@ -50,7 +50,6 @@ fun NewsCarousel(
         state = carouselState,
         preferredItemWidth = 320.dp,
         itemSpacing = 16.dp,
-       // contentPadding = PaddingValues(horizontal = 16.dp),
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
@@ -100,14 +99,6 @@ fun NewsCarousel(
                         overflow = TextOverflow.Ellipsis,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-//                    item.pubDate?.let {
-//                        Spacer(modifier = Modifier.height(8.dp))
-//                        Text(
-//                            text = it,
-//                            style = MaterialTheme.typography.labelSmall,
-//                            color = MaterialTheme.colorScheme.primary
-//                        )
-//                    }
                 }
             }
         }

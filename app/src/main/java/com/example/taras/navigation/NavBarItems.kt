@@ -5,28 +5,30 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.collections.immutable.persistentMapOf
 
-data class NavBarPra(
+@Immutable
+data class NavBarItemData(
     val icon: ImageVector,
     val title: String
 )
 
 val NAV_BAR_PARAMETER = persistentMapOf(
-    MainNavRoutes.Paddock to NavBarPra(
+    MainNavRoutes.Paddock to NavBarItemData(
         icon = Icons.Default.Home,
         title = "Paddock"
     ),
-    MainNavRoutes.Grid to NavBarPra(
+    MainNavRoutes.Grid to NavBarItemData(
         icon = Icons.Default.GridView,
         title = "Grid"
     ),
-    MainNavRoutes.Calendar to NavBarPra(
+    MainNavRoutes.Calendar to NavBarItemData(
         icon = Icons.Default.CalendarMonth,
         title = "Calendar"
     ),
-    MainNavRoutes.F1drivers to NavBarPra(
+    MainNavRoutes.F1drivers to NavBarItemData(
         icon = Icons.Default.Person,
         title = "Drivers"
     )

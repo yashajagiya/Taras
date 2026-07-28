@@ -1,6 +1,8 @@
 package com.example.taras.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.taras.network_calls.NetworkModule
@@ -8,6 +10,8 @@ import com.example.taras.network_calls.taras.TarasDataService
 import com.example.taras.network_calls.taras.model.TeamsImageResponse
 import com.example.taras.network_calls.taras.model.TeamsPerRaceResponse
 import com.example.taras.core.common.UiState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -20,6 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlin.time.Duration.Companion.milliseconds
 
+@Stable
 class TeamsViewModel : ViewModel() {
     private val logTag = "TeamsViewModel"
 
@@ -35,7 +40,7 @@ class TeamsViewModel : ViewModel() {
     private val _teams = MutableStateFlow<UiState<TeamsPerRaceResponse>>(UiState.Loading)
     val teams = _teams.asStateFlow()
 
-    private val _teamsImage = MutableStateFlow<UiState<List<TeamsImageResponse>>>(UiState.Loading)
+    private val _teamsImage = MutableStateFlow<UiState<ImmutableList<TeamsImageResponse>>>(UiState.Loading)
     val teamsImage = _teamsImage.asStateFlow()
 
     val combinedTeams = combine(_teams, _teamsImage) { teamsState, imagesState ->
@@ -52,7 +57,7 @@ class TeamsViewModel : ViewModel() {
                     teamLogo = imageDetail?.teamLogo,
                     teamCar = imageDetail?.teamCar
                 )
-            }
+            }.toImmutableList()
             UiState.Success(combined)
         } else if (teamsState is UiState.Error || imagesState is UiState.Error) {
             UiState.Error("Something went wrong")
@@ -86,7 +91,7 @@ class TeamsViewModel : ViewModel() {
                     }
 
                     try {
-                        _teamsImage.value = UiState.Success(teamsImageDataDeferred.await())
+                        _teamsImage.value = UiState.Success(teamsImageDataDeferred.await().toImmutableList())
                     } catch (e: Exception) {
                         Log.e(logTag, "Error fetching teams images", e)
                         _teamsImage.value = UiState.Error("Something went wrong")
@@ -101,6 +106,7 @@ class TeamsViewModel : ViewModel() {
     }
 }
 
+@Immutable
 data class TeamUiModel(
     val teamName: String,
     val rank: Int,

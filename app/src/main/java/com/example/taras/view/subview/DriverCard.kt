@@ -28,11 +28,12 @@ import com.example.taras.viewmodel.DriverUiModel
 @Composable
 fun DriverCard(
     driver: DriverUiModel,
+    modifier: Modifier = Modifier,
 ) {
     val containerColor = driver.teamColor?.toComposeColor() ?: Color.White
-    
+
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),

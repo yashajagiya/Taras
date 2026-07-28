@@ -15,77 +15,76 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.taras.core.helpercore.toComposeColor
-import com.example.taras.network_calls.taras.model.TeamsEntry
-import com.example.taras.network_calls.taras.model.TeamsImageResponse
 import com.example.taras.viewmodel.TeamUiModel
 
 @Composable
 fun TeamCard(
     teamData: TeamUiModel,
 ) {
-    val containerColor= teamData.teamColor?.toComposeColor() ?: Color.Transparent
-    Row(
+    val containerColor = teamData.teamColor?.toComposeColor() ?: Color.Transparent
+
+    val contentColor = if (containerColor.luminance() > 0.5f) Color.Black else Color.White
+
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor,
+            contentColor = contentColor
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        shape = shapes.medium
     ) {
-        Card(
-            modifier = Modifier.weight(1f),
-            colors = CardDefaults.cardColors(
-                containerColor = containerColor,
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-            shape = shapes.medium
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AsyncImage(
-                        model = if (teamData.teamLogo.isNullOrEmpty()) {
-                            "https://f1tv.formula1.com/static/favicon.ico"
-                        } else {
-                            teamData.teamLogo
-                        },
-                        contentDescription = null,
-                        modifier = Modifier.height(40.dp),
-                        contentScale = ContentScale.Fit
-                    )
-                    Text(
-                        text = teamData.teamName,
-                        modifier = Modifier.padding(start = 8.dp),
-                        style = typography.titleMedium
-                    )
-                }
-
                 AsyncImage(
-                    model = if (teamData.teamCar.isNullOrEmpty()) {
-                        "https://f1tv.formula1.com/static/favicon.ico"
-                    } else {
-                        teamData.teamCar
-                    },
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp),
+                    model = teamData.teamLogo?.takeIf { it.isNotEmpty() }
+                        ?: "https://f1tv.formula1.com/static/favicon.ico",
+                    contentDescription = "${teamData.teamName} Logo",
+                    modifier = Modifier.height(40.dp),
                     contentScale = ContentScale.Fit
                 )
+                Text(
+                    text = teamData.teamName,
+                    modifier = Modifier.padding(start = 8.dp),
+                    style = typography.titleMedium
+                )
+            }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(text = "Pos: ${teamData.rank}")
-                    Text(text = "Pts: ${teamData.points}")
-                }
+            AsyncImage(
+                model = teamData.teamCar?.takeIf { it.isNotEmpty() }
+                    ?: "https://f1tv.formula1.com/static/favicon.ico",
+                contentDescription = "${teamData.teamName} Car",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp),
+                contentScale = ContentScale.Fit
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Pos: ${teamData.rank}",
+                    style = typography.labelLarge
+                )
+                Text(
+                    text = "Pts: ${teamData.points}",
+                    style = typography.labelLarge
+                )
             }
         }
     }

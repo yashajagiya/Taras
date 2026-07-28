@@ -14,4 +14,6 @@ data class RacesImageResponse(
     val city: String,
     @SerialName("track_image")
     val trackImage: String,
+    @SerialName("gp_name")
+    val gpName: String
 )

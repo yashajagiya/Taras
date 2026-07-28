@@ -1,57 +1,28 @@
 package com.example.taras.navigation
 
+import androidx.compose.runtime.Immutable
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
+@Immutable
 @Serializable
 sealed class MainNavRoutes : NavKey {
-    @Serializable
-    data object Paddock : MainNavRoutes() {
-//        override val icon = Icons.Default.Home
-//        override val title = "Paddock"
-    }
 
     @Serializable
-    data object Grid : MainNavRoutes() {
-//        override val icon = Icons.Default.GridView
-//        override val title = "Grid"
-    }
+    data object Paddock : MainNavRoutes()
 
     @Serializable
-    data object Calendar : MainNavRoutes() {
-//        override val icon = Icons.Default.CalendarMonth
-//        override val title = "Calendar"
-    }
+    data object Grid : MainNavRoutes()
 
     @Serializable
-    data object F1drivers : MainNavRoutes() {
-//        override val icon = Icons.Default.Person
-//        override val title = "Drivers"
-    }
-    @Serializable
-    data class Driversprofile(val id : String) : MainNavRoutes() {
-//        override val icon = Icons.Default.Person
-//        override val title = "Drivers"
-    }
-
+    data object Calendar : MainNavRoutes()
 
     @Serializable
-    data object GridDrivers : MainNavRoutes() {
+    data object F1drivers : MainNavRoutes()
 
-    }
     @Serializable
-    data object GridTeams : MainNavRoutes() {
+    data class DriverProfile(val driverNumber: String) : MainNavRoutes()
 
-    }
     @Serializable
-    data class CircitData(val name : String) : MainNavRoutes() {
-//        override val icon = Icons.Default.Person
-//        override val title = "Drivers"
-    }
-
-
-
-
-
+    data class CircuitData(val name: String) : MainNavRoutes()
 }
-

@@ -23,19 +23,20 @@ import com.example.taras.navigation.MainNavRoutes
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toPersistentMap
-import kotlinx.serialization.PolymorphicSerializer
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
+import kotlinx.serialization.modules.subclass
 
 @Stable
-class NavState(
-    val startRoute: NavKey,
-    topLevelRoute: MutableState<NavKey>,
-    val backStacks: ImmutableMap<NavKey, NavBackStack<NavKey>>
+class NavState<T : NavKey>(
+    val startRoute: T,
+    topLevelRoute: MutableState<T>,
+    val backStacks: ImmutableMap<T, NavBackStack<T>>
 ) {
     var topLevelRoute by topLevelRoute
 
-    val stackInUse: List<NavKey>
+    val stackInUse: List<T>
         get() = if (topLevelRoute == startRoute) {
             listOf(startRoute)
         } else {
@@ -43,27 +44,41 @@ class NavState(
         }
 }
 
+val serializerConfig = SavedStateConfiguration {
+    serializersModule = SerializersModule {
+        polymorphic(NavKey::class) {
+            subclass(MainNavRoutes.Paddock::class)
+            subclass(MainNavRoutes.Grid::class)
+            subclass(MainNavRoutes.Calendar::class)
+            subclass(MainNavRoutes.F1drivers::class)
+            subclass(MainNavRoutes.DriverProfile::class)
+            subclass(MainNavRoutes.CircuitData::class)
+        }
+    }
+}
+
 @Composable
-fun rememberNavigationState(
-    startRoute: NavKey,
-    topLevelRoutes: ImmutableSet<NavKey>
-): NavState {
+fun <T : NavKey> rememberNavigationState(
+    startRoute: T,
+    topLevelRoutes: ImmutableSet<T>,
+    serializer: KSerializer<T>
+): NavState<T> {
     val topLevelRoute = rememberSerializable(
         startRoute,
         topLevelRoutes,
         configuration = serializerConfig,
-        serializer = MutableStateSerializer(PolymorphicSerializer(NavKey::class))
+        serializer = MutableStateSerializer(serializer)
     ) {
         mutableStateOf(startRoute)
     }
 
-    val backStacks =
-        topLevelRoutes.associateWith { key ->
-            rememberNavBackStack(
-                configuration = serializerConfig,
-                key
-            )
-        }.toPersistentMap()
+    @Suppress("UNCHECKED_CAST")
+    val backStacks = topLevelRoutes.associateWith { key ->
+        rememberNavBackStack(
+            configuration = serializerConfig,
+            key
+        ) as NavBackStack<T>
+    }.toPersistentMap()
 
     return remember(startRoute, topLevelRoutes) {
         NavState(
@@ -74,29 +89,14 @@ fun rememberNavigationState(
     }
 }
 
-val serializerConfig = SavedStateConfiguration {
-    serializersModule = SerializersModule {
-        polymorphic(NavKey::class) {
-            subclass(MainNavRoutes.Paddock::class, MainNavRoutes.Paddock.serializer())
-            subclass(MainNavRoutes.Grid::class, MainNavRoutes.Grid.serializer())
-            subclass(MainNavRoutes.Calendar::class, MainNavRoutes.Calendar.serializer())
-            subclass(MainNavRoutes.F1drivers::class, MainNavRoutes.F1drivers.serializer())
-            subclass(MainNavRoutes.Driversprofile::class, MainNavRoutes.Driversprofile.serializer())
-//            subclass(MainNavRoutes.GridDrivers::class, MainNavRoutes.GridDrivers.serializer())
-            subclass(MainNavRoutes.GridTeams::class, MainNavRoutes.GridTeams.serializer())
-            subclass(MainNavRoutes.CircitData::class, MainNavRoutes.CircitData.serializer())
-        }
-    }
-}
-
 @Composable
-fun NavState.toEntries(
-    entryProvider: (NavKey) -> NavEntry<NavKey>
-): SnapshotStateList<NavEntry<NavKey>> {
-    val decoratedEntries = mutableMapOf<NavKey, List<NavEntry<NavKey>>>()
+fun <T : NavKey> NavState<T>.toEntries(
+    entryProvider: (T) -> NavEntry<T>
+): SnapshotStateList<NavEntry<T>> {
+    val decoratedEntries = mutableMapOf<T, List<NavEntry<T>>>()
     backStacks.forEach { (key, stack) ->
         val decoratedStack = listOf(
-            rememberSaveableStateHolderNavEntryDecorator<NavKey>(),
+            rememberSaveableStateHolderNavEntryDecorator<T>(),
             rememberViewModelStoreNavEntryDecorator()
         )
         decoratedEntries[key] = rememberDecoratedNavEntries(

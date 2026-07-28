@@ -1,15 +1,17 @@
 package com.example.taras.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.taras.network_calls.NetworkModule
-//import com.example.taras.api.openf1.OpenF1Service
-//import com.example.taras.api.openf1.model.DriverStanding
 import com.example.taras.network_calls.taras.TarasDataService
 import com.example.taras.network_calls.taras.model.DriverDetail
 import com.example.taras.network_calls.taras.model.DriverPerRaceResponce
 import com.example.taras.core.common.UiState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -23,10 +25,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlin.time.Duration.Companion.milliseconds
 
+@Stable
 class DriversViewModel : ViewModel() {
     private val logTag = "DriversViewModel"
 
-    // "//" is old code for openf1 api
+    // code for openf1 api
     // private val openF1Service = NetworkModule.openF1Retrofit.create(OpenF1Service::class.java)
 
     private val tarasDataService =
@@ -44,7 +47,7 @@ class DriversViewModel : ViewModel() {
 //    val driverDetails = _driverDetails.asStateFlow()
 
 
-    private val _driverDetails = MutableStateFlow<UiState<List<DriverDetail>>>(UiState.Loading)
+    private val _driverDetails = MutableStateFlow<UiState<ImmutableList<DriverDetail>>>(UiState.Loading)
     val driverDetails = _driverDetails.asStateFlow()
 
     val combinedDrivers = combine(_drivers, _driverDetails) { driversState, detailsState ->
@@ -65,22 +68,26 @@ class DriversViewModel : ViewModel() {
                     fullName = detail?.fullName,
                     nationality = driver.nationality
                 )
-            }
+            }.toImmutableList()
             UiState.Success(combined)
         } else if (driversState is UiState.Error || detailsState is UiState.Error) {
             UiState.Error("Something went wrong")
         } else {
             UiState.Loading
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
+    }.stateIn(viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        UiState.Loading)
 
     val topThree = combinedDrivers.map { state ->
         if (state is UiState.Success) {
-            UiState.Success(state.data.take(3))
+            UiState.Success(state.data.take(3).toImmutableList())
         } else {
             state
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
+    }.stateIn(viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        UiState.Loading)
 
     init {
         fetchDriverData()
@@ -91,16 +98,11 @@ class DriversViewModel : ViewModel() {
             _drivers.value = UiState.Loading
             delay(1000.milliseconds)
 
-
-            //  _driverDetails.value = UiState.Loading
-
             try {
                 supervisorScope {
 
-
                     //  val driversDeferred = async(Dispatchers.IO) { openF1Service.getDriverStandings() }
                     // val detailsDeferred = async(Dispatchers.IO) { tarasDataService.getDriverDetails() }
-
 
                     val driversDeferred =
                         async(Dispatchers.IO) { tarasDataService.getDriverStandings() }
@@ -115,7 +117,6 @@ class DriversViewModel : ViewModel() {
                         _drivers.value = UiState.Error("Something went wrong")
                     }
 
-
 //                    try {
 //                        _driverDetails.value = UiState.Success(detailsDeferred.await())
 //                    } catch (e: Exception) {
@@ -123,9 +124,8 @@ class DriversViewModel : ViewModel() {
 //                        _driverDetails.value = UiState.Error("Something went wrong")
 //                    }
 
-
                     try {
-                        _driverDetails.value = UiState.Success(detailsDeferred.await())
+                        _driverDetails.value = UiState.Success(detailsDeferred.await().toImmutableList())
                     } catch (e: Exception) {
                         Log.e(logTag, "Error fetching driver details API", e)
                         _driverDetails.value = UiState.Error("Something went wrong")
@@ -136,9 +136,7 @@ class DriversViewModel : ViewModel() {
                 Log.e(logTag, "Error in fetchDriverData", e)
                 _drivers.value = UiState.Error("Something went wrong")
 
-
                 // _driverDetails.value = UiState.Error("Something went wrong")
-
 
                 _driverDetails.value = UiState.Error("Something went wrong")
             }
@@ -148,6 +146,7 @@ class DriversViewModel : ViewModel() {
 }
 
 
+@Immutable
 data class DriverUiModel(
     val driverNumber: Int,
     val rank: Int,

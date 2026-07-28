@@ -27,7 +27,10 @@ import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun NaveF1DriversScreen(onDriverclick: (String) -> Unit) {
+fun NaveF1DriversScreen(
+    modifier: Modifier = Modifier,
+    onDriverClick: (String) -> Unit
+) {
     var isRefreshing by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val pullToRefreshState = rememberPullToRefreshState()
@@ -51,7 +54,7 @@ fun NaveF1DriversScreen(onDriverclick: (String) -> Unit) {
         }
     ) {
         Surface(
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             color = Color.Transparent
         ) {
             Box(contentAlignment = Alignment.Center) {

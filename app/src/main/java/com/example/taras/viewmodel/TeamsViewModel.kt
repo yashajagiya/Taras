@@ -44,9 +44,9 @@ class TeamsViewModel : ViewModel() {
     val teamsImage = _teamsImage.asStateFlow()
 
     val combinedTeams = combine(_teams, _teamsImage) { teamsState, imagesState ->
-        if (teamsState is UiState.Success && imagesState is UiState.Success) {
+        if (teamsState is UiState.Success) {
             val teams = teamsState.data.entries
-            val images = imagesState.data
+            val images = (imagesState as? UiState.Success)?.data ?: emptyList()
             val combined = teams.map { teamEntry ->
                 val imageDetail = images.find { it.teamName.equals(teamEntry.team, ignoreCase = true) }
                 TeamUiModel(
@@ -74,7 +74,7 @@ class TeamsViewModel : ViewModel() {
         viewModelScope.launch {
             _teams.value = UiState.Loading
             _teamsImage.value = UiState.Loading
-            delay(2000.milliseconds)
+            delay(1000.milliseconds)
 
             try {
                 supervisorScope {

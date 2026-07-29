@@ -51,9 +51,9 @@ class DriversViewModel : ViewModel() {
     val driverDetails = _driverDetails.asStateFlow()
 
     val combinedDrivers = combine(_drivers, _driverDetails) { driversState, detailsState ->
-        if (driversState is UiState.Success && detailsState is UiState.Success) {
+        if (driversState is UiState.Success) {
             val drivers = driversState.data.entries
-            val details = detailsState.data
+            val details = (detailsState as? UiState.Success)?.data ?: emptyList()
             val combined = drivers.map { driver ->
                 val detail = details.find { it.driverNumber == driver.driverNumber }
                 DriverUiModel(
@@ -96,6 +96,7 @@ class DriversViewModel : ViewModel() {
     fun fetchDriverData() {
         viewModelScope.launch {
             _drivers.value = UiState.Loading
+            _driverDetails.value = UiState.Loading
             delay(1000.milliseconds)
 
             try {

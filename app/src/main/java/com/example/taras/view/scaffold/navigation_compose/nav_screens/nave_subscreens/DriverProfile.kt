@@ -1,4 +1,4 @@
-package com.example.taras.view.scaffold.navigation_compose.nav_screens
+package com.example.taras.view.scaffold.navigation_compose.nav_screens.nave_subscreens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size

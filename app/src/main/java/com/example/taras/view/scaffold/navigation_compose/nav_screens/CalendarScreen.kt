@@ -76,8 +76,7 @@ fun CalanderComposble(
         val pullToRefreshState = rememberPullToRefreshState()
 
         LaunchedEffect(racesState) {
-            if (racesState !is UiState.Loading && racesCurrentState == null
-            ) {
+            if (racesState !is UiState.Loading) {
                 isRefreshing = false
             }
         }
@@ -91,18 +90,20 @@ fun CalanderComposble(
             },
             state = pullToRefreshState,
             indicator = {
-                PullToRefreshDefaults.LoadingIndicator(
-                    state = pullToRefreshState,
-                    isRefreshing = isRefreshing,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
+                if (!isRefreshing) {
+                    PullToRefreshDefaults.LoadingIndicator(
+                        state = pullToRefreshState,
+                        isRefreshing = false,
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
+                }
             }
         ) {
             Surface(color = Color.Transparent) {
                 val isAnyLoading = racesState is UiState.Loading
                 val isAnyError = racesState is UiState.Error
 
-                if (isAnyLoading && !isRefreshing) {
+                if (isAnyLoading) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,

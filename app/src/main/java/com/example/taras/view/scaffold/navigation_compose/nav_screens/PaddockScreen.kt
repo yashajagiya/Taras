@@ -113,11 +113,13 @@ fun PaddockContent(
             },
             state = pullToRefreshState,
             indicator = {
-                PullToRefreshDefaults.LoadingIndicator(
-                    state = pullToRefreshState,
-                    isRefreshing = isRefreshing,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
+                if (!isRefreshing) {
+                    PullToRefreshDefaults.LoadingIndicator(
+                        state = pullToRefreshState,
+                        isRefreshing = false,
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
+                }
             }
         ) {
             Surface(
@@ -134,7 +136,7 @@ fun PaddockContent(
                         raceCurrentState is UiState.Error ||
                         teamsImage is UiState.Error
 
-                if (isAnyLoading && !isRefreshing && !isAnyError) {
+                if (isAnyLoading && !isAnyError) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -354,6 +356,21 @@ fun PaddockContent(
                                     RunnerUpDriverCard(driver = p3Driver, positionLabel = "P3")
                                 }
                             }
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                modifier = Modifier.padding(
+                                    start = 16.dp,
+                                    top = 16.dp,
+                                    end = 16.dp
+                                ),
+                                text = "Latest from the Paddock....",
+                                color = Color.Black,
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 2
+                            )
                         }
 
                         item {

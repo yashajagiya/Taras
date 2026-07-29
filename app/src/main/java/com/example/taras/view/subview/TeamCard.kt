@@ -1,5 +1,6 @@
 package com.example.taras.view.subview
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,14 +26,17 @@ import com.example.taras.viewmodel.TeamUiModel
 @Composable
 fun TeamCard(
     teamData: TeamUiModel,
+    onDriverClick: (String) -> Unit,
+    modifier: Modifier.Companion,
 ) {
     val containerColor = teamData.teamColor?.toComposeColor() ?: Color.Transparent
 
     val contentColor = if (containerColor.luminance() > 0.5f) Color.Black else Color.White
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
+            .clickable{onDriverClick(teamData.teamName)}
             .padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = containerColor,
@@ -42,23 +46,23 @@ fun TeamCard(
         shape = shapes.medium
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AsyncImage(
                     model = teamData.teamLogo?.takeIf { it.isNotEmpty() }
                         ?: "https://f1tv.formula1.com/static/favicon.ico",
                     contentDescription = "${teamData.teamName} Logo",
-                    modifier = Modifier.height(40.dp),
+                    modifier = modifier.height(40.dp),
                     contentScale = ContentScale.Fit
                 )
                 Text(
                     text = teamData.teamName,
-                    modifier = Modifier.padding(start = 8.dp),
+                    modifier = modifier.padding(start = 8.dp),
                     style = typography.titleMedium
                 )
             }
@@ -67,14 +71,14 @@ fun TeamCard(
                 model = teamData.teamCar?.takeIf { it.isNotEmpty() }
                     ?: "https://f1tv.formula1.com/static/favicon.ico",
                 contentDescription = "${teamData.teamName} Car",
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .height(100.dp),
                 contentScale = ContentScale.Fit
             )
 
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(

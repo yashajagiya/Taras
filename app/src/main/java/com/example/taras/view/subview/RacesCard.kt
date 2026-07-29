@@ -63,7 +63,7 @@ fun RacesCards(
 
     LaunchedEffect(currentIndex) {
         if (currentIndex > 0) {
-            listState.animateScrollToItem(
+            listState.scrollToItem(
                 index = currentIndex, scrollOffset = -80
             )
         }
@@ -268,20 +268,22 @@ fun CurrentRaceExtended(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+        border = BorderStroke(
+            2.dp,
+            MaterialTheme.colorScheme.primary
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = RoundedCornerShape(28.dp)
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
-            // Background Track Image
             AsyncImage(
                 model = race.trackImage.ifEmpty { "https://f1tv.formula1.com/static/favicon.ico" },
-                contentDescription = null,
+                contentDescription = "map",
                 modifier = Modifier
                     .matchParentSize()
                     .padding(24.dp),
                 contentScale = ContentScale.Fit,
-                alpha = 0.15f
+                alpha = 0.1f
             )
 
             Column(
@@ -354,8 +356,8 @@ fun CurrentRaceExtended(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
+                Row(                    modifier = Modifier.fillMaxWidth(),
+
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Bottom
                 ) {
@@ -373,8 +375,6 @@ fun CurrentRaceExtended(
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-
-                    // Quick Stats/Action Placeholder
                     Card(
                         shape = CircleShape,
                         colors = CardDefaults.cardColors(
@@ -396,17 +396,17 @@ fun CurrentRaceExtended(
 }
 
 
-@Composable
-fun WeekendSchedule(modifier: Modifier = Modifier) {
-    Card(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier.padding(16.dp)) { // Added padding so text doesn't hit edges
-            Text(
-                text = "CHAMPIONSHIP",
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.sp
-            )
-        }
-    }
-}
+        //@Composable
+        //fun WeekendSchedule(modifier: Modifier = Modifier) {
+        //    Card(modifier = modifier.fillMaxSize()) {
+        //        Column(modifier = Modifier.padding(16.dp)) { // Added padding so text doesn't hit edges
+        //            Text(
+        //                text = "CHAMPIONSHIP",
+        //                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+        //                style = MaterialTheme.typography.labelSmall,
+        //                fontWeight = FontWeight.Bold,
+        //                letterSpacing = 1.sp
+        //            )
+        //        }
+        //    }
+        //}

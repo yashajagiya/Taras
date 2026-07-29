@@ -51,6 +51,7 @@ import kotlinx.collections.immutable.ImmutableList
 )
 @Composable
 fun NaveGridScreen(
+    onDriverClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     driversViewModel: DriversViewModel = viewModel(),
     teamsViewModel: TeamsViewModel = viewModel()
@@ -65,6 +66,7 @@ fun NaveGridScreen(
             driversViewModel.fetchDriverData()
             teamsViewModel.fetchTeams()
         },
+        onDriverClick,
         modifier = modifier
     )
 }
@@ -78,6 +80,7 @@ fun GridContent(
     driversState: UiState<ImmutableList<DriverUiModel>>,
     teamsState: UiState<ImmutableList<TeamUiModel>>,
     onRefresh: () -> Unit,
+    onDriverClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -176,7 +179,11 @@ fun GridContent(
                                                 items = drivers,
                                                 key = { it.driverNumber }
                                             ) { driver ->
-                                                DriverCard(driver = driver)
+                                                DriverCard(
+                                                    driver = driver,
+                                                    onDriverClick,
+                                                    modifier = Modifier
+                                                )
                                             }
                                         }
                                     }
@@ -229,7 +236,11 @@ fun GridContent(
                                                 items = teamsResponse,
                                                 key = { it.teamName }
                                             ) { teamData ->
-                                                TeamCard(teamData = teamData)
+                                                TeamCard(
+                                                    teamData = teamData,
+                                                    onDriverClick,
+                                                    modifier = Modifier
+                                                )
                                             }
                                         }
                                     }

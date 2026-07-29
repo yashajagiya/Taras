@@ -18,11 +18,14 @@ sealed class MainNavRoutes : NavKey {
     data object Calendar : MainNavRoutes()
 
     @Serializable
-    data object F1drivers : MainNavRoutes()
+    data object Result : MainNavRoutes()
 
     @Serializable
-    data class DriverProfile(val driverNumber: String) : MainNavRoutes()
+    data class DriverProfile(val numberOrName: String) : MainNavRoutes()
 
     @Serializable
     data class CircuitData(val name: String) : MainNavRoutes()
-}
+
+
+    @Serializable
+    data class TeamsData(val numberOrName: String) : MainNavRoutes()}

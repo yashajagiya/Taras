@@ -1,6 +1,7 @@
 package com.example.taras.view.subview
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +29,7 @@ import com.example.taras.viewmodel.DriverUiModel
 @Composable
 fun DriverCard(
     driver: DriverUiModel,
+    onDriverClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val containerColor = driver.teamColor?.toComposeColor() ?: Color.White
@@ -35,6 +37,7 @@ fun DriverCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .clickable{onDriverClick(driver.driverNumber.toString())}
             .padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),

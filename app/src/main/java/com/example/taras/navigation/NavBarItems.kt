@@ -2,9 +2,9 @@ package com.example.taras.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.collections.immutable.persistentMapOf
@@ -28,8 +28,8 @@ val NAV_BAR_PARAMETER = persistentMapOf(
         icon = Icons.Default.CalendarMonth,
         title = "Calendar"
     ),
-    MainNavRoutes.F1drivers to NavBarItemData(
-        icon = Icons.Default.Person,
-        title = "Drivers"
+    MainNavRoutes.Result to NavBarItemData(
+        icon = Icons.Default.DirectionsCar,
+        title = "Result"
     )
 )

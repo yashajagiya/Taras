@@ -50,9 +50,10 @@ val serializerConfig = SavedStateConfiguration {
             subclass(MainNavRoutes.Paddock::class)
             subclass(MainNavRoutes.Grid::class)
             subclass(MainNavRoutes.Calendar::class)
-            subclass(MainNavRoutes.F1drivers::class)
+            subclass(MainNavRoutes.Result::class)
             subclass(MainNavRoutes.DriverProfile::class)
             subclass(MainNavRoutes.CircuitData::class)
+            subclass(MainNavRoutes.TeamsData::class)
         }
     }
 }

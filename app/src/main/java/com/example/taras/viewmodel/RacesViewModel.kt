@@ -51,6 +51,7 @@ class RacesViewModel : ViewModel() {
         viewModelScope.launch {
             _races.value = UiState.Loading
             _racesImage.value = UiState.Loading
+            delay(1000.milliseconds)
 
             supervisorScope {
                 launch(Dispatchers.IO) {
@@ -77,9 +78,13 @@ class RacesViewModel : ViewModel() {
     }
 
     val combinedRaces = combine(_races, _racesImage) { racesState, racesImageState ->
-        if (racesState is UiState.Success && racesImageState is UiState.Success) {
+        if (racesState is UiState.Success) {
             val races = racesState.data.races
-            val imagesMap = racesImageState.data.associateBy { it.circuitId }
+            val imagesMap = if (racesImageState is UiState.Success) {
+                racesImageState.data.associateBy { it.circuitId }
+            } else {
+                emptyMap()
+            }
 
             val combine = races.map { race ->
                 val imageDetail = imagesMap[race.circuit.circuitId]

@@ -26,6 +26,9 @@ import coil3.compose.AsyncImage
 import com.example.taras.core.helpercore.toComposeColor
 import com.example.taras.viewmodel.DriverUiModel
 
+
+
+
 @Composable
 fun DriverCard(
     driver: DriverUiModel,

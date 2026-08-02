@@ -24,6 +24,10 @@ data class Hero(
     val teamColor: String,
     @SerialName("accessible_color")
     val accessibleColor: String,
+    @SerialName("team_car")
+    val teamCar: String,
+    @SerialName("team_logo")
+    val teamLogo: String
 )
 
 @Serializable

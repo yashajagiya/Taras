@@ -26,17 +26,17 @@ import com.example.taras.viewmodel.TeamUiModel
 @Composable
 fun TeamCard(
     teamData: TeamUiModel,
-    onDriverClick: (String) -> Unit,
-    modifier: Modifier.Companion,
+    onTeamClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val containerColor = teamData.teamColor?.toComposeColor() ?: Color.Transparent
 
     val contentColor = if (containerColor.luminance() > 0.5f) Color.Black else Color.White
 
     Card(
-        modifier = modifier
+        modifier
             .fillMaxWidth()
-            .clickable{onDriverClick(teamData.teamName)}
+            .clickable { onTeamClick(teamData.teamName) }
             .padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = containerColor,
@@ -46,23 +46,23 @@ fun TeamCard(
         shape = shapes.medium
     ) {
         Column(
-            modifier = modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
-                modifier = modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AsyncImage(
                     model = teamData.teamLogo?.takeIf { it.isNotEmpty() }
                         ?: "https://f1tv.formula1.com/static/favicon.ico",
                     contentDescription = "${teamData.teamName} Logo",
-                    modifier = modifier.height(40.dp),
+                    modifier = Modifier.height(40.dp),
                     contentScale = ContentScale.Fit
                 )
                 Text(
                     text = teamData.teamName,
-                    modifier = modifier.padding(start = 8.dp),
+                    modifier = Modifier.padding(start = 8.dp),
                     style = typography.titleMedium
                 )
             }
@@ -71,14 +71,14 @@ fun TeamCard(
                 model = teamData.teamCar?.takeIf { it.isNotEmpty() }
                     ?: "https://f1tv.formula1.com/static/favicon.ico",
                 contentDescription = "${teamData.teamName} Car",
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp),
                 contentScale = ContentScale.Fit
             )
 
             Row(
-                modifier = modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(

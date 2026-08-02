@@ -42,8 +42,11 @@ object ApiConstants {
     const val ENDPOINT_RACES_FP3 = "practice3/fp3_extracted.json"
 
     const val ENDPOINT_RACES_QUALIFYING = "qualifying/qualifying_results.json"
+
     const val ENDPOINT_RACES_RESULT = "race-result/race_results.json"
+
     const val ENDPOINT_DRIVERS_DATA = "f1Info/drivers_data.json"
+
     const val ENDPOINT_TEAMS_DATA = "f1Info/teams_data.json"
 
   //  const val ENDPOINT_RACES_SPRINT_QUALIFYING = "qualifying/qualifying_results.json"

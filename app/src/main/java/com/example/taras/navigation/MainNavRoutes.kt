@@ -18,7 +18,7 @@ sealed class MainNavRoutes : NavKey {
     data object Calendar : MainNavRoutes()
 
     @Serializable
-    data object Result : MainNavRoutes()
+    data object F1Results : MainNavRoutes()
 
     @Serializable
     data class DriverProfile(val numberOrName: String) : MainNavRoutes()

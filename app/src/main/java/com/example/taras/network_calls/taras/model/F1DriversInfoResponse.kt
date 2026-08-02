@@ -1,8 +1,10 @@
 package com.example.taras.network_calls.taras.model
 
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Immutable
 @Serializable
 data class F1DriversInfoResponse(
     val slug: String,
@@ -15,6 +17,7 @@ data class F1DriversInfoResponse(
     val careerStats: CareerStats,
 )
 
+@Immutable
 @Serializable
 data class DriverHero(
     @SerialName("first_name") val firstName: String,
@@ -24,8 +27,11 @@ data class DriverHero(
     val number: String,
     @SerialName("team_color") val teamColor: String,
     @SerialName("accessible_color") val accessibleColor: String,
+    @SerialName("driver_image") val driverImage: String? = null,
+    @SerialName("driver_number_logo") val driverNumberLogo: String? = null,
 )
 
+@Immutable
 @Serializable
 data class Biography(
     @SerialName("Date of Birth") val dateOfBirth: String,
@@ -34,12 +40,14 @@ data class Biography(
     val quote: Quote? = null,
 )
 
+@Immutable
 @Serializable
 data class Quote(
     val text: String,
     val author: String,
 )
 
+@Immutable
 @Serializable
 data class DriverSeasonStats(
     @SerialName("Season Position") val seasonPosition: String,
@@ -60,6 +68,7 @@ data class DriverSeasonStats(
     @SerialName("Sprint Top 10s") val sprintTop10s: String,
 )
 
+@Immutable
 @Serializable
 data class CareerStats(
     @SerialName("Grands Prix Entered") val grandsPrixEntered: String,

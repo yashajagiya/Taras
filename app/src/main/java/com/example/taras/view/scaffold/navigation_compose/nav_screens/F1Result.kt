@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -140,13 +141,11 @@ private fun ResultContent(
         },
         state = pullToRefreshState,
         indicator = {
-            if (!isRefreshing) {
-                PullToRefreshDefaults.LoadingIndicator(
-                    state = pullToRefreshState,
-                    isRefreshing = false,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
-            }
+            PullToRefreshDefaults.LoadingIndicator(
+                state = pullToRefreshState,
+                isRefreshing = isRefreshing,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
     ) {
         Column(modifier = modifier.fillMaxSize()) {
@@ -495,17 +494,14 @@ private fun LoadingView(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(64.dp),
+            .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         LoadingIndicator()
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.requiredHeight(30.dp))
         Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            text = message
         )
     }
 }

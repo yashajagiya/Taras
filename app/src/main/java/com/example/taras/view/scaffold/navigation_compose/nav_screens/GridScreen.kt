@@ -52,11 +52,12 @@ import kotlinx.collections.immutable.ImmutableList
 @Composable
 fun NaveGridScreen(
     onDriverClick: (String) -> Unit,
+    onTeamClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     driversViewModel: DriversViewModel = viewModel(),
     teamsViewModel: TeamsViewModel = viewModel()
 ) {
-    val driversState by driversViewModel.combinedDrivers.collectAsStateWithLifecycle()
+    val driversState by driversViewModel.combinedLowDrivers.collectAsStateWithLifecycle()
     val teamsState by teamsViewModel.combinedTeams.collectAsStateWithLifecycle()
 
     GridContent(
@@ -66,7 +67,8 @@ fun NaveGridScreen(
             driversViewModel.fetchDriverData()
             teamsViewModel.fetchTeams()
         },
-        onDriverClick,
+        onDriverClick = onDriverClick,
+        onTeamClick = onTeamClick,
         modifier = modifier
     )
 }
@@ -81,6 +83,7 @@ fun GridContent(
     teamsState: UiState<ImmutableList<TeamUiModel>>,
     onRefresh: () -> Unit,
     onDriverClick: (String) -> Unit,
+    onTeamClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -238,7 +241,7 @@ fun GridContent(
                                             ) { teamData ->
                                                 TeamCard(
                                                     teamData = teamData,
-                                                    onDriverClick,
+                                                    onTeamClick = onTeamClick,
                                                     modifier = Modifier
                                                 )
                                             }

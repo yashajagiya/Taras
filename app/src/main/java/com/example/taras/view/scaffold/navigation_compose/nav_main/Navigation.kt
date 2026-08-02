@@ -32,8 +32,11 @@ fun MainNavHost(
                 entry<MainNavRoutes.Grid> {
                     NaveGridScreen(
                         modifier = Modifier.fillMaxSize(),
-                        onDriverClick = { driverNumber ->
-                            navigator.navigate(MainNavRoutes.DriverProfile(driverNumber))
+                        onDriverClick = { data ->
+                            navigator.navigate(MainNavRoutes.DriverProfile(data))
+                        },
+                        onTeamClick = { teamName ->
+                            navigator.navigate(MainNavRoutes.TeamsData(teamName))
                         })
                 }
                 entry<MainNavRoutes.Calendar> {
@@ -43,7 +46,7 @@ fun MainNavHost(
                         }
                     )
                 }
-                entry<MainNavRoutes.Result> {
+                entry<MainNavRoutes.F1Results> {
                     NaveF1DriversScreen(
                     )
                 }
@@ -54,7 +57,7 @@ fun MainNavHost(
                     CircuitData(circuitName = route.name)
                 }
                 entry<MainNavRoutes.TeamsData> { route ->
-                    TeamsData(circuitName = route.numberOrName)
+                    TeamsData( route.numberOrName)
                 }
             }
         )

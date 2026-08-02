@@ -2,6 +2,7 @@ package com.example.taras.view.scaffold.navigation_compose.nav_screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,8 +27,6 @@ import coil3.compose.AsyncImage
 import com.example.taras.core.common.UiState
 import com.example.taras.core.helpercore.toComposeColor
 import com.example.taras.network_calls.rss.RssItem
-import com.example.taras.network_calls.taras.model.DriverDetail
-import com.example.taras.network_calls.taras.model.TeamsImageResponse
 import com.example.taras.view.subview.NewsCarousel
 import com.example.taras.viewmodel.CurrentRace
 import com.example.taras.viewmodel.DriverUiModel
@@ -35,6 +34,7 @@ import com.example.taras.viewmodel.DriversViewModel
 import com.example.taras.viewmodel.NewsViewModel
 import com.example.taras.viewmodel.RacesViewModel
 import com.example.taras.viewmodel.SessionInfo
+import com.example.taras.viewmodel.TeamUiModel
 import com.example.taras.viewmodel.TeamsViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -53,8 +53,8 @@ fun NavPaddockScreen(
     racesViewModel: RacesViewModel = viewModel()
 ) {
     val driverTopThree by driversViewModel.topThree.collectAsStateWithLifecycle()
-    val driverDetails by driversViewModel.driverDetails.collectAsStateWithLifecycle()
-    val teamsImage by teamsViewModel.teamsImage.collectAsStateWithLifecycle()
+    val allDrivers by driversViewModel.combinedLowDrivers.collectAsStateWithLifecycle()
+    val allTeams by teamsViewModel.combinedTeams.collectAsStateWithLifecycle()
     val newsState by newsViewModel.news.collectAsStateWithLifecycle()
     val raceCurrentState by racesViewModel.oneRace.collectAsStateWithLifecycle()
     val nextSessionInfo by racesViewModel.nextSessionInfo.collectAsStateWithLifecycle()
@@ -62,8 +62,8 @@ fun NavPaddockScreen(
     PaddockContent(
         modifier = modifier,
         driverTopThree = driverTopThree,
-        driverDetails = driverDetails,
-        teamsImage = teamsImage,
+        allDrivers = allDrivers,
+        allTeams = allTeams,
         newsState = newsState,
         raceCurrentState = raceCurrentState,
         nextSessionInfo = nextSessionInfo,
@@ -83,8 +83,8 @@ fun NavPaddockScreen(
 @Composable
 fun PaddockContent(
     driverTopThree: UiState<ImmutableList<DriverUiModel>>,
-    driverDetails: UiState<ImmutableList<DriverDetail>>,
-    teamsImage: UiState<ImmutableList<TeamsImageResponse>>,
+    allDrivers: UiState<ImmutableList<DriverUiModel>>,
+    allTeams: UiState<ImmutableList<TeamUiModel>>,
     newsState: UiState<ImmutableList<RssItem>>,
     raceCurrentState: UiState<CurrentRace?>,
     nextSessionInfo: SessionInfo?,
@@ -95,11 +95,17 @@ fun PaddockContent(
         var isRefreshing by remember { mutableStateOf(false) }
         val pullToRefreshState = rememberPullToRefreshState()
 
-        LaunchedEffect(driverTopThree, newsState, raceCurrentState, teamsImage) {
+        LaunchedEffect(driverTopThree, newsState, raceCurrentState, allTeams) {
             if (driverTopThree !is UiState.Loading &&
                 newsState !is UiState.Loading &&
                 raceCurrentState !is UiState.Loading &&
-                teamsImage !is UiState.Loading
+                allTeams !is UiState.Loading
+            ) {
+                isRefreshing = false
+            } else if (driverTopThree is UiState.Error ||
+                newsState is UiState.Error ||
+                raceCurrentState is UiState.Error ||
+                allTeams is UiState.Error
             ) {
                 isRefreshing = false
             }
@@ -129,12 +135,12 @@ fun PaddockContent(
                 val isAnyLoading = driverTopThree is UiState.Loading ||
                         newsState is UiState.Loading ||
                         raceCurrentState is UiState.Loading ||
-                        teamsImage is UiState.Loading
+                        allTeams is UiState.Loading
 
                 val isAnyError = driverTopThree is UiState.Error ||
                         newsState is UiState.Error ||
                         raceCurrentState is UiState.Error ||
-                        teamsImage is UiState.Error
+                        allTeams is UiState.Error
 
                 if (isAnyLoading && !isAnyError) {
                     Column(
@@ -143,17 +149,17 @@ fun PaddockContent(
                         verticalArrangement = Arrangement.Center
                     ) {
                         LoadingIndicator()
-                        Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.requiredHeight(30.dp))
                         Text("Loading...")
                     }
                 } else if (isAnyError && !isRefreshing) {
-                    val errorMessage = when {
-                        raceCurrentState is UiState.Error -> raceCurrentState.message
-                        driverTopThree is UiState.Error -> driverTopThree.message
-                        newsState is UiState.Error -> newsState.message
-                        teamsImage is UiState.Error -> teamsImage.message
-                        else -> "An unknown error occurred"
-                    }
+//                    val errorMessage = when {
+//                        raceCurrentState is UiState.Error -> raceCurrentState.message
+//                        driverTopThree is UiState.Error -> driverTopThree.message
+//                        newsState is UiState.Error -> newsState.message
+//                        allTeams is UiState.Error -> allTeams.message
+//                        else -> "An unknown error occurred"
+//                    }
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -162,7 +168,7 @@ fun PaddockContent(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = errorMessage,
+                            text = "Something went wrong",
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center
@@ -377,9 +383,9 @@ fun PaddockContent(
                             NewsCarousel(
                                 newsState = newsState,
                                 modifier = Modifier.padding(vertical = 8.dp),
-                                drivers = (driverDetails as? UiState.Success)?.data
+                                drivers = (allDrivers as? UiState.Success)?.data
                                     ?: persistentListOf(),
-                                teams = (teamsImage as? UiState.Success)?.data ?: persistentListOf()
+                                teams = (allTeams as? UiState.Success)?.data ?: persistentListOf()
                             )
                         }
                     }

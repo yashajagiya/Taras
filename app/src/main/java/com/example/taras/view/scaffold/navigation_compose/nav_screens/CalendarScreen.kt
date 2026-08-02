@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -90,27 +91,25 @@ fun CalanderComposble(
             },
             state = pullToRefreshState,
             indicator = {
-                if (!isRefreshing) {
-                    PullToRefreshDefaults.LoadingIndicator(
-                        state = pullToRefreshState,
-                        isRefreshing = false,
-                        modifier = Modifier.align(Alignment.TopCenter)
-                    )
-                }
+                PullToRefreshDefaults.LoadingIndicator(
+                    state = pullToRefreshState,
+                    isRefreshing = isRefreshing,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
             }
         ) {
             Surface(color = Color.Transparent) {
                 val isAnyLoading = racesState is UiState.Loading
                 val isAnyError = racesState is UiState.Error
 
-                if (isAnyLoading) {
+                if (isAnyLoading && !isRefreshing) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
                         LoadingIndicator()
-                        Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.requiredHeight(30.dp))
                         Text("Loading...")
                     }
                 } else if (isAnyError && !isRefreshing) {

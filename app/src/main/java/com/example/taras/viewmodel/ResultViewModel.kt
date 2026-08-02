@@ -8,9 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.taras.core.common.UiState
 import com.example.taras.network_calls.NetworkModule
 import com.example.taras.network_calls.taras.TarasDataService
-import com.example.taras.network_calls.taras.model.DriverDetail
 import com.example.taras.network_calls.taras.model.DriverRaceQualifyingResponse
 import com.example.taras.network_calls.taras.model.DriverRaceResultResponse
+import com.example.taras.network_calls.taras.model.F1DriversInfoResponse
 import com.example.taras.network_calls.taras.model.Fp1Response
 import com.example.taras.network_calls.taras.model.Fp2Response
 import com.example.taras.network_calls.taras.model.Fp3Response
@@ -63,12 +63,17 @@ class ResultViewModel : ViewModel() {
     private val _racesFp3Result = MutableStateFlow<UiState<Fp3Response>>(UiState.Loading)
     private val _racesFp2Result = MutableStateFlow<UiState<Fp2Response>>(UiState.Loading)
     private val _racesFp1Result = MutableStateFlow<UiState<Fp1Response>>(UiState.Loading)
-    private val _driverDetails = MutableStateFlow<UiState<List<DriverDetail>>>(UiState.Loading)
+    private val _driversInfoData = MutableStateFlow<UiState<List<F1DriversInfoResponse>>>(UiState.Loading)
 
-    val fp1Results = combine(_racesFp1Result, _driverDetails) { state, details ->
-        mapSessionState(state) { data ->
+    val fp1Results = combine(_racesFp1Result, _driversInfoData) { sessionState, detailsState ->
+        if (sessionState is UiState.Loading || detailsState is UiState.Loading) {
+            UiState.Loading
+        } else if (sessionState is UiState.Error) {
+            UiState.Error(sessionState.message)
+        } else if (sessionState is UiState.Success) {
+            val data = sessionState.data
             val results = data.results.map { res ->
-                val detail = findDriverDetail(res.driver, details)
+                val info = findDriverInfo(res.driver, detailsState)
                 ResultRowData(
                     position = res.position,
                     number = res.number,
@@ -76,17 +81,24 @@ class ResultViewModel : ViewModel() {
                     team = res.team,
                     extra = res.timeOrGap,
                     laps = res.laps,
-                    headshotUrl = detail?.headshotUrl
+                    headshotUrl = info?.hero?.driverImage
                 )
             }.toImmutableList()
-            SessionResultUiState(ResultHeader(data.raceName, data.circuitName), results)
+            UiState.Success(SessionResultUiState(ResultHeader(data.raceName, data.circuitName), results))
+        } else {
+            UiState.Loading
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
 
-    val fp2Results = combine(_racesFp2Result, _driverDetails) { state, details ->
-        mapSessionState(state) { data ->
+    val fp2Results = combine(_racesFp2Result, _driversInfoData) { sessionState, detailsState ->
+        if (sessionState is UiState.Loading || detailsState is UiState.Loading) {
+            UiState.Loading
+        } else if (sessionState is UiState.Error) {
+            UiState.Error(sessionState.message)
+        } else if (sessionState is UiState.Success) {
+            val data = sessionState.data
             val results = data.results.map { res ->
-                val detail = findDriverDetail(res.driver, details)
+                val info = findDriverInfo(res.driver, detailsState)
                 ResultRowData(
                     position = res.position,
                     number = res.number,
@@ -94,17 +106,24 @@ class ResultViewModel : ViewModel() {
                     team = res.team,
                     extra = res.timeOrGap,
                     laps = res.laps,
-                    headshotUrl = detail?.headshotUrl
+                    headshotUrl = info?.hero?.driverImage
                 )
             }.toImmutableList()
-            SessionResultUiState(ResultHeader(data.raceName, data.circuitName), results)
+            UiState.Success(SessionResultUiState(ResultHeader(data.raceName, data.circuitName), results))
+        } else {
+            UiState.Loading
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
 
-    val fp3Results = combine(_racesFp3Result, _driverDetails) { state, details ->
-        mapSessionState(state) { data ->
+    val fp3Results = combine(_racesFp3Result, _driversInfoData) { sessionState, detailsState ->
+        if (sessionState is UiState.Loading || detailsState is UiState.Loading) {
+            UiState.Loading
+        } else if (sessionState is UiState.Error) {
+            UiState.Error(sessionState.message)
+        } else if (sessionState is UiState.Success) {
+            val data = sessionState.data
             val results = data.results.map { res ->
-                val detail = findDriverDetail(res.driver, details)
+                val info = findDriverInfo(res.driver, detailsState)
                 ResultRowData(
                     position = res.position,
                     number = res.number,
@@ -112,17 +131,24 @@ class ResultViewModel : ViewModel() {
                     team = res.team,
                     extra = res.timeOrGap,
                     laps = res.laps,
-                    headshotUrl = detail?.headshotUrl
+                    headshotUrl = info?.hero?.driverImage
                 )
             }.toImmutableList()
-            SessionResultUiState(ResultHeader(data.raceName, data.circuitName), results)
+            UiState.Success(SessionResultUiState(ResultHeader(data.raceName, data.circuitName), results))
+        } else {
+            UiState.Loading
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
 
-    val qualifyResults = combine(_racesQulyResult, _driverDetails) { state, details ->
-        mapSessionState(state) { data ->
+    val qualifyResults = combine(_racesQulyResult, _driversInfoData) { sessionState, detailsState ->
+        if (sessionState is UiState.Loading || detailsState is UiState.Loading) {
+            UiState.Loading
+        } else if (sessionState is UiState.Error) {
+            UiState.Error(sessionState.message)
+        } else if (sessionState is UiState.Success) {
+            val data = sessionState.data
             val results = data.results.map { res ->
-                val detail = findDriverDetail(res.driverName, details)
+                val info = findDriverInfo(res.driverName, detailsState)
                 ResultRowData(
                     position = res.position,
                     number = res.driverNumber,
@@ -130,17 +156,24 @@ class ResultViewModel : ViewModel() {
                     team = res.team,
                     extra = res.q3.ifBlank { res.q2.ifBlank { res.q1 } },
                     laps = res.laps,
-                    headshotUrl = detail?.headshotUrl
+                    headshotUrl = info?.hero?.driverImage
                 )
             }.toImmutableList()
-            SessionResultUiState(ResultHeader(data.raceName, data.circuitName), results)
+            UiState.Success(SessionResultUiState(ResultHeader(data.raceName, data.circuitName), results))
+        } else {
+            UiState.Loading
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
 
-    val raceResults = combine(_racesResult, _driverDetails) { state, details ->
-        mapSessionState(state) { data ->
+    val raceResults = combine(_racesResult, _driversInfoData) { sessionState, detailsState ->
+        if (sessionState is UiState.Loading || detailsState is UiState.Loading) {
+            UiState.Loading
+        } else if (sessionState is UiState.Error) {
+            UiState.Error(sessionState.message)
+        } else if (sessionState is UiState.Success) {
+            val data = sessionState.data
             val results = data.results.map { res ->
-                val detail = findDriverDetail(res.driverName, details)
+                val info = findDriverInfo(res.driverName, detailsState)
                 ResultRowData(
                     position = res.position,
                     number = res.driverNumber,
@@ -149,10 +182,12 @@ class ResultViewModel : ViewModel() {
                     extra = res.timeOrRetired,
                     laps = res.laps,
                     points = res.points,
-                    headshotUrl = detail?.headshotUrl
+                    headshotUrl = info?.hero?.driverImage
                 )
             }.toImmutableList()
-            SessionResultUiState(ResultHeader(data.raceName, data.circuitName), results)
+            UiState.Success(SessionResultUiState(ResultHeader(data.raceName, data.circuitName), results))
+        } else {
+            UiState.Loading
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
 
@@ -166,28 +201,28 @@ class ResultViewModel : ViewModel() {
         _racesFp3Result.value = UiState.Loading
         _racesQulyResult.value = UiState.Loading
         _racesResult.value = UiState.Loading
-        _driverDetails.value = UiState.Loading
+        _driversInfoData.value = UiState.Loading
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             delay(1000.milliseconds)
 
-            launch {
-                _driverDetails.value = safeApiCall { tarasDataService.getDriverDetailsANDImage() }
+            launch(Dispatchers.IO) {
+                _driversInfoData.value = safeApiCall { tarasDataService.getDriverInfoData() }
             }
-            launch {
+            launch(Dispatchers.IO) {
                 _racesFp1Result.value = safeApiCall { tarasDataService.getDriverFp1Standings() }
             }
-            launch {
+            launch(Dispatchers.IO) {
                 _racesFp2Result.value = safeApiCall { tarasDataService.getDriverFp2Standings() }
             }
-            launch {
+            launch(Dispatchers.IO) {
                 _racesFp3Result.value = safeApiCall { tarasDataService.getDriverFp3Standings() }
             }
-            launch {
+            launch(Dispatchers.IO) {
                 _racesQulyResult.value =
                     safeApiCall { tarasDataService.getDriverRaceQualifyingStandings() }
             }
-            launch {
+            launch(Dispatchers.IO) {
                 _racesResult.value = safeApiCall { tarasDataService.getDriverRaceResultStandings() }
             }
         }
@@ -202,25 +237,16 @@ class ResultViewModel : ViewModel() {
         }
     }
 
-    private fun <T> mapSessionState(
-        state: UiState<T>,
-        transform: (T) -> SessionResultUiState
-    ): UiState<SessionResultUiState> {
-        return when (state) {
-            is UiState.Success -> UiState.Success(transform(state.data))
-            is UiState.Error -> UiState.Error(state.message)
-            is UiState.Loading -> UiState.Loading
-        }
-    }
 
-    private fun findDriverDetail(
+    private fun findDriverInfo(
         driverName: String,
-        details: UiState<List<DriverDetail>>
-    ): DriverDetail? {
+        details: UiState<List<F1DriversInfoResponse>>
+    ): F1DriversInfoResponse? {
         val detailList = (details as? UiState.Success)?.data ?: return null
         return detailList.find { d ->
-            d.broadcastName?.contains(driverName, ignoreCase = true) == true ||
-                    d.fullName?.contains(driverName, ignoreCase = true) == true
+            val fullName = "${d.hero.firstName} ${d.hero.lastName}"
+            fullName.contains(driverName, ignoreCase = true) ||
+                    d.hero.lastName.contains(driverName, ignoreCase = true)
         }
     }
 }

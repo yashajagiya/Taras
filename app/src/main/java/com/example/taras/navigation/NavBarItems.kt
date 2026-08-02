@@ -28,7 +28,7 @@ val NAV_BAR_PARAMETER = persistentMapOf(
         icon = Icons.Default.CalendarMonth,
         title = "Calendar"
     ),
-    MainNavRoutes.Result to NavBarItemData(
+    MainNavRoutes.F1Results to NavBarItemData(
         icon = Icons.Default.DirectionsCar,
         title = "Result"
     )

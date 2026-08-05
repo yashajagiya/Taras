@@ -85,6 +85,9 @@ dependencies {
     implementation(platform(libs.charts.bom))
     implementation(libs.charts.line)
 
+    //widgets
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
 
 }
 

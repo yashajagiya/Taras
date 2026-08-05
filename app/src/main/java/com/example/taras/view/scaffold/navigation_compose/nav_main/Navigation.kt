@@ -41,8 +41,8 @@ fun MainNavHost(
                 }
                 entry<MainNavRoutes.Calendar> {
                     NavCalendarScreen(
-                        onCircuitClick = { circuitName ->
-                            navigator.navigate(MainNavRoutes.CircuitData(circuitName))
+                        onCircuitClick = { circuitId ->
+                            navigator.navigate(MainNavRoutes.CircuitData(circuitId))
                         }
                     )
                 }
@@ -54,7 +54,7 @@ fun MainNavHost(
                     DriverProfile(driverNumber = route.numberOrName)
                 }
                 entry<MainNavRoutes.CircuitData> { route ->
-                    CircuitData(circuitName = route.name)
+                    CircuitData(circuitId = route.id)
                 }
                 entry<MainNavRoutes.TeamsData> { route ->
                     TeamsData( route.numberOrName)

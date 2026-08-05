@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EmojiEvents
+import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale.Companion.Crop
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -86,6 +88,7 @@ fun NaveF1DriversScreen(
     val fp3State by resultViewModel.fp3Results.collectAsStateWithLifecycle()
     val qualifyState by resultViewModel.qualifyResults.collectAsStateWithLifecycle()
     val raceState by resultViewModel.raceResults.collectAsStateWithLifecycle()
+    val isSprintWeekend by resultViewModel.isSprintWeekend.collectAsStateWithLifecycle()
 
     ResultContent(
         fp1State = fp1State,
@@ -93,6 +96,7 @@ fun NaveF1DriversScreen(
         fp3State = fp3State,
         qualifyState = qualifyState,
         resultState = raceState,
+        isSprintWeekend = isSprintWeekend,
         onRefresh = {
             resultViewModel.fetchRacesResultData()
         },
@@ -111,6 +115,7 @@ private fun ResultContent(
     fp3State: UiState<SessionResultUiState>,
     qualifyState: UiState<SessionResultUiState>,
     resultState: UiState<SessionResultUiState>,
+    isSprintWeekend: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -118,10 +123,13 @@ private fun ResultContent(
     val pullToRefreshState = rememberPullToRefreshState()
     val scope = rememberCoroutineScope()
 
-    val tabs = listOf("FP1", "FP2", "FP3", "Qualifying", "Results")
+    val tabs = if (isSprintWeekend) {
+        listOf("FP1", "Sprint Q", "Sprint Race", "Qualifying", "Results")
+    } else {
+        listOf("FP1", "FP2", "FP3", "Qualifying", "Results")
+    }
     val pagerState = rememberPagerState(pageCount = { tabs.size })
 
-    // Automatically stop refreshing once all states are no longer loading
     LaunchedEffect(fp1State, fp2State, fp3State, qualifyState, resultState) {
         if (fp1State !is UiState.Loading &&
             fp2State !is UiState.Loading &&
@@ -200,13 +208,13 @@ private fun ResultContent(
                         1 -> SessionTabs(
                             state = fp2State,
                             isRefreshing = isRefreshing,
-                            loadingMessage = "Loading practice results..."
+                            loadingMessage = if (isSprintWeekend) "Loading sprint qualifying results..." else "Loading practice results..."
                         )
 
                         2 -> SessionTabs(
                             state = fp3State,
                             isRefreshing = isRefreshing,
-                            loadingMessage = "Loading practice results..."
+                            loadingMessage = if (isSprintWeekend) "Loading sprint race results..." else "Loading practice results..."
                         )
 
                         3 -> SessionTabs(
@@ -238,7 +246,6 @@ private fun SessionTabs(
     LazyColumn(modifier = modifier.fillMaxSize()) {
         when (state) {
             is UiState.Loading -> {
-                // Don't show the full-screen loader if we are just swiping to refresh
                 if (!isRefreshing) {
                     item(contentType = "Loading") { LoadingView(loadingMessage) }
                 }
@@ -250,7 +257,11 @@ private fun SessionTabs(
 
             is UiState.Success -> {
                 val data = state.data
-                if (data.results.isEmpty()) {
+                if (!data.isStarted) {
+                    item(contentType = "Upcoming") {
+                        UpcomingSessionView(data.scheduledTime ?: "Upcoming")
+                    }
+                } else if (data.results.isEmpty()) {
                     item(contentType = "Empty") { EmptyView() }
                 } else {
                     if (data.header != null) {
@@ -330,7 +341,6 @@ private fun ResultCard(
     val isFirstPlace = data.position == "1"
     val teamColor = getTeamColor(data.team)
 
-    // Parse points for prominent display
     val pointsFloat = data.points?.toFloatOrNull() ?: 0f
     val displayPoints = if (pointsFloat > 0f) {
         if (pointsFloat % 1f == 0f) pointsFloat.toInt().toString() else pointsFloat.toString()
@@ -389,7 +399,7 @@ private fun ResultCard(
                             .size(48.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                        contentScale = Crop,
                         alignment = Alignment.TopCenter
                     )
 
@@ -529,6 +539,41 @@ private fun ErrorView(
             text = message,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun UpcomingSessionView(
+    scheduledTime: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(64.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.Schedule,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+        )
+        Spacer(Modifier.height(16.dp))
+        Text(
+            text = "Session hasn't started yet",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = "Scheduled for: $scheduledTime",
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center
         )
     }

@@ -24,7 +24,7 @@ sealed class MainNavRoutes : NavKey {
     data class DriverProfile(val numberOrName: String) : MainNavRoutes()
 
     @Serializable
-    data class CircuitData(val name: String) : MainNavRoutes()
+    data class CircuitData(val id: String) : MainNavRoutes()
 
 
     @Serializable

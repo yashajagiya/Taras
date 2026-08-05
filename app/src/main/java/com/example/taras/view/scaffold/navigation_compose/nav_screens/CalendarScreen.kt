@@ -57,8 +57,6 @@ fun NavCalendarScreen(
         },
         modifier = modifier.padding(vertical = 8.dp)
     )
-
-
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -70,7 +68,7 @@ fun CalanderComposble(
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
 
         var isRefreshing by remember { mutableStateOf(false) }
 

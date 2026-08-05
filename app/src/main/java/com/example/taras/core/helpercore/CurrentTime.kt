@@ -1,8 +1,10 @@
 package com.example.taras.core.helpercore
 
 import android.util.Log
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.TimeZone.Companion.currentSystemDefault
+import kotlinx.datetime.number
 import kotlin.time.Duration
 import kotlin.time.Instant
 import kotlin.time.Clock
@@ -41,6 +43,26 @@ fun parseSessionTimeToInstant(date: String?, time: String?): Instant? {
     }
 }
 
+fun formatToLocalSession(date: String?, time: String?): String {
+    val instant = parseSessionTimeToInstant(date, time) ?: return ""
+    val localDateTime = instant.toLocalDateTime(currentSystemDefault())
+    val day = localDateTime.dayOfWeek.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+    val hour = localDateTime.hour.toString().padStart(2, '0')
+    val minute = localDateTime.minute.toString().padStart(2, '0')
+    return "$day $hour:$minute"
+}
+
+fun formatToLocalFull(date: String?, time: String?): String {
+    val instant = parseSessionTimeToInstant(date, time) ?: return ""
+    val localDateTime = instant.toLocalDateTime(currentSystemDefault())
+    val day = localDateTime.day.toString().padStart(2, '0')
+    val month = localDateTime.month.number.toString().padStart(2, '0')
+    val year = localDateTime.year
+    val hour = localDateTime.hour.toString().padStart(2, '0')
+    val minute = localDateTime.minute.toString().padStart(2, '0')
+    return "$day/$month/$year $hour:$minute"
+}
+
 fun formatCountdown(duration: Duration): String {
     if (!duration.isPositive()) return "00:00:00"
 
@@ -58,8 +80,24 @@ fun formatCountdown(duration: Duration): String {
     }
 }
 
-fun String.toMonthes(): String{
-    return when(this){
+fun formatCountdownWidgets(duration: Duration): String {
+    if (!duration.isPositive()) return "00:00:00"
+
+    return duration.toComponents { days, hours, minutes, _, _ ->
+
+        val h = hours.toString().padStart(2, '0')
+        val m = minutes.toString().padStart(2, '0')
+
+        if (days > 0) {
+            "${days}Day / ${h}Hours"
+        } else {
+            "${h}Hours /${m}Minutes"
+        }
+    }
+}
+
+fun String.toMonthes(): String {
+    return when (this) {
         "01" -> "Jan"
         "02" -> "Feb"
         "03" -> "Mar"
@@ -76,12 +114,13 @@ fun String.toMonthes(): String{
     }
 
 }
-fun String.toGetMonths(): String{
+
+fun String.toGetMonths(): String {
     val date = this.split("-")
     return date[1]
 }
 
-fun String.toGetDate(): String{
+fun String.toGetDate(): String {
     val date = this.split("-")
     return date[2]
 }

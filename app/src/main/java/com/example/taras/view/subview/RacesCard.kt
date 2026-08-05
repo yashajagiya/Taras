@@ -37,13 +37,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.example.taras.core.helpercore.formatToLocalSession
+import com.example.taras.core.helpercore.parseSessionTimeToInstant
 import com.example.taras.core.helpercore.toGetDate
 import com.example.taras.core.helpercore.toGetMonths
 import com.example.taras.core.helpercore.toMonthes
 import com.example.taras.viewmodel.CurrentRound
 import com.example.taras.viewmodel.RaceClearData
 import kotlinx.collections.immutable.ImmutableList
-
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PlayArrow
@@ -57,8 +58,10 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.font.FontFamily.Companion.Monospace
 import androidx.compose.ui.text.font.FontStyle
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.TimeZone.Companion.currentSystemDefault
 
 @Composable
 fun RacesCards(
@@ -204,7 +207,7 @@ fun CollapsedRaceCard(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                            fontFamily = Monospace
                         )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
@@ -227,24 +230,31 @@ fun CollapsedRaceCard(
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
+                    val localRaceDateTime = remember(race.race) {
+                        parseSessionTimeToInstant(race.race.date, race.race.time)
+                            ?.toLocalDateTime(currentSystemDefault())
+                    }
+                    
                     Text(
-                        text = race.race.date.toString().toGetMonths().toMonthes().uppercase(),
+                        text = localRaceDateTime?.month?.name?.take(3)?.uppercase()
+                            ?: race.race.date.toString().toGetMonths().toMonthes().uppercase(),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                        fontFamily = Monospace
                     )
                     Text(
-                        text = race.race.date.toString().toGetDate(),
+                        text = localRaceDateTime?.dayOfMonth?.toString()
+                            ?: race.race.date.toString().toGetDate(),
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                        fontFamily = Monospace
                     )
                 }
             }
 
-            if (isPast && race.name.isNotEmpty()) {
+            if (isPast && race.winnerName.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
                     modifier = Modifier
@@ -257,7 +267,7 @@ fun CollapsedRaceCard(
                     Text(text = "🏆", fontSize = 12.sp)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = race.name,
+                        text = race.winnerName,
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface
@@ -286,9 +296,11 @@ fun CurrentRaceExtended(
         shape = MaterialTheme.shapes.large,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
     ) {
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+        ) {
             AsyncImage(
                 model = race.trackImage.ifEmpty { "https://f1tv.formula1.com/static/favicon.ico" },
                 contentDescription = "track",
@@ -331,7 +343,7 @@ fun CurrentRaceExtended(
                                 color = MaterialTheme.colorScheme.onPrimary,
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Bold,
-                                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                                fontFamily = Monospace
                             )
                         }
                         Text(
@@ -435,12 +447,22 @@ fun CurrentRaceExtended(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        val sessions = listOf(
-                            "FP1" to race.fp1,
-                            "FP2" to race.fp2,
-                            "FP3" to race.fp3,
-                            "QUALI" to race.qualy
-                        )
+                        val isSprint = race.fp2.date == null && race.fp3.date == null
+                        val sessions = if (isSprint) {
+                            listOf(
+                                "FP1" to race.fp1,
+                                "SPRINT QUALY" to race.sprintQualy,
+                                "SPRINT RACE" to race.sprintRace,
+                                "QUALI" to race.qualy
+                            )
+                        } else {
+                            listOf(
+                                "FP1" to race.fp1,
+                                "FP2" to race.fp2,
+                                "FP3" to race.fp3,
+                                "QUALI" to race.qualy
+                            )
+                        }
 
                         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             Row(
@@ -473,7 +495,7 @@ fun CurrentRaceExtended(
                                     modifier = Modifier.weight(1f),
                                     isHighlight = true,
 
-                                )
+                                    )
                             }
                         }
 
@@ -499,11 +521,7 @@ fun CurrentRaceExtended(
                                         color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                                     )
                                     Text(
-                                        text = "${formatSessionDay(race.race.date)} ${
-                                            race.race.time?.take(
-                                                5
-                                            ) ?: ""
-                                        }",
+                                        text = formatToLocalSession(race.race.date, race.race.time),
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onPrimary
@@ -546,10 +564,10 @@ fun SessionItem(
             color = if (isHighlight) MaterialTheme.colorScheme.primary.copy(alpha = 0.6f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(
                 alpha = 0.6f
             ),
-            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+            fontFamily = Monospace
         )
         Text(
-            text = "${formatSessionDay(session.date)} ${session.time?.take(5) ?: ""}",
+            text = formatToLocalSession(session.date, session.time),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
             color = if (isHighlight) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
@@ -557,13 +575,4 @@ fun SessionItem(
     }
 }
 
-fun formatSessionDay(dateStr: String?): String {
-    if (dateStr == null) return ""
-    return try {
-        val date = LocalDate.parse(dateStr)
-        date.dayOfWeek.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
-    } catch (e: Exception) {
-        ""
-    }
-}
 

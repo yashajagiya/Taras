@@ -81,17 +81,18 @@ fun formatCountdown(duration: Duration): String {
 }
 
 fun formatCountdownWidgets(duration: Duration): String {
-    if (!duration.isPositive()) return "00:00:00"
+    if (!duration.isPositive()) return "Session Started"
 
-    return duration.toComponents { days, hours, minutes, _, _ ->
+    return duration.toComponents { days, hours, _, _, _ ->
+        val daysPart = if (days > 0) "$days ${if (days == 1L) "Day" else "Days"}" else ""
+        val hoursPart = if (hours > 0) "$hours ${if (hours == 1) "Hour" else "Hours"}" else ""
 
-        val h = hours.toString().padStart(2, '0')
-        val m = minutes.toString().padStart(2, '0')
+        val timeStr = listOf(daysPart, hoursPart).filter { it.isNotEmpty() }.joinToString(" ")
 
-        if (days > 0) {
-            "${days}Day / ${h}Hours"
+        if (timeStr.isEmpty()) {
+            "Less than 1 Hour Left"
         } else {
-            "${h}Hours /${m}Minutes"
+            "$timeStr Left"
         }
     }
 }

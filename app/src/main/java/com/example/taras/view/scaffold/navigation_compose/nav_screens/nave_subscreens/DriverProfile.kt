@@ -53,6 +53,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -61,12 +62,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.taras.core.db.AppDatabase
 import com.example.taras.core.common.UiState
 import com.example.taras.core.helpercore.toComposeColor
 import com.example.taras.network_calls.taras.model.DriverPerRace
 import com.example.taras.network_calls.taras.model.Quote
 import com.example.taras.viewmodel.DriverDetailUiModel
 import com.example.taras.viewmodel.DriversViewModel
+import com.example.taras.viewmodel.DriversViewModelFactory
 import io.github.dautovicharis.charts.LineChart
 import io.github.dautovicharis.charts.model.toChartDataSet
 import io.github.dautovicharis.charts.style.ChartViewDefaults
@@ -82,7 +85,9 @@ import kotlinx.collections.immutable.ImmutableList
 fun DriverProfile(
     driverNumber: String,
     modifier: Modifier = Modifier,
-    driversViewModel: DriversViewModel = viewModel()
+    driversViewModel: DriversViewModel = viewModel(
+        factory = DriversViewModelFactory(AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao())
+    )
 ) {
     val driverDetailsState by driversViewModel.combinedDetailedDrivers.collectAsStateWithLifecycle()
 

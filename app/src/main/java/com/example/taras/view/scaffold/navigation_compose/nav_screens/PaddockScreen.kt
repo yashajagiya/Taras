@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -24,6 +25,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.taras.core.db.AppDatabase
+import com.example.taras.core.common.CurrentData
 import com.example.taras.core.common.UiState
 import com.example.taras.core.helpercore.toComposeColor
 import com.example.taras.network_calls.rss.RssItem
@@ -31,8 +34,10 @@ import com.example.taras.view.subview.NewsCarousel
 import com.example.taras.viewmodel.CurrentRace
 import com.example.taras.viewmodel.DriverUiModel
 import com.example.taras.viewmodel.DriversViewModel
-import com.example.taras.viewmodel.NewsViewModel
+import com.example.taras.viewmodel.DriversViewModelFactory
+import com.example.taras.core.helpercore.NewsRepository
 import com.example.taras.viewmodel.RacesViewModel
+import com.example.taras.viewmodel.RacesViewModelFactory
 import com.example.taras.viewmodel.SessionInfo
 import com.example.taras.viewmodel.TeamUiModel
 import com.example.taras.viewmodel.TeamsViewModel
@@ -47,15 +52,19 @@ import kotlinx.collections.immutable.persistentListOf
 @Composable
 fun NavPaddockScreen(
     modifier: Modifier = Modifier,
-    driversViewModel: DriversViewModel = viewModel(),
+    driversViewModel: DriversViewModel = viewModel(
+        factory = DriversViewModelFactory(AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao())
+    ),
     teamsViewModel: TeamsViewModel = viewModel(),
-    newsViewModel: NewsViewModel = viewModel(),
-    racesViewModel: RacesViewModel = viewModel()
+    newsRepository: NewsRepository = viewModel(),
+    racesViewModel: RacesViewModel = viewModel(
+        factory = RacesViewModelFactory(CurrentData(LocalContext.current))
+    )
 ) {
     val driverTopThree by driversViewModel.topThree.collectAsStateWithLifecycle()
     val allDrivers by driversViewModel.combinedLowDrivers.collectAsStateWithLifecycle()
     val allTeams by teamsViewModel.combinedTeams.collectAsStateWithLifecycle()
-    val newsState by newsViewModel.news.collectAsStateWithLifecycle()
+    val newsState by newsRepository.news.collectAsStateWithLifecycle()
     val raceCurrentState by racesViewModel.oneRace.collectAsStateWithLifecycle()
     val nextSessionInfo by racesViewModel.nextSessionInfo.collectAsStateWithLifecycle()
 
@@ -70,7 +79,7 @@ fun NavPaddockScreen(
         onRefresh = {
             driversViewModel.fetchDriverData()
             teamsViewModel.fetchTeams()
-            newsViewModel.fetchNews()
+            newsRepository.fetchNews()
             racesViewModel.fetchRacesData()
         }
     )
@@ -142,7 +151,12 @@ fun PaddockContent(
                         raceCurrentState is UiState.Error ||
                         allTeams is UiState.Error
 
-                if (isAnyLoading && !isAnyError) {
+                val isEssentialSuccess =
+                    driverTopThree is UiState.Success && raceCurrentState is UiState.Success
+                val isEssentialLoading =
+                    driverTopThree is UiState.Loading || raceCurrentState is UiState.Loading
+
+                if (isEssentialLoading && !isEssentialSuccess) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -152,14 +166,7 @@ fun PaddockContent(
                         Spacer(Modifier.requiredHeight(30.dp))
                         Text("Loading...")
                     }
-                } else if (isAnyError && !isRefreshing) {
-//                    val errorMessage = when {
-//                        raceCurrentState is UiState.Error -> raceCurrentState.message
-//                        driverTopThree is UiState.Error -> driverTopThree.message
-//                        newsState is UiState.Error -> newsState.message
-//                        allTeams is UiState.Error -> allTeams.message
-//                        else -> "An unknown error occurred"
-//                    }
+                } else if (isAnyError && !isEssentialSuccess && !isRefreshing) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -363,30 +370,32 @@ fun PaddockContent(
                                 }
                             }
                         }
-                        item {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                modifier = Modifier.padding(
-                                    start = 16.dp,
-                                    top = 16.dp,
-                                    end = 16.dp
-                                ),
-                                text = "Latest from the Paddock....",
-                                color = Color.Black,
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 2
-                            )
-                        }
+                        if (!isAnyError) {
+                            item {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    modifier = Modifier.padding(
+                                        start = 16.dp,
+                                        top = 16.dp,
+                                        end = 16.dp
+                                    ),
+                                    text = "Latest from the Paddock....",
+                                    color = Color.Black,
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 2
+                                )
+                            }
 
-                        item {
-                            NewsCarousel(
-                                newsState = newsState,
-                                modifier = Modifier.padding(vertical = 8.dp),
-                                drivers = (allDrivers as? UiState.Success)?.data
-                                    ?: persistentListOf(),
-                                teams = (allTeams as? UiState.Success)?.data ?: persistentListOf()
-                            )
+                            item {
+                                NewsCarousel(
+                                    newsState = newsState,
+                                    modifier = Modifier.padding(vertical = 8.dp),
+                                    drivers = (allDrivers as? UiState.Success)?.data
+                                        ?: persistentListOf(),
+                                    teams = (allTeams as? UiState.Success)?.data ?: persistentListOf()
+                                )
+                            }
                         }
                     }
                 }

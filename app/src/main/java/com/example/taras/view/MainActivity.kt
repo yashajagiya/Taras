@@ -22,6 +22,7 @@ import com.example.taras.view.scaffold.topbar.TarasTopBar
 
 class MainActivity : ComponentActivity() {
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

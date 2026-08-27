@@ -32,15 +32,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.taras.core.db.AppDatabase
 import com.example.taras.core.common.UiState
 import com.example.taras.view.subview.DriverCard
 import com.example.taras.view.subview.TeamCard
 import com.example.taras.viewmodel.DriverUiModel
 import com.example.taras.viewmodel.DriversViewModel
+import com.example.taras.viewmodel.DriversViewModelFactory
 import com.example.taras.viewmodel.TeamUiModel
 import com.example.taras.viewmodel.TeamsViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -54,7 +57,9 @@ fun NaveGridScreen(
     onDriverClick: (String) -> Unit,
     onTeamClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    driversViewModel: DriversViewModel = viewModel(),
+    driversViewModel: DriversViewModel = viewModel(
+        factory = DriversViewModelFactory(AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao())
+    ),
     teamsViewModel: TeamsViewModel = viewModel()
 ) {
     val driversState by driversViewModel.combinedLowDrivers.collectAsStateWithLifecycle()
@@ -180,7 +185,7 @@ fun GridContent(
                                         } else {
                                             items(
                                                 items = drivers,
-                                                key = { it.driverNumber }
+                                                key = { it.driverNumber ?: it.name }
                                             ) { driver ->
                                                 DriverCard(
                                                     driver = driver,

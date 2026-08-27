@@ -14,7 +14,7 @@ data class DriverPerRaceResponce(
 data class DriverEntry(
     val rank: Int,
     @SerialName("driver_number")
-    val driverNumber: Int,
+    val driverNumber: Int?,
     val name: String,
     val shortName: String,
     val abbreviation: String,

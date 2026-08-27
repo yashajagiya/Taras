@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.taras.network_calls.NetworkModule
 import com.example.taras.network_calls.taras.TarasDataService
@@ -13,6 +14,8 @@ import com.example.taras.network_calls.taras.model.CareerStats
 import com.example.taras.network_calls.taras.model.DriverPerRace
 import com.example.taras.network_calls.taras.model.DriverSeasonStats
 import com.example.taras.network_calls.taras.model.F1DriversInfoResponse
+import com.example.taras.core.db.TopThreeDriversDAO
+import com.example.taras.core.db.TopThreeDriversEntity
 import com.example.taras.network_calls.taras.model.Quote
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -31,7 +34,9 @@ import kotlinx.coroutines.supervisorScope
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
-class DriversViewModel : ViewModel() {
+class DriversViewModel(
+    private val topThreeDriversDAO: TopThreeDriversDAO
+) : ViewModel() {
     private val logTag = "DriversViewModel"
 
     private val tarasDataService =
@@ -43,6 +48,10 @@ class DriversViewModel : ViewModel() {
     private val _driversInfoData =
         MutableStateFlow<UiState<ImmutableList<F1DriversInfoResponse>>>(UiState.Loading)
     val driversInfoData = _driversInfoData.asStateFlow()
+
+    init {
+        fetchDriverData()
+    }
 
 
     // code for openf1 api
@@ -88,9 +97,27 @@ class DriversViewModel : ViewModel() {
         UiState.Loading
     )
 
-    val topThree = combinedLowDrivers.map { state ->
+    val topThree = combine(combinedLowDrivers, topThreeDriversDAO.getAll()) { state, dbList ->
         if (state is UiState.Success) {
-            UiState.Success(state.data.take(3).toImmutableList())
+            val top3 = state.data.take(3).toImmutableList()
+            saveTopThreeToDb(top3)
+            UiState.Success(top3)
+        } else if (dbList.isNotEmpty()) {
+            val combined = dbList.map { entity ->
+                DriverUiModel(
+                    driverNumber = null,
+                    rank = entity.position,
+                    name = entity.name,
+                    teamName = entity.team,
+                    points = entity.points.toString(),
+                    teamColor = null,
+                    headshotUrl = null,
+                    carNumberImage = null,
+                    fullName = entity.name,
+                    nationality = ""
+                )
+            }.toImmutableList()
+            UiState.Success(combined)
         } else {
             state
         }
@@ -99,6 +126,26 @@ class DriversViewModel : ViewModel() {
         SharingStarted.WhileSubscribed(5000),
         UiState.Loading
     )
+
+    private fun saveTopThreeToDb(drivers: List<DriverUiModel>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val entities = drivers.take(3).mapIndexed { index, uiModel ->
+                    TopThreeDriversEntity(
+                        id = index + 1,
+                        position = uiModel.rank,
+                        name = uiModel.name,
+                        points = uiModel.points.filter { it.isDigit() || it == '.' }.toFloatOrNull() ?: 0f,
+                        team = uiModel.teamName
+                    )
+                }
+                topThreeDriversDAO.insertAll(*entities.toTypedArray())
+                Log.d(logTag, "Successfully saved top 3 drivers to DB")
+            } catch (e: Exception) {
+                Log.e(logTag, "Error saving top 3 drivers to DB", e)
+            }
+        }
+    }
 
     val combinedDetailedDrivers =
         combine(_drivers, _driversInfoData) { driversState, driverInfoState ->
@@ -113,7 +160,7 @@ class DriversViewModel : ViewModel() {
 
                     DriverDetailUiModel(
                         rank = driver.rank,
-                        driverNumber = driver.driverNumber.toString(),
+                        driverNumber = driver.driverNumber?.toString() ?: driver.name,
                         slug = detail?.slug.orEmpty(),
                         url = detail?.url.orEmpty(),
 
@@ -161,18 +208,12 @@ class DriversViewModel : ViewModel() {
             initialValue = UiState.Loading
         )
 
-    init {
-        fetchDriverData()
-    }
-
     fun fetchDriverData() {
         viewModelScope.launch {
-            _drivers.value = UiState.Loading
-            _driversInfoData.value = UiState.Loading
-            delay(1000.milliseconds)
-
-//            _driverDetails.value = UiState.Loading
-
+            if (_drivers.value !is UiState.Success) {
+                _drivers.value = UiState.Loading
+                _driversInfoData.value = UiState.Loading
+            }
 
             try {
                 supervisorScope {
@@ -241,7 +282,7 @@ class DriversViewModel : ViewModel() {
 
 @Immutable
 data class DriverUiModel(
-    val driverNumber: Int,
+    val driverNumber: Int?,
     val rank: Int,
     val name: String,
     val teamName: String,
@@ -287,3 +328,13 @@ data class DriverDetailUiModel(
     val seasonStats: DriverSeasonStats?,
     val careerStats: CareerStats?
 )
+
+class DriversViewModelFactory(private val dao: TopThreeDriversDAO) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(DriversViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return DriversViewModel(dao) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}

@@ -1,4 +1,4 @@
-package com.example.taras.viewmodel
+package com.example.taras.core.helpercore
 
 import android.util.Log
 import androidx.compose.runtime.Stable
@@ -17,11 +17,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @Stable
-class NewsViewModel(
+class NewsRepository(
     private val rssRepository: RssRepository = RssRepository()
 ) : ViewModel() {
 
-    private val logTag = "NewsViewModel"
+    private val logTag = "NewsRepository"
 
     private val _news = MutableStateFlow<UiState<ImmutableList<RssItem>>>(UiState.Loading)
     val news: StateFlow<UiState<ImmutableList<RssItem>>> = _news.asStateFlow()

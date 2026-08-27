@@ -40,7 +40,7 @@ fun DriverCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable{onDriverClick(driver.driverNumber.toString())}
+            .clickable{onDriverClick(driver.driverNumber?.toString() ?: driver.name)}
             .padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),

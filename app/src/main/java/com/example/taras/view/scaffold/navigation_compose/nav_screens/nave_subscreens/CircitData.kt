@@ -46,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -54,10 +55,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.taras.core.common.CurrentData
 import com.example.taras.core.common.UiState
 import com.example.taras.core.helpercore.removeNameExtra
 import com.example.taras.viewmodel.RaceClearData
 import com.example.taras.viewmodel.RacesViewModel
+import com.example.taras.viewmodel.RacesViewModelFactory
 import com.example.taras.viewmodel.SessionTime
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.LocalDate
@@ -67,7 +70,9 @@ import kotlinx.datetime.LocalDate
 fun CircuitData(
     circuitId: String,
     modifier: Modifier = Modifier,
-    racesViewModel: RacesViewModel = viewModel()
+    racesViewModel: RacesViewModel = viewModel(
+        factory = RacesViewModelFactory(CurrentData(LocalContext.current))
+    )
 ) {
     val racesState by racesViewModel.combinedRaces.collectAsStateWithLifecycle()
 

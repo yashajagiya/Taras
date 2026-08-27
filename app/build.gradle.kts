@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.jetbrains.kotlin.serialization)
-    alias(libs.plugins.compose.multiplatform)
+    alias(libs.plugins.ksp)
+
 }
 
 android {
@@ -88,6 +89,14 @@ dependencies {
     //widgets
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
+
+    //datastore
+    implementation(libs.androidx.datastore.preferences)
+
+    //room
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+
 
 }
 

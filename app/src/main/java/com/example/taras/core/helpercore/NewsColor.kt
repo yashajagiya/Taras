@@ -18,14 +18,14 @@ fun getNewsColor(
     val description = newsItem.description ?: ""
     val content = "$title $description"
 
-    // 1. Try dynamic teams
+    //dynamic teams
     for (team in teams) {
         if (content.contains(team.teamName, ignoreCase = true)) {
             return team.teamColor?.toComposeColor() ?: defaultColor
         }
     }
 
-    // 2. Try dynamic drivers
+    //dynamic drivers
     for (driver in drivers) {
         val fullName = driver.fullName ?: ""
         val name = driver.name

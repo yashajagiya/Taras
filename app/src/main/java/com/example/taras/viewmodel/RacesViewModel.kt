@@ -5,6 +5,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taras.core.common.CurrentData
 import com.example.taras.core.common.UiState
 import com.example.taras.core.helpercore.getTodayDate
 import com.example.taras.core.helpercore.toRemoveDateExtra
@@ -17,6 +18,9 @@ import com.example.taras.network_calls.taras.model.F1RacesInfoResponse
 import com.example.taras.network_calls.taras.model.RaceEvent
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -27,7 +31,9 @@ import kotlin.time.Clock
 import kotlin.time.Instant
 
 @Stable
-class RacesViewModel : ViewModel() {
+class RacesViewModel(
+    private val currentData: CurrentData
+) : ViewModel() {
     private val logTag = "RacesViewModel"
 
     private val racesDataService =
@@ -37,20 +43,63 @@ class RacesViewModel : ViewModel() {
     val races = _races.asStateFlow()
 
     init {
-        fetchRacesData()
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                currentData.racesData.firstOrNull()?.let { json ->
+                    val cachedData = Json.decodeFromString<F1RacesInfoResponse>(json)
+                    if (_races.value is UiState.Loading) {
+                        _races.value = UiState.Success(cachedData)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(logTag, "Error loading initial races cache", e)
+            }
+            fetchRacesData()
+        }
     }
 
     fun fetchRacesData() {
         viewModelScope.launch(Dispatchers.IO) {
-            _races.value = UiState.Loading
-            delay(1000.milliseconds)
+            if (_races.value !is UiState.Success) {
+                _races.value = UiState.Loading
+            }
 
             try {
                 val racesData = racesDataService.getRaceInfoData()
                 _races.value = UiState.Success(racesData)
+                try {
+                    val today = getTodayDate().toRemoveDateExtra()
+                    // Filter to only the current upcoming race to save storage
+                    val currentRace = racesData.races.firstOrNull { it.schedule.race.date.toRemoveDateExtra() >= today }
+                        ?: racesData.races.lastOrNull()
+
+                    val cacheData = if (currentRace != null) {
+                        racesData.copy(races = listOf(currentRace))
+                    } else racesData
+
+                    val json = Json.encodeToString(cacheData)
+                    currentData.saveRacesData(json)
+                } catch (e: Exception) {
+                    Log.e(logTag, "Error saving races data to cache", e)
+                }
             } catch (e: Exception) {
                 Log.e(logTag, "Error fetching races data", e)
-                _races.value = UiState.Error("Races API: ${e.message}")
+
+                // Fallback to cache if not already loaded
+                if (_races.value !is UiState.Success) {
+                    try {
+                        val cachedJson = currentData.racesData.first()
+                        if (cachedJson != null) {
+                            val cachedData = Json.decodeFromString<F1RacesInfoResponse>(cachedJson)
+                            _races.value = UiState.Success(cachedData)
+                        } else {
+                            _races.value = UiState.Error("Races API: ${e.message}")
+                        }
+                    } catch (cacheEx: Exception) {
+                        Log.e(logTag, "Error loading races data from cache", cacheEx)
+                        _races.value = UiState.Error("Races API: ${e.message}")
+                    }
+                }
             }
         }
     }
@@ -169,6 +218,7 @@ class RacesViewModel : ViewModel() {
                         roundNumber = race.roundNumber,
                         sessionName = upcomingSession.name,
                         countdown = formatCountdown(duration),
+                        sessionTime = upcomingSession.instant.toString(),
                         circuitName = race.circuitName,
                         raceName = race.raceName
                     )
@@ -192,15 +242,27 @@ class RacesViewModel : ViewModel() {
                 CurrentRound(
                     roundNumber = session.roundNumber,
                     sessionName = session.sessionName,
+                    sessionTime = session.sessionTime
                 )
             }
         }
         .distinctUntilChanged()
+        .onEach { round ->
+            round?.let {
+                saveSessionStatus(it.sessionName, it.sessionTime)
+            }
+        }
         .stateIn(
             scope = viewModelScope,
             started = WhileSubscribed(1000),
             initialValue = null
         )
+
+    private fun saveSessionStatus(name: String, time: String) {
+        viewModelScope.launch {
+            currentData.saveCurrentSessionStatus(name, time)
+        }
+    }
 
     private fun mapToCurrentRace(race: RaceEvent): CurrentRace {
         val parsedSessions = listOfNotNull(
@@ -253,6 +315,7 @@ data class SessionInfo(
     val roundNumber: Int,
     val sessionName: String,
     val countdown: String,
+    val sessionTime: String,
     val circuitName: String,
     val raceName: String
 )
@@ -268,6 +331,7 @@ data class ParsedSession(
 data class CurrentRound(
     val roundNumber: Int,
     val sessionName: String,
+    val sessionTime: String
 )
 
 @Immutable
@@ -314,3 +378,13 @@ data class CurrentRace(
     val trackImage: String,
     val parsedSessions: ImmutableList<ParsedSession>
 )
+
+class RacesViewModelFactory(private val currentData: CurrentData) : androidx.lifecycle.ViewModelProvider.Factory {
+    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(RacesViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return RacesViewModel(currentData) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}

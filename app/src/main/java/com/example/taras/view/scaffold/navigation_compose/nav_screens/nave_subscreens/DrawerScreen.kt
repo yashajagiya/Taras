@@ -1,11 +1,18 @@
 package com.example.taras.view.scaffold.navigation_compose.nav_screens.nave_subscreens
 
 import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,8 +27,6 @@ import com.example.taras.R
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.DrawerState
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.filled.PermIdentity
@@ -45,6 +50,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
@@ -61,6 +67,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.taras.viewmodel.AppearanceViewModel
 import com.example.taras.viewmodel.UserViewModel
@@ -191,10 +198,12 @@ fun SettingDrawer(
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 private fun NotificationPermissionItem() {
+    val context = LocalContext.current
     val notificationPermissionState =
         rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS)
 
     var showRationaleDialog by remember { mutableStateOf(false) }
+    var showSettingsDialog by remember { mutableStateOf(false) }
 
     if (!notificationPermissionState.status.isGranted) {
         NavigationDrawerItem(
@@ -207,10 +216,18 @@ private fun NotificationPermissionItem() {
                 )
             },
             onClick = {
-                if (notificationPermissionState.status.shouldShowRationale) {
+                val hasPermission = ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+
+                if (hasPermission) {
+                    Toast.makeText(context, "Permission already granted", Toast.LENGTH_SHORT).show()
+                } else if (notificationPermissionState.status.shouldShowRationale) {
                     showRationaleDialog = true
                 } else {
                     notificationPermissionState.launchPermissionRequest()
+                    showSettingsDialog = true
                 }
             }
         )
@@ -232,6 +249,34 @@ private fun NotificationPermissionItem() {
             dismissButton = {
                 TextButton(onClick = { showRationaleDialog = false }) {
                     Text("Dismiss")
+                }
+            }
+        )
+    }
+
+    if (showSettingsDialog && !notificationPermissionState.status.shouldShowRationale) {
+        AlertDialog(
+            onDismissRequest = { showSettingsDialog = false },
+            title = { Text("Permissions Required") },
+            text = { Text("It seems notification permissions are disabled or permanently denied. Please enable them in the App Settings to receive updates.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showSettingsDialog = false
+                    try {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", context.packageName, null)
+                        }
+                        context.startActivity(intent)
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Could not open settings", Toast.LENGTH_SHORT).show()
+                    }
+                }) {
+                    Text("Open Settings")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSettingsDialog = false }) {
+                    Text("Cancel")
                 }
             }
         )

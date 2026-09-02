@@ -5,7 +5,12 @@
     android:viewportWidth="1024"
     android:viewportHeight="1024">
 
-    <!-- F1 Dynamic Red Swoosh & Aerodynamic 'T' -->
+    <!-- Background (Warm Paper) -->
+    <path
+        android:fillColor="#FFF6F5"
+        android:pathData="M150,0 h724 c82.8,0 150,67.2 150,150 v724 c0,82.8 -67.2,150 -150,150 h-724 c-82.8,0 -150,-67.2 -150,-150 v-724 c0,-82.8 67.2,-150 150,-150 z"/>
+
+    <!-- Red Swoosh -->
     <path
         android:fillColor="#CC0000"
         android:pathData="M250,320 h524 c26,0 41,20 26,40 l-60,60 c-10,10 -30,10 -50,10 H250 Z M450,430 h120 l-100,320 c-10,30 -40,50 -70,50 H280 l100,-320 c10,-30 40,-50 70,-50 Z M200,480 h120 l-40,120 H160 Z M170,640 h90 l-30,90 H140 Z"/>

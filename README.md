@@ -1,7 +1,7 @@
 # Taras (तरस्) 🏎️
 
 <p align="center">
-  <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp" alt="App Icon" width="128"/>
+  <img src="assets/logo.png" alt="Taras Logo" width="140" style="border-radius:24px;"/>
 </p>
 
 <p align="center">
@@ -28,22 +28,23 @@ As a lifelong F1 fan, I built Taras to solve a personal need for a clean, minima
 ## 📱 Screenshots
 
 <p align="center">
-  <img src="assets/paddock.jpg" alt="Paddock" width="180" style="border-radius:16px;"/>
-  <img src="assets/grid_drivers.jpg" alt="Drivers" width="180" style="border-radius:16px;"/>
-  <img src="assets/grid_teams.jpg" alt="Teams" width="180" style="border-radius:16px;"/>
+  <img src="assets/paddock.png" alt="Paddock" width="220" style="border-radius:16px;"/>
+  <img src="assets/grid_drivers.png" alt="Drivers Grid" width="220" style="border-radius:16px;"/>
+  <img src="assets/driver_profile.png" alt="Driver Profile" width="220" style="border-radius:16px;"/>
   <br>
-  <em><b>Paddock (News Feed)</b> | <b>Grid (Driver Profiles)</b> | <b>Grid (Team Profiles)</b></em>
+  <em><b>Paddock (News Feed)</b> | <b>Grid (Drivers)</b> | <b>Driver Profile</b></em>
   <br><br>
-  <img src="assets/calendar.jpg" alt="Calendar" width="180" style="border-radius:16px;"/>
-  <img src="assets/results.jpg" alt="Results" width="180" style="border-radius:16px;"/>
-  <img src="assets/drawer.jpg" alt="Drawer" width="180" style="border-radius:16px;"/>
+  <img src="assets/grid_teams.png" alt="Teams Grid" width="220" style="border-radius:16px;"/>
+  <img src="assets/team_profile.png" alt="Team Profile" width="220" style="border-radius:16px;"/>
+  <img src="assets/calendar.png" alt="Calendar" width="220" style="border-radius:16px;"/>
   <br>
-  <em><b>Calendar (Race Weekend)</b> | <b>Session Results</b> | <b>Navigation Drawer</b></em>
+  <em><b>Grid (Teams)</b> | <b>Team Profile</b> | <b>Calendar (Race Weekend)</b></em>
   <br><br>
-  <img src="assets/widget_light.jpg" alt="Widget Light" width="180" style="border-radius:16px;"/>
-  <img src="assets/widget_dark.jpg" alt="Widget Dark" width="180" style="border-radius:16px;"/>
+  <img src="assets/circuit_profile.png" alt="Circuit Profile" width="220" style="border-radius:16px;"/>
+  <img src="assets/results.png" alt="Session Results" width="220" style="border-radius:16px;"/>
+  <img src="assets/drawer.png" alt="Navigation Drawer" width="220" style="border-radius:16px;"/>
   <br>
-  <em><b>Home Screen Widgets (Glance)</b></em>
+  <em><b>Circuit Profile</b> | <b>Session Results</b> | <b>Navigation Drawer</b></em>
 </p>
 
 ---

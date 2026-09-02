@@ -1,5 +1,6 @@
 package com.example.taras.view.subview
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,14 +26,17 @@ import com.example.taras.viewmodel.TeamUiModel
 @Composable
 fun TeamCard(
     teamData: TeamUiModel,
+    onTeamClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val containerColor = teamData.teamColor?.toComposeColor() ?: Color.Transparent
 
     val contentColor = if (containerColor.luminance() > 0.5f) Color.Black else Color.White
 
     Card(
-        modifier = Modifier
+        modifier
             .fillMaxWidth()
+            .clickable { onTeamClick(teamData.teamName) }
             .padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = containerColor,

@@ -6,12 +6,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SignalWifiStatusbarConnectedNoInternet4
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
@@ -32,15 +36,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.taras.core.common.NetworkObserver
+import com.example.taras.core.db.AppDatabase
 import com.example.taras.core.common.UiState
 import com.example.taras.view.subview.DriverCard
 import com.example.taras.view.subview.TeamCard
 import com.example.taras.viewmodel.DriverUiModel
 import com.example.taras.viewmodel.DriversViewModel
+import com.example.taras.viewmodel.DriversViewModelFactory
 import com.example.taras.viewmodel.TeamUiModel
 import com.example.taras.viewmodel.TeamsViewModel
 import kotlinx.collections.immutable.ImmutableList
@@ -50,21 +58,32 @@ import kotlinx.collections.immutable.ImmutableList
     ExperimentalMaterial3ExpressiveApi::class
 )
 @Composable
-fun NaveGridScreen(
+fun NavGridScreen(
+    onDriverClick: (String) -> Unit,
+    onTeamClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    driversViewModel: DriversViewModel = viewModel(),
+    driversViewModel: DriversViewModel = viewModel(
+        factory = DriversViewModelFactory(
+            AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao()
+        )
+    ),
     teamsViewModel: TeamsViewModel = viewModel()
 ) {
-    val driversState by driversViewModel.combinedDrivers.collectAsStateWithLifecycle()
+    val driversState by driversViewModel.combinedLowDrivers.collectAsStateWithLifecycle()
     val teamsState by teamsViewModel.combinedTeams.collectAsStateWithLifecycle()
+    val isDriversRefreshing by driversViewModel.isRefreshing.collectAsStateWithLifecycle()
+    val isTeamsRefreshing by teamsViewModel.isRefreshing.collectAsStateWithLifecycle()
 
     GridContent(
         driversState = driversState,
         teamsState = teamsState,
+        isRefreshing = isDriversRefreshing || isTeamsRefreshing,
         onRefresh = {
-            driversViewModel.fetchDriverData()
-            teamsViewModel.fetchTeams()
+            driversViewModel.fetchDriverData(isRefresh = true)
+            teamsViewModel.fetchTeams(isRefresh = true)
         },
+        onDriverClick = onDriverClick,
+        onTeamClick = onTeamClick,
         modifier = modifier
     )
 }
@@ -77,7 +96,10 @@ fun NaveGridScreen(
 fun GridContent(
     driversState: UiState<ImmutableList<DriverUiModel>>,
     teamsState: UiState<ImmutableList<TeamUiModel>>,
+    isRefreshing: Boolean,
     onRefresh: () -> Unit,
+    onDriverClick: (String) -> Unit,
+    onTeamClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -85,21 +107,15 @@ fun GridContent(
         var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
         val tabs = listOf("Drivers", "Teams")
 
-        var isRefreshing by remember { mutableStateOf(false) }
         val pullToRefreshState = rememberPullToRefreshState()
 
-        LaunchedEffect(driversState, teamsState) {
-            if (driversState !is UiState.Loading && teamsState !is UiState.Loading) {
-                isRefreshing = false
-            }
-        }
+        val context = LocalContext.current
+        val networkObserver = remember { NetworkObserver(context) }
+        val isConnected by networkObserver.isConnected.collectAsStateWithLifecycle(initialValue = true)
 
         PullToRefreshBox(
             isRefreshing = isRefreshing,
-            onRefresh = {
-                isRefreshing = true
-                onRefresh()
-            },
+            onRefresh = onRefresh,
             state = pullToRefreshState,
             indicator = {
                 PullToRefreshDefaults.LoadingIndicator(
@@ -153,13 +169,35 @@ fun GridContent(
                                     }
 
                                     is UiState.Error -> {
-                                        item {
-                                            Text(
-                                                text = "Error: ${driversState.message}",
-                                                color = MaterialTheme.colorScheme.error,
-                                                modifier = Modifier.padding(16.dp)
-                                            )
+                                        if (!isConnected) {
+                                            item(contentType = "Error") {
+                                                Column (
+                                                    modifier = Modifier.fillMaxSize(),
+                                                    verticalArrangement = Arrangement.Center,
+                                                    horizontalAlignment = Alignment.CenterHorizontally) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.SignalWifiStatusbarConnectedNoInternet4,
+                                                        contentDescription = "No internet connection",
+                                                        tint = MaterialTheme.colorScheme.error
+                                                    )
+                                                    Spacer(modifier = Modifier.height(8.dp))
+                                                    Text(
+                                                        "No internet connection",
+                                                        color = MaterialTheme.colorScheme.error,
+                                                        modifier = Modifier.padding(16.dp)
+                                                    )
+                                                }
+                                            }
+                                        } else {
+                                            item {
+                                                Text(
+                                                    text = "Something went wrong",
+                                                    color = MaterialTheme.colorScheme.error,
+                                                    modifier = Modifier.padding(16.dp)
+                                                )
+                                            }
                                         }
+
                                     }
 
                                     is UiState.Success -> {
@@ -174,9 +212,13 @@ fun GridContent(
                                         } else {
                                             items(
                                                 items = drivers,
-                                                key = { it.driverNumber }
+                                                key = { it.driverNumber ?: it.name }
                                             ) { driver ->
-                                                DriverCard(driver = driver)
+                                                DriverCard(
+                                                    driver = driver,
+                                                    onDriverClick,
+                                                    modifier = Modifier
+                                                )
                                             }
                                         }
                                     }
@@ -229,7 +271,11 @@ fun GridContent(
                                                 items = teamsResponse,
                                                 key = { it.teamName }
                                             ) { teamData ->
-                                                TeamCard(teamData = teamData)
+                                                TeamCard(
+                                                    teamData = teamData,
+                                                    onTeamClick = onTeamClick,
+                                                    modifier = Modifier
+                                                )
                                             }
                                         }
                                     }

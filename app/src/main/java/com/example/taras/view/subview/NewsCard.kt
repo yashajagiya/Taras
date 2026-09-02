@@ -29,16 +29,16 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import androidx.compose.material3.CardDefaults
 import com.example.taras.core.helpercore.getNewsColor
-import com.example.taras.network_calls.taras.model.DriverDetail
-import com.example.taras.network_calls.taras.model.TeamsImageResponse
+import com.example.taras.viewmodel.DriverUiModel
+import com.example.taras.viewmodel.TeamUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsCarousel(
-    newsState: UiState<ImmutableList<RssItem>>,
+    newsState: UiState<ImmutableList<com.example.taras.network_calls.rss.RssItem>>,
     modifier: Modifier = Modifier,
-    drivers: ImmutableList<DriverDetail> = persistentListOf(),
-    teams: ImmutableList<TeamsImageResponse> = persistentListOf()
+    drivers: ImmutableList<DriverUiModel> = persistentListOf(),
+    teams: ImmutableList<TeamUiModel> = persistentListOf()
 ) {
     if (newsState !is UiState.Success) return
 

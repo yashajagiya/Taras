@@ -7,9 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.taras.network_calls.NetworkModule
 import com.example.taras.network_calls.taras.TarasDataService
-import com.example.taras.network_calls.taras.model.TeamsImageResponse
 import com.example.taras.network_calls.taras.model.TeamsPerRaceResponse
 import com.example.taras.core.common.UiState
+import com.example.taras.network_calls.taras.model.F1TeamsInfoResponse
+import com.example.taras.network_calls.taras.model.Racedata
+import com.example.taras.network_calls.taras.model.SeasonStats
+import com.example.taras.network_calls.taras.model.TeamProfile
+import com.example.taras.network_calls.taras.model.TeamSummary
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
@@ -28,60 +32,129 @@ import kotlin.time.Duration.Companion.milliseconds
 class TeamsViewModel : ViewModel() {
     private val logTag = "TeamsViewModel"
 
+    private val _teams = MutableStateFlow<UiState<TeamsPerRaceResponse>>(UiState.Loading)
+    val teams = _teams.asStateFlow()
+    private val _teamsInfoData =
+        MutableStateFlow<UiState<ImmutableList<F1TeamsInfoResponse>>>(UiState.Loading)
+    val teamsInfoData = _teamsInfoData.asStateFlow()
 
-    //  private val openF1Service = NetworkModule.openF1Retrofit.create(OpenF1Service::class.java)
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
 
     private val tarasDataService =
         NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
 
 
+    //  private val openF1Service = NetworkModule.openF1Retrofit.create(OpenF1Service::class.java)
+
     // private val _teams = MutableStateFlow<UiState<List<TeamStanding>>>(UiState.Loading)
 
-    private val _teams = MutableStateFlow<UiState<TeamsPerRaceResponse>>(UiState.Loading)
-    val teams = _teams.asStateFlow()
+//    private val _teamsImage = MutableStateFlow<UiState<ImmutableList<TeamsImageResponse>>>(UiState.Loading)
+//    val teamsImage = _teamsImage.asStateFlow()
 
-    private val _teamsImage = MutableStateFlow<UiState<ImmutableList<TeamsImageResponse>>>(UiState.Loading)
-    val teamsImage = _teamsImage.asStateFlow()
 
-    val combinedTeams = combine(_teams, _teamsImage) { teamsState, imagesState ->
-        if (teamsState is UiState.Success && imagesState is UiState.Success) {
+    val combinedTeams = combine(_teams, _teamsInfoData) { teamsState, teamsInfoData ->
+        if (teamsState is UiState.Success) {
             val teams = teamsState.data.entries
-            val images = imagesState.data
+            val info = (teamsInfoData as? UiState.Success)?.data ?: emptyList()
             val combined = teams.map { teamEntry ->
-                val imageDetail = images.find { it.teamName.equals(teamEntry.team, ignoreCase = true) }
+                val teamsInfo = info.find { it.hero.name.equals(teamEntry.team, ignoreCase = true) }
                 TeamUiModel(
                     teamName = teamEntry.team,
                     rank = teamEntry.rank,
                     points = teamEntry.points.displayValue,
-                    teamColor = imageDetail?.teamColor,
-                    teamLogo = imageDetail?.teamLogo,
-                    teamCar = imageDetail?.teamCar
+                    teamColor = teamsInfo?.hero?.teamColor,
+                    teamLogo = teamsInfo?.hero?.teamLogo,
+                    teamCar = teamsInfo?.hero?.teamCar
                 )
             }.toImmutableList()
             UiState.Success(combined)
-        } else if (teamsState is UiState.Error || imagesState is UiState.Error) {
+        } else if (teamsState is UiState.Error || teamsInfoData is UiState.Error) {
             UiState.Error("Something went wrong")
         } else {
             UiState.Loading
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState.Loading)
 
+    val combinedDetailedTeams = combine(
+        _teams,
+        _teamsInfoData
+    ) { teamsState, teamsInfoState ->
+
+        if (teamsState is UiState.Success && teamsInfoState is UiState.Success) {
+            val teamEntries = teamsState.data.entries
+            val infoList = teamsInfoState.data
+
+            val combinedList = teamEntries.map { teamEntry ->
+                val info = infoList.find { it.hero.name.equals(teamEntry.team, ignoreCase = true) }
+
+                DetailedTeamUiModel(
+                    rank = teamEntry.rank,
+                    teamName = teamEntry.team,
+                    currentPoints = teamEntry.points.value,
+                    currentPointsDisplay = teamEntry.points.displayValue,
+                    races = teamEntry.races.toImmutableList(),
+
+                    slug = info?.slug.orEmpty(),
+                    url = info?.url.orEmpty(),
+                    teamColor = info?.hero?.teamColor.orEmpty(),
+                    accessibleColor = info?.hero?.accessibleColor.orEmpty(),
+                    teamCarUrl = info?.hero?.teamCar,
+                    teamLogoUrl = info?.hero?.teamLogo,
+
+                    biography = info?.biography.orEmpty(),
+                    fullTeamName = info?.teamProfile?.fullTeamName ?: teamEntry.team,
+                    baseLocation = info?.teamProfile?.base.orEmpty(),
+                    teamChief = info?.teamProfile?.teamChief.orEmpty(),
+                    technicalChief = info?.teamProfile?.technicalChief.orEmpty(),
+                    chassis = info?.teamProfile?.chassis.orEmpty(),
+                    powerUnit = info?.teamProfile?.powerUnit.orEmpty(),
+                    reserveDriver = info?.teamProfile?.reserveDriver.orEmpty(),
+                    firstTeamEntryYear = info?.teamProfile?.firstTeamEntry.orEmpty(),
+                    seasonStats = info?.seasonStats,
+                    teamSummary = info?.teamSummary
+                )
+            }.toImmutableList()
+
+            UiState.Success(combinedList)
+
+        } else if (teamsState is UiState.Error) {
+            UiState.Error(teamsState.message ?: "Failed to load team standings.")
+        } else if (teamsInfoState is UiState.Error) {
+            UiState.Error(teamsInfoState.message ?: "Failed to load team details.")
+        } else {
+            UiState.Loading
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = UiState.Loading
+    )
+
     init {
-        fetchTeams()
+        fetchTeams(isRefresh = false)
     }
 
-    fun fetchTeams() {
+    fun fetchTeams(isRefresh: Boolean = false) {
         viewModelScope.launch {
-            _teams.value = UiState.Loading
-            _teamsImage.value = UiState.Loading
-            delay(2000.milliseconds)
+            if (isRefresh) {
+                _isRefreshing.value = true
+            } else if (_teams.value !is UiState.Success) {
+                _teams.value = UiState.Loading
+                _teamsInfoData.value = UiState.Loading
+            }
+
+//            _teamsImage.value = UiState.Loading
+
+            delay(1000.milliseconds)
 
             try {
                 supervisorScope {
                     val teamsDataDeferred =
                         async(Dispatchers.IO) { tarasDataService.getTeamStandings() }
-                    val teamsImageDataDeferred =
-                        async(Dispatchers.IO) { tarasDataService.getTeamsImage() }
+
+                    val teamsInfoDeferred =
+                        async(Dispatchers.IO) { tarasDataService.getTeamsInfoData() }
 
                     try {
                         _teams.value = UiState.Success(teamsDataDeferred.await())
@@ -91,16 +164,33 @@ class TeamsViewModel : ViewModel() {
                     }
 
                     try {
-                        _teamsImage.value = UiState.Success(teamsImageDataDeferred.await().toImmutableList())
+                        _teamsInfoData.value =
+                            UiState.Success(teamsInfoDeferred.await().toImmutableList())
                     } catch (e: Exception) {
-                        Log.e(logTag, "Error fetching teams images", e)
-                        _teamsImage.value = UiState.Error("Something went wrong")
+                        Log.e(logTag, "Error fetching teams standings", e)
+                        _teamsInfoData.value = UiState.Error("Something went wrong")
                     }
+
+
+                    //                    val teamsImageDataDeferred =
+//                        async(Dispatchers.IO) { tarasDataService.getTeamsImage() }
+
+//                    try {
+//                        _teamsImage.value = UiState.Success(teamsImageDataDeferred.await().toImmutableList())
+//                    } catch (e: Exception) {
+//                        Log.e(logTag, "Error fetching teams images", e)
+//                        _teamsImage.value = UiState.Error("Something went wrong")
+//                    }
+
                 }
             } catch (e: Exception) {
                 Log.e(logTag, "Error in fetchTeams", e)
                 _teams.value = UiState.Error("Something went wrong")
-                _teamsImage.value = UiState.Error("Something went wrong")
+                _teamsInfoData.value = UiState.Error("Something went wrong")
+
+//                _teamsImage.value = UiState.Error("Something went wrong")
+            } finally {
+                _isRefreshing.value = false
             }
         }
     }
@@ -114,4 +204,38 @@ data class TeamUiModel(
     val teamColor: String?,
     val teamLogo: String?,
     val teamCar: String?
+)
+
+
+@Immutable
+data class DetailedTeamUiModel(
+    // Standings & Core Info (Merged)
+    val rank: Int,
+    val teamName: String,
+    val currentPoints: Int,
+    val currentPointsDisplay: String,
+    val races: ImmutableList<Racedata>,
+
+    // Media & Colors (from Info JSON)
+    val slug: String,
+    val url: String,
+    val teamColor: String,
+    val accessibleColor: String,
+    val teamCarUrl: String?,
+    val teamLogoUrl: String?,
+
+    // Biography & Profile (Flattened)
+    val biography: String,
+    val fullTeamName: String,
+    val baseLocation: String,
+    val teamChief: String,
+    val technicalChief: String,
+    val chassis: String,
+    val powerUnit: String,
+    val reserveDriver: String,
+    val firstTeamEntryYear: String,
+
+    // Statistics (Nested to avoid 20+ duplicated variable declarations)
+    val seasonStats: SeasonStats?,
+    val teamSummary: TeamSummary?
 )

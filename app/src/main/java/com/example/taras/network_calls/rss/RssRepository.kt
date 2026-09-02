@@ -20,7 +20,7 @@ class RssRepository {
                     title = item.selectFirst("title")?.text(),
                     link = item.selectFirst("link")?.text(),
                     description = item.selectFirst("description")?.text(),
-                    image = item.selectFirst("enclosure")?.attr("url") 
+                    image = item.selectFirst("enclosure")?.attr("url")
                         ?: item.selectFirst("media|content")?.attr("url")
                         ?: item.selectFirst("image")?.text(),
                     pubDate = item.selectFirst("pubDate")?.text()

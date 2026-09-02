@@ -1,10 +1,18 @@
 package com.example.taras.view.scaffold.navigation_compose.nav_screens
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.PowerManager
+import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -36,7 +44,6 @@ import com.example.taras.core.db.AppDatabase
 import com.example.taras.core.common.CurrentData
 import com.example.taras.core.common.UiState
 import com.example.taras.core.helpercore.toComposeColor
-import com.example.taras.network_calls.rss.RssItem
 import com.example.taras.view.subview.NewsCarousel
 import com.example.taras.viewmodel.CurrentRace
 import com.example.taras.viewmodel.DriverUiModel
@@ -48,8 +55,11 @@ import com.example.taras.viewmodel.RacesViewModelFactory
 import com.example.taras.viewmodel.SessionInfo
 import com.example.taras.viewmodel.TeamUiModel
 import com.example.taras.viewmodel.TeamsViewModel
+import com.example.taras.network_calls.rss.RssItem
+import com.example.taras.core.notification.NotificationScheduler
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import androidx.core.net.toUri
 
 
 @OptIn(
@@ -109,7 +119,7 @@ fun PaddockContent(
     driverTopThree: UiState<ImmutableList<DriverUiModel>>,
     allDrivers: UiState<ImmutableList<DriverUiModel>>,
     allTeams: UiState<ImmutableList<TeamUiModel>>,
-    newsState: UiState<ImmutableList<com.example.taras.network_calls.rss.RssItem>>,
+    newsState: UiState<ImmutableList<RssItem>>,
     raceCurrentState: UiState<CurrentRace?>,
     nextSessionInfo: SessionInfo?,
     isRefreshing: Boolean,
@@ -119,11 +129,6 @@ fun PaddockContent(
     Box(modifier = modifier) {
         StartNofi()
         val pullToRefreshState = rememberPullToRefreshState()
-
-        val isAnyLoading = driverTopThree is UiState.Loading ||
-                newsState is UiState.Loading ||
-                raceCurrentState is UiState.Loading ||
-                allTeams is UiState.Loading
 
         val isAnyError = driverTopThree is UiState.Error ||
                 newsState is UiState.Error ||
@@ -468,18 +473,26 @@ private fun RunnerUpDriverCard(
     }
 }
 @Composable
-fun StartNofi(modifier: Modifier = Modifier) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        val context = LocalContext.current
-        val permissionLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission()
-        ) { isGranted ->
-            if (isGranted) {
-                Toast.makeText(context, "Notifications enabled for race updates", Toast.LENGTH_SHORT).show()
-            }
-        }
+fun StartNofi() {
+    val context = LocalContext.current
 
-        LaunchedEffect(Unit) {
+    val batteryOptLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) {
+        NotificationScheduler.scheduleNotificationSync(context)
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Toast.makeText(context, "Notifications enabled for race updates", Toast.LENGTH_SHORT).show()
+        }
+        requestBatteryOptimizationExemption(context, batteryOptLauncher)
+    }
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val permission = Manifest.permission.POST_NOTIFICATIONS
             val hasPermission = ContextCompat.checkSelfPermission(
                 context,
@@ -488,7 +501,33 @@ fun StartNofi(modifier: Modifier = Modifier) {
 
             if (!hasPermission) {
                 permissionLauncher.launch(permission)
+            } else {
+                requestBatteryOptimizationExemption(context, batteryOptLauncher)
             }
+        } else {
+            requestBatteryOptimizationExemption(context, batteryOptLauncher)
         }
     }
+}
+
+@SuppressLint("BatteryLife")
+private fun requestBatteryOptimizationExemption(
+    context: Context,
+    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
+) {
+    val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+    if (!pm.isIgnoringBatteryOptimizations(context.packageName)) {
+        try {
+            val intent = Intent(
+                Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                "package:${context.packageName}".toUri()
+            )
+            launcher.launch(intent)
+            return
+        } catch (e: Exception) {
+            Log.e("PaddockScreen", "Failed to launch battery optimization intent", e)
+            Toast.makeText(context, "Please allow background activity in settings", Toast.LENGTH_LONG).show()
+        }
+    }
+    NotificationScheduler.scheduleNotificationSync(context)
 }

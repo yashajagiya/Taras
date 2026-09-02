@@ -2,13 +2,20 @@ package com.example.taras.core.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.taras.R
+import com.example.taras.core.common.UserPreferences
+import com.example.taras.view.MainActivity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -17,8 +24,6 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 import androidx.core.content.edit
-import com.example.taras.core.common.UserPreferences
-import kotlinx.coroutines.flow.first
 
 /**
  * Data model for the notification JSON fetched from GitHub.
@@ -98,11 +103,18 @@ class GithubNotificationWorker(
 
             // Fetch username from DataStore
             val userPreferences = UserPreferences(applicationContext)
-            val userName = userPreferences.userNameFlow.first()
+            val userName = userPreferences.userNameFlow.first().ifBlank { "User" }
 
-            // Personalize the notification by replacing $username placeholder
-            val title = rawTitle.replace("\$username", userName, ignoreCase = true)
-            val message = rawMessage.replace("\$username", userName, ignoreCase = true)
+            // Personalize the notification by replacing placeholders
+            val placeholders = listOf("[username]", "\$username", "{username}", "\${username}")
+            
+            var title = rawTitle
+            var message = rawMessage
+            
+            placeholders.forEach { placeholder ->
+                title = title.replace(placeholder, userName, ignoreCase = true)
+                message = message.replace(placeholder, userName, ignoreCase = true)
+            }
 
             // 4. Persistence Check: Compare current ID with the last one we successfully showed
             val prefs = applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -136,7 +148,20 @@ class GithubNotificationWorker(
     private fun showLocalNotification(title: String, message: String, notificationId: Int) {
         val manager = applicationContext
             .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        
+
+        // Create an Intent that opens MainActivity when clicked
+        val intent = Intent(applicationContext, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        // Wrap the Intent in a PendingIntent
+        val pendingIntent = PendingIntent.getActivity(
+            applicationContext,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         // Since Android 8.0 (Oreo), notifications MUST have a channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -151,10 +176,13 @@ class GithubNotificationWorker(
 
         // Build the actual notification appearance
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_info) // The icon shown in the status bar
+            .setSmallIcon(R.mipmap.ic_launcher) // Use app icon as small icon
+            .setLargeIcon(BitmapFactory.decodeResource(applicationContext.resources, R.mipmap.ic_launcher)) // Use app icon as large icon
             .setContentTitle(title)
             .setContentText(message)
+            .setColor(0xFFC00100.toInt()) // App's primary red color
             .setPriority(NotificationCompat.PRIORITY_HIGH) // Visual priority
+            .setContentIntent(pendingIntent) // Set the intent to open app on click
             .setAutoCancel(true) // Dismiss when the user taps it
             .build()
 

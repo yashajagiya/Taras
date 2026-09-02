@@ -21,7 +21,7 @@
 
 **Taras (तरस्)** in Sanskrit translates to **"speed," "velocity," "energy,"** or **"strength."** It perfectly encapsulates the essence of Formula 1—a sport defined by swiftness and powerful force.
 
-As a lifelong F1 fan, I built Taras to solve a personal need for a clean, minimalist, and performance-driven data tool. This project serves as a cornerstone of my professional portfolio, demonstrating my ability to architect complex Android applications that handle multi-source data streams, robust offline persistence, and modern UI patterns.
+As a fan of F1, I built Taras to solve a personal need for a clean, minimalist, and performance-driven data tool. This project serves as a cornerstone of my professional portfolio, demonstrating my ability to architect complex Android applications that handle multi-source data streams, robust offline persistence, and modern UI patterns.
 
 ---
 
@@ -32,19 +32,19 @@ As a lifelong F1 fan, I built Taras to solve a personal need for a clean, minima
   <img src="assets/grid_drivers.png" alt="Drivers Grid" width="220" style="border-radius:16px;"/>
   <img src="assets/driver_profile.png" alt="Driver Profile" width="220" style="border-radius:16px;"/>
   <br>
-  <em><b>Paddock (News Feed)</b> | <b>Grid (Drivers)</b> | <b>Driver Profile</b></em>
+  <em><b>Paddock (News Feed)</b>    |    <b>Grid (Drivers)</b>    |    <b>Driver Profile</b></em>
   <br><br>
   <img src="assets/grid_teams.png" alt="Teams Grid" width="220" style="border-radius:16px;"/>
   <img src="assets/team_profile.png" alt="Team Profile" width="220" style="border-radius:16px;"/>
   <img src="assets/calendar.png" alt="Calendar" width="220" style="border-radius:16px;"/>
   <br>
-  <em><b>Grid (Teams)</b> | <b>Team Profile</b> | <b>Calendar (Race Weekend)</b></em>
+  <em><b>Grid (Teams)</b>    |    <b>Team Profile</b>    |    <b>Calendar (Race Weekend)</b></em>
   <br><br>
   <img src="assets/circuit_profile.png" alt="Circuit Profile" width="220" style="border-radius:16px;"/>
   <img src="assets/results.png" alt="Session Results" width="220" style="border-radius:16px;"/>
   <img src="assets/drawer.png" alt="Navigation Drawer" width="220" style="border-radius:16px;"/>
   <br>
-  <em><b>Circuit Profile</b> | <b>Session Results</b> | <b>Navigation Drawer</b></em>
+  <em><b>Circuit Profile</b>    |    <b>Session Results</b>    |    <b>Navigation Drawer</b></em>
 </p>
 
 ---
@@ -82,7 +82,7 @@ As a lifelong F1 fan, I built Taras to solve a personal need for a clean, minima
 | **XML/RSS** | [Ksoup](https://github.com/fleeksoft/ksoup) | Fast parsing of F1 news feeds |
 | **Database** | [Room](https://developer.android.com/training/data-storage/room) | Local data persistence for profiles/standings |
 | **Preferences** | [DataStore](https://developer.android.com/topic/libraries/architecture/datastore) | Reactive user settings management |
-| **Visuals** | [Compose Charts](https://github.com/tehras/charts) | Data visualization and trend analysis |
+| **Visuals** | [charts](https://github.com/HDCharts/charts) | Data visualization and trend analysis |
 | **Background** | WorkManager | Reliable background sync and notifications |
 
 ---
@@ -149,5 +149,5 @@ app/src/main/java/com/example/taras/
 Distributed under the Apache 2.0 License. See `LICENSE` for more information.
 
 <p align="center">
-  Made with 🏎️ by <a href="https://github.com/yashajagiya">yashajagiya</a>
+  Made by <a href="https://github.com/yashajagiya">yashajagiya</a> 🏎️🏆❤️
 </p>

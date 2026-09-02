@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.taras.core.common.CurrentData
 import com.example.taras.core.common.UiState
@@ -36,13 +37,17 @@ class RacesViewModel(
 ) : ViewModel() {
     private val logTag = "RacesViewModel"
 
-    private val racesDataService =
-        NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
+    private val racesDataService = NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
 
     private val _races = MutableStateFlow<UiState<F1RacesInfoResponse>>(UiState.Loading)
     val races = _races.asStateFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
     init {
+        fetchRacesData(isRefresh = false)
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 currentData.racesData.firstOrNull()?.let { json ->
@@ -54,13 +59,14 @@ class RacesViewModel(
             } catch (e: Exception) {
                 Log.e(logTag, "Error loading initial races cache", e)
             }
-            fetchRacesData()
         }
     }
 
-    fun fetchRacesData() {
+    fun fetchRacesData(isRefresh: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (_races.value !is UiState.Success) {
+            if (isRefresh) {
+                _isRefreshing.value = true
+            } else if (_races.value !is UiState.Success) {
                 _races.value = UiState.Loading
             }
 
@@ -68,16 +74,7 @@ class RacesViewModel(
                 val racesData = racesDataService.getRaceInfoData()
                 _races.value = UiState.Success(racesData)
                 try {
-                    val today = getTodayDate().toRemoveDateExtra()
-                    // Filter to only the current upcoming race to save storage
-                    val currentRace = racesData.races.firstOrNull { it.schedule.race.date.toRemoveDateExtra() >= today }
-                        ?: racesData.races.lastOrNull()
-
-                    val cacheData = if (currentRace != null) {
-                        racesData.copy(races = listOf(currentRace))
-                    } else racesData
-
-                    val json = Json.encodeToString(cacheData)
+                    val json = Json.encodeToString(racesData)
                     currentData.saveRacesData(json)
                 } catch (e: Exception) {
                     Log.e(logTag, "Error saving races data to cache", e)
@@ -85,71 +82,79 @@ class RacesViewModel(
             } catch (e: Exception) {
                 Log.e(logTag, "Error fetching races data", e)
 
-                // Fallback to cache if not already loaded
-                if (_races.value !is UiState.Success) {
-                    try {
-                        val cachedJson = currentData.racesData.first()
-                        if (cachedJson != null) {
-                            val cachedData = Json.decodeFromString<F1RacesInfoResponse>(cachedJson)
-                            _races.value = UiState.Success(cachedData)
-                        } else {
-                            _races.value = UiState.Error("Races API: ${e.message}")
-                        }
-                    } catch (cacheEx: Exception) {
-                        Log.e(logTag, "Error loading races data from cache", cacheEx)
+                // Fallback to cache if not already loaded OR if it's a refresh failure
+                try {
+                    val cachedJson = currentData.racesData.first()
+                    if (cachedJson != null) {
+                        val cachedData = Json.decodeFromString<F1RacesInfoResponse>(cachedJson)
+                        _races.value = UiState.Success(cachedData)
+                    } else if (_races.value !is UiState.Success) {
+                        _races.value = UiState.Error("Races API: ${e.message}")
+                    }
+                } catch (cacheEx: Exception) {
+                    Log.e(logTag, "Error loading races data from cache", cacheEx)
+                    if (_races.value !is UiState.Success) {
                         _races.value = UiState.Error("Races API: ${e.message}")
                     }
                 }
+            } finally {
+                _isRefreshing.value = false
             }
         }
     }
 
     val combinedRaces = _races.map { racesState ->
-        if (racesState is UiState.Success) {
-            val races = racesState.data.races
+        when (racesState) {
+            is UiState.Success -> {
+                val races = racesState.data.races
 
-            val combine = races.map { race ->
-                RaceClearData(
-                    raceId = race.raceId,
-                    roundNumber = race.round,
-                    raceName = race.raceName,
-                    laps = race.laps,
-                    circuitId = race.circuit.circuitId,
-                    circuitName = race.circuit.circuitName,
-                    country = race.circuit.country,
-                    city = race.circuit.city,
-                    circuitLength = race.circuit.circuitLength,
-                    lapRecord = race.circuit.lapRecord,
-                    firstParticipationYear = race.circuit.firstParticipationYear,
-                    corners = race.circuit.corners,
-                    fastestLapDriverId = race.circuit.fastestLapDriverId,
-                    fastestLapTeamId = race.circuit.fastestLapTeamId,
-                    fastestLapYear = race.circuit.fastestLapYear,
-                    winnerName = race.winner?.fullName ?: "",
-                    winnerNumber = race.winner?.drivernumber ?: 0,
-                    winnerTeam = race.winner?.teamWinner ?: "",
-                    race = SessionTime(race.schedule.race.date, race.schedule.race.time),
-                    qualy = SessionTime(race.schedule.qualy.date, race.schedule.qualy.time),
-                    fp1 = SessionTime(race.schedule.fp1.date, race.schedule.fp1.time),
-                    fp2 = SessionTime(race.schedule.fp2?.date, race.schedule.fp2?.time),
-                    fp3 = SessionTime(race.schedule.fp3?.date, race.schedule.fp3?.time),
-                    sprintQualy = SessionTime(
-                        race.schedule.sprintQualy?.date,
-                        race.schedule.sprintQualy?.time
-                    ),
-                    sprintRace = SessionTime(
-                        race.schedule.sprintRace?.date,
-                        race.schedule.sprintRace?.time
-                    ),
-                    trackImage = race.circuit.trackImage,
-                    gpName = race.circuit.gpName
-                )
+                val combine = races.map { race ->
+                    RaceClearData(
+                        raceId = race.raceId,
+                        roundNumber = race.round,
+                        raceName = race.raceName,
+                        laps = race.laps,
+                        circuitId = race.circuit.circuitId,
+                        circuitName = race.circuit.circuitName,
+                        country = race.circuit.country,
+                        city = race.circuit.city,
+                        circuitLength = race.circuit.circuitLength,
+                        lapRecord = race.circuit.lapRecord,
+                        firstParticipationYear = race.circuit.firstParticipationYear,
+                        corners = race.circuit.corners,
+                        fastestLapDriverId = race.circuit.fastestLapDriverId,
+                        fastestLapTeamId = race.circuit.fastestLapTeamId,
+                        fastestLapYear = race.circuit.fastestLapYear,
+                        winnerName = race.winner?.fullName ?: "",
+                        winnerNumber = race.winner?.drivernumber ?: 0,
+                        winnerTeam = race.winner?.teamWinner ?: "",
+                        race = SessionTime(race.schedule.race.date, race.schedule.race.time),
+                        qualy = SessionTime(race.schedule.qualy.date, race.schedule.qualy.time),
+                        fp1 = SessionTime(race.schedule.fp1.date, race.schedule.fp1.time),
+                        fp2 = SessionTime(race.schedule.fp2?.date, race.schedule.fp2?.time),
+                        fp3 = SessionTime(race.schedule.fp3?.date, race.schedule.fp3?.time),
+                        sprintQualy = SessionTime(
+                            race.schedule.sprintQualy?.date,
+                            race.schedule.sprintQualy?.time
+                        ),
+                        sprintRace = SessionTime(
+                            race.schedule.sprintRace?.date,
+                            race.schedule.sprintRace?.time
+                        ),
+                        trackImage = race.circuit.trackImage,
+                        gpName = race.circuit.gpName
+                    )
+                }
+                UiState.Success(combine.toImmutableList())
             }
-            UiState.Success(combine.toImmutableList())
-        } else if (racesState is UiState.Error) {
-            UiState.Error(racesState.message)
-        } else {
-            UiState.Loading
+
+            is UiState.Error -> {
+                UiState.Error(racesState.message)
+            }
+
+            else -> {
+                UiState.Loading
+            }
         }
     }.stateIn(
         viewModelScope,
@@ -379,8 +384,8 @@ data class CurrentRace(
     val parsedSessions: ImmutableList<ParsedSession>
 )
 
-class RacesViewModelFactory(private val currentData: CurrentData) : androidx.lifecycle.ViewModelProvider.Factory {
-    override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+class RacesViewModelFactory(private val currentData: CurrentData) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RacesViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return RacesViewModel(currentData) as T

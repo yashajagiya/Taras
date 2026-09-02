@@ -35,7 +35,7 @@ import com.example.taras.viewmodel.TeamUiModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsCarousel(
-    newsState: UiState<ImmutableList<RssItem>>,
+    newsState: UiState<ImmutableList<com.example.taras.network_calls.rss.RssItem>>,
     modifier: Modifier = Modifier,
     drivers: ImmutableList<DriverUiModel> = persistentListOf(),
     teams: ImmutableList<TeamUiModel> = persistentListOf()

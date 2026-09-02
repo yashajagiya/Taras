@@ -1,5 +1,11 @@
 package com.example.taras.view.scaffold.navigation_compose.nav_screens
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.requiredHeight
@@ -22,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
@@ -53,7 +60,9 @@ import kotlinx.collections.immutable.persistentListOf
 fun NavPaddockScreen(
     modifier: Modifier = Modifier,
     driversViewModel: DriversViewModel = viewModel(
-        factory = DriversViewModelFactory(AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao())
+        factory = DriversViewModelFactory(
+            AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao()
+        )
     ),
     teamsViewModel: TeamsViewModel = viewModel(),
     newsRepository: NewsRepository = viewModel(),
@@ -68,6 +77,11 @@ fun NavPaddockScreen(
     val raceCurrentState by racesViewModel.oneRace.collectAsStateWithLifecycle()
     val nextSessionInfo by racesViewModel.nextSessionInfo.collectAsStateWithLifecycle()
 
+    val isDriversRefreshing by driversViewModel.isRefreshing.collectAsStateWithLifecycle()
+    val isTeamsRefreshing by teamsViewModel.isRefreshing.collectAsStateWithLifecycle()
+    val isNewsRefreshing by newsRepository.isRefreshing.collectAsStateWithLifecycle()
+    val isRacesRefreshing by racesViewModel.isRefreshing.collectAsStateWithLifecycle()
+
     PaddockContent(
         modifier = modifier,
         driverTopThree = driverTopThree,
@@ -76,11 +90,12 @@ fun NavPaddockScreen(
         newsState = newsState,
         raceCurrentState = raceCurrentState,
         nextSessionInfo = nextSessionInfo,
+        isRefreshing = isDriversRefreshing || isTeamsRefreshing || isNewsRefreshing || isRacesRefreshing,
         onRefresh = {
-            driversViewModel.fetchDriverData()
-            teamsViewModel.fetchTeams()
-            newsRepository.fetchNews()
-            racesViewModel.fetchRacesData()
+            driversViewModel.fetchDriverData(isRefresh = true)
+            teamsViewModel.fetchTeams(isRefresh = true)
+            newsRepository.fetchNews(isRefresh = true)
+            racesViewModel.fetchRacesData(isRefresh = true)
         }
     )
 }
@@ -94,41 +109,38 @@ fun PaddockContent(
     driverTopThree: UiState<ImmutableList<DriverUiModel>>,
     allDrivers: UiState<ImmutableList<DriverUiModel>>,
     allTeams: UiState<ImmutableList<TeamUiModel>>,
-    newsState: UiState<ImmutableList<RssItem>>,
+    newsState: UiState<ImmutableList<com.example.taras.network_calls.rss.RssItem>>,
     raceCurrentState: UiState<CurrentRace?>,
     nextSessionInfo: SessionInfo?,
+    isRefreshing: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
-        var isRefreshing by remember { mutableStateOf(false) }
+        StartNofi()
         val pullToRefreshState = rememberPullToRefreshState()
 
-        LaunchedEffect(driverTopThree, newsState, raceCurrentState, allTeams) {
-            if (driverTopThree !is UiState.Loading &&
-                newsState !is UiState.Loading &&
-                raceCurrentState !is UiState.Loading &&
-                allTeams !is UiState.Loading
-            ) {
-                isRefreshing = false
-            } else if (driverTopThree is UiState.Error ||
+        val isAnyLoading = driverTopThree is UiState.Loading ||
+                newsState is UiState.Loading ||
+                raceCurrentState is UiState.Loading ||
+                allTeams is UiState.Loading
+
+        val isAnyError = driverTopThree is UiState.Error ||
                 newsState is UiState.Error ||
                 raceCurrentState is UiState.Error ||
                 allTeams is UiState.Error
-            ) {
-                isRefreshing = false
-            }
-        }
+
+        val isEssentialSuccess =
+            driverTopThree is UiState.Success && raceCurrentState is UiState.Success
+        val isEssentialLoading =
+            driverTopThree is UiState.Loading || raceCurrentState is UiState.Loading
 
         PullToRefreshBox(
             isRefreshing = isRefreshing,
-            onRefresh = {
-                isRefreshing = true
-                onRefresh()
-            },
+            onRefresh = onRefresh,
             state = pullToRefreshState,
             indicator = {
-                if (!isRefreshing) {
+                if (!(isEssentialLoading || isRefreshing)) {
                     PullToRefreshDefaults.LoadingIndicator(
                         state = pullToRefreshState,
                         isRefreshing = false,
@@ -141,22 +153,8 @@ fun PaddockContent(
                 modifier = Modifier.fillMaxSize(),
                 color = Color.Transparent
             ) {
-                val isAnyLoading = driverTopThree is UiState.Loading ||
-                        newsState is UiState.Loading ||
-                        raceCurrentState is UiState.Loading ||
-                        allTeams is UiState.Loading
 
-                val isAnyError = driverTopThree is UiState.Error ||
-                        newsState is UiState.Error ||
-                        raceCurrentState is UiState.Error ||
-                        allTeams is UiState.Error
-
-                val isEssentialSuccess =
-                    driverTopThree is UiState.Success && raceCurrentState is UiState.Success
-                val isEssentialLoading =
-                    driverTopThree is UiState.Loading || raceCurrentState is UiState.Loading
-
-                if (isEssentialLoading && !isEssentialSuccess) {
+                if (isEssentialLoading || isRefreshing) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -166,7 +164,7 @@ fun PaddockContent(
                         Spacer(Modifier.requiredHeight(30.dp))
                         Text("Loading...")
                     }
-                } else if (isAnyError && !isEssentialSuccess && !isRefreshing) {
+                } else if (isAnyError && !isEssentialSuccess) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -370,32 +368,32 @@ fun PaddockContent(
                                 }
                             }
                         }
-                        if (!isAnyError) {
-                            item {
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Text(
-                                    modifier = Modifier.padding(
-                                        start = 16.dp,
-                                        top = 16.dp,
-                                        end = 16.dp
-                                    ),
-                                    text = "Latest from the Paddock....",
-                                    color = Color.Black,
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    maxLines = 2
-                                )
-                            }
 
-                            item {
-                                NewsCarousel(
-                                    newsState = newsState,
-                                    modifier = Modifier.padding(vertical = 8.dp),
-                                    drivers = (allDrivers as? UiState.Success)?.data
-                                        ?: persistentListOf(),
-                                    teams = (allTeams as? UiState.Success)?.data ?: persistentListOf()
-                                )
-                            }
+                        item {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                modifier = Modifier.padding(
+                                    start = 16.dp,
+                                    top = 16.dp,
+                                    end = 16.dp
+                                ),
+                                text = "Latest from the Paddock....",
+                                color = Color.Black,
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 2
+                            )
+                        }
+
+                        item {
+                            NewsCarousel(
+                                newsState = newsState,
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                drivers = (allDrivers as? UiState.Success)?.data
+                                    ?: persistentListOf(),
+                                teams = (allTeams as? UiState.Success)?.data
+                                    ?: persistentListOf()
+                            )
                         }
                     }
                 }
@@ -465,6 +463,31 @@ private fun RunnerUpDriverCard(
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.padding(bottom = 6.dp, start = 4.dp)
                 )
+            }
+        }
+    }
+}
+@Composable
+fun StartNofi(modifier: Modifier = Modifier) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val context = LocalContext.current
+        val permissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                Toast.makeText(context, "Notifications enabled for race updates", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        LaunchedEffect(Unit) {
+            val permission = Manifest.permission.POST_NOTIFICATIONS
+            val hasPermission = ContextCompat.checkSelfPermission(
+                context,
+                permission
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (!hasPermission) {
+                permissionLauncher.launch(permission)
             }
         }
     }

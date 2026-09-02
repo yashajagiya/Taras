@@ -1,4 +1,4 @@
-package com.example.taras.navigation
+package com.example.taras.core.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth

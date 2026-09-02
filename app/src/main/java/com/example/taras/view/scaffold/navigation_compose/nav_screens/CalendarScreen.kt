@@ -19,11 +19,8 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,13 +49,15 @@ fun NavCalendarScreen(
 ) {
     val racesState by racesViewModel.combinedRaces.collectAsStateWithLifecycle()
     val racesCurrentState by racesViewModel.upcomingRoundInfo.collectAsStateWithLifecycle()
+    val isRefreshing by racesViewModel.isRefreshing.collectAsStateWithLifecycle()
 
-    CalanderComposble(
+    CalendarComposable(
         racesState,
         racesCurrentState,
+        isRefreshing = isRefreshing,
         onCircuitClick,
         onRefresh = {
-            racesViewModel.fetchRacesData()
+            racesViewModel.fetchRacesData(isRefresh = true)
         },
         modifier = modifier.padding(vertical = 8.dp)
     )
@@ -66,46 +65,40 @@ fun NavCalendarScreen(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun CalanderComposble(
+fun CalendarComposable(
     racesState: UiState<ImmutableList<RaceClearData>>,
     racesCurrentState: CurrentRound?,
+    isRefreshing: Boolean,
     onCircuitClick: (String) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxSize()) {
 
-        var isRefreshing by remember { mutableStateOf(false) }
-
         val pullToRefreshState = rememberPullToRefreshState()
 
-        LaunchedEffect(racesState) {
-            if (racesState !is UiState.Loading) {
-                isRefreshing = false
-            }
-        }
-
+        val isAnyLoading = racesState is UiState.Loading
+        val isAnyError = racesState is UiState.Error
 
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh = {
-                isRefreshing = true
                 onRefresh()
             },
             state = pullToRefreshState,
             indicator = {
-                PullToRefreshDefaults.LoadingIndicator(
-                    state = pullToRefreshState,
-                    isRefreshing = isRefreshing,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
+                if (!(isAnyLoading || isRefreshing)) {
+                    PullToRefreshDefaults.LoadingIndicator(
+                        state = pullToRefreshState,
+                        isRefreshing = false,
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
+                }
             }
         ) {
             Surface(color = Color.Transparent) {
-                val isAnyLoading = racesState is UiState.Loading
-                val isAnyError = racesState is UiState.Error
 
-                if (isAnyLoading && !isRefreshing) {
+                if (isAnyLoading || isRefreshing) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -115,7 +108,7 @@ fun CalanderComposble(
                         Spacer(Modifier.requiredHeight(30.dp))
                         Text("Loading...")
                     }
-                } else if (isAnyError && !isRefreshing) {
+                } else if (isAnyError) {
                     val errorMessage = racesState.message
 
                     Column(

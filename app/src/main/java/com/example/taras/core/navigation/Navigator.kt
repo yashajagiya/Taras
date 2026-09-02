@@ -1,4 +1,4 @@
-package com.example.taras.navigation
+package com.example.taras.core.navigation
 
 import com.example.taras.view.scaffold.navigation_compose.nav_main.NavState
 import androidx.compose.runtime.Stable

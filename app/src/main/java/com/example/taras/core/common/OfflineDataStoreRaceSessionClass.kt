@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.map
 
-val Context.dataStore by preferencesDataStore(name = "offlineData")
+val Context.raceSessionDataStore by preferencesDataStore(name = "offlineData")
 
 class CurrentData(private val context: Context) {
 
@@ -17,23 +17,24 @@ class CurrentData(private val context: Context) {
     }
 
     suspend fun saveRacesData(json: String) {
-        context.dataStore.edit {
+        context.raceSessionDataStore.edit {
             it[RACES_DATA_KEY] = json
         }
     }
 
-    val racesData = context.dataStore.data.map {
+    val racesData = context.raceSessionDataStore.data.map {
         it[RACES_DATA_KEY]
     }
 
     suspend fun saveCurrentSessionStatus(sessionName: String, sessionTime: String) {
-        context.dataStore.edit {
+        context.raceSessionDataStore.edit {
             it[SESSION_NAME_KEY] = sessionName
             it[SESSION_TIME_KEY] = sessionTime
         }
     }
 
-    val isCurrentSessionSaved = context.dataStore.data.map {
+    val isCurrentSessionSaved = context.raceSessionDataStore.data.map {
         it.contains(SESSION_NAME_KEY) && it.contains(SESSION_TIME_KEY)
     }
 }
+

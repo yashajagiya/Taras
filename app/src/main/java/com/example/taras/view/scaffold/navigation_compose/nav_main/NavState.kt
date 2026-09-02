@@ -19,7 +19,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.savedstate.serialization.SavedStateConfiguration
 import androidx.savedstate.compose.serialization.serializers.MutableStateSerializer
-import com.example.taras.navigation.MainNavRoutes
+import com.example.taras.core.navigation.MainNavRoutes
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toPersistentMap
@@ -54,6 +54,8 @@ val serializerConfig = SavedStateConfiguration {
             subclass(MainNavRoutes.DriverProfile::class)
             subclass(MainNavRoutes.CircuitData::class)
             subclass(MainNavRoutes.TeamsData::class)
+            subclass(MainNavRoutes.DrawerSetting::class)
+
         }
     }
 }

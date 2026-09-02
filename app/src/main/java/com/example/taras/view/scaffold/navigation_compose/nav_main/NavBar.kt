@@ -7,8 +7,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import com.example.taras.navigation.MainNavRoutes
-import com.example.taras.navigation.NAV_BAR_PARAMETER
+import com.example.taras.core.navigation.MainNavRoutes
+import com.example.taras.core.navigation.NAV_BAR_PARAMETER
 
 @Composable
 fun MainNavBar(

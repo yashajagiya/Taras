@@ -18,8 +18,7 @@ import android.content.Context
 import android.util.Log
 
 class RaceRepository {
-    private val racesDataService =
-        NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
+    private val racesDataService = NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
 
     suspend fun getNextRaceData(context: Context): Pair<UiState<CurrentRace?>, SessionInfo?> {
         var raceCurrentState: UiState<CurrentRace?> = UiState.Loading
@@ -54,7 +53,7 @@ class RaceRepository {
                 val currentData = CurrentData(context)
                 val cachedJson = currentData.racesData.firstOrNull()
                 if (cachedJson != null) {
-                    val cachedData = Json.decodeFromString<F1RacesInfoResponse>(cachedJson)
+                    val cachedData = Json.decodeFromString<com.example.taras.network_calls.taras.model.F1RacesInfoResponse>(cachedJson)
                     val result = processRacesData(cachedData)
                     raceCurrentState = result.first
                     nextSessionInfo = result.second
@@ -70,7 +69,7 @@ class RaceRepository {
         return Pair(raceCurrentState, nextSessionInfo)
     }
 
-    private fun processRacesData(racesData: F1RacesInfoResponse): Pair<UiState<CurrentRace?>, SessionInfo?> {
+    private fun processRacesData(racesData: com.example.taras.network_calls.taras.model.F1RacesInfoResponse): Pair<UiState<CurrentRace?>, SessionInfo?> {
         val races = racesData.races
         val today = getTodayDate().toRemoveDateExtra()
 
@@ -111,7 +110,7 @@ class RaceRepository {
         return Pair(raceCurrentState, nextSessionInfo)
     }
 
-    private fun mapToCurrentRace(race: RaceEvent): CurrentRace {
+    private fun mapToCurrentRace(race: com.example.taras.network_calls.taras.model.RaceEvent): CurrentRace {
         val parsedSessions = listOfNotNull(
             createParsedSession("FP1", race.schedule.fp1.date, race.schedule.fp1.time),
             createParsedSession("FP2", race.schedule.fp2?.date, race.schedule.fp2?.time),

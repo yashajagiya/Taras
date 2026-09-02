@@ -62,5 +62,4 @@ interface TarasDataService {
     @GET(ApiConstants.ENDPOINT_RACES_DATA)
     suspend fun getRaceInfoData(): F1RacesInfoResponse
 
-   
 }

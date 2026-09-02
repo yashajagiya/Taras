@@ -534,7 +534,7 @@ fun TeamProfileContent(
 
 @Composable
 private fun ChartPerTeam(
-    perRace: ImmutableList<Racedata>,
+    perRace: ImmutableList<com.example.taras.network_calls.taras.model.Racedata>,
     points: String
 ) {
     val dataSet = remember(perRace, points) {

@@ -49,8 +49,11 @@ class DriversViewModel(
         MutableStateFlow<UiState<ImmutableList<F1DriversInfoResponse>>>(UiState.Loading)
     val driversInfoData = _driversInfoData.asStateFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
     init {
-        fetchDriverData()
+        fetchDriverData(isRefresh = false)
     }
 
 
@@ -135,7 +138,8 @@ class DriversViewModel(
                         id = index + 1,
                         position = uiModel.rank,
                         name = uiModel.name,
-                        points = uiModel.points.filter { it.isDigit() || it == '.' }.toFloatOrNull() ?: 0f,
+                        points = uiModel.points.filter { it.isDigit() || it == '.' }.toFloatOrNull()
+                            ?: 0f,
                         team = uiModel.teamName
                     )
                 }
@@ -208,9 +212,11 @@ class DriversViewModel(
             initialValue = UiState.Loading
         )
 
-    fun fetchDriverData() {
+    fun fetchDriverData(isRefresh: Boolean = false) {
         viewModelScope.launch {
-            if (_drivers.value !is UiState.Success) {
+            if (isRefresh) {
+                _isRefreshing.value = true
+            } else if (_drivers.value !is UiState.Success) {
                 _drivers.value = UiState.Loading
                 _driversInfoData.value = UiState.Loading
             }
@@ -273,6 +279,8 @@ class DriversViewModel(
                 // _driverDetails.value = UiState.Error("Something went wrong")
 
 //                _driverDetails.value = UiState.Error("Something went wrong")
+            } finally {
+                _isRefreshing.value = false
             }
         }
 

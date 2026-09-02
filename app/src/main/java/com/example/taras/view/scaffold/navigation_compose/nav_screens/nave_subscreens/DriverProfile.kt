@@ -567,7 +567,7 @@ fun DriverProfileContent(
 
 @Composable
 fun ChartPerRace(
-    perRace: ImmutableList<DriverPerRace>,
+    perRace: ImmutableList<com.example.taras.network_calls.taras.model.DriverPerRace>,
     points: String
 ) {
 
@@ -768,7 +768,7 @@ private fun DriverStatItem(
 @Composable
 fun BioCard(
     bioText: ImmutableList<String>,
-    quoteText: Quote?,
+    quoteText: com.example.taras.network_calls.taras.model.Quote?,
     birthDate: String,
     birthPlace: String,
     modifier: Modifier = Modifier

@@ -1,5 +1,6 @@
 package com.example.taras.view.scaffold.navigation_compose.nav_screens
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.filled.SignalWifiStatusbarConnectedNoInternet4
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
@@ -49,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale.Companion.Crop
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -58,6 +61,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.taras.core.common.UiState
 import coil3.compose.AsyncImage
+import com.example.taras.core.common.NetworkObserver
 import com.example.taras.ui.theme.TeamAlpine
 import com.example.taras.ui.theme.TeamAstonMartin
 import com.example.taras.ui.theme.TeamFerrari
@@ -79,7 +83,7 @@ import kotlinx.coroutines.launch
     ExperimentalMaterial3ExpressiveApi::class
 )
 @Composable
-fun NaveF1DriversScreen(
+fun NavF1DriversScreen(
     modifier: Modifier = Modifier,
     resultViewModel: ResultViewModel = viewModel()
 ) {
@@ -89,6 +93,7 @@ fun NaveF1DriversScreen(
     val qualifyState by resultViewModel.qualifyResults.collectAsStateWithLifecycle()
     val raceState by resultViewModel.raceResults.collectAsStateWithLifecycle()
     val isSprintWeekend by resultViewModel.isSprintWeekend.collectAsStateWithLifecycle()
+    val isRefreshing by resultViewModel.isRefreshing.collectAsStateWithLifecycle()
 
     ResultContent(
         fp1State = fp1State,
@@ -97,8 +102,9 @@ fun NaveF1DriversScreen(
         qualifyState = qualifyState,
         resultState = raceState,
         isSprintWeekend = isSprintWeekend,
+        isRefreshing = isRefreshing,
         onRefresh = {
-            resultViewModel.fetchRacesResultData()
+            resultViewModel.fetchRacesResultData(isRefresh = true)
         },
         modifier = modifier
     )
@@ -116,12 +122,15 @@ private fun ResultContent(
     qualifyState: UiState<SessionResultUiState>,
     resultState: UiState<SessionResultUiState>,
     isSprintWeekend: Boolean,
+    isRefreshing: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isRefreshing by remember { mutableStateOf(false) }
     val pullToRefreshState = rememberPullToRefreshState()
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val networkObserver = remember { NetworkObserver(context) }
+    val isConnected by networkObserver.isConnected.collectAsStateWithLifecycle(initialValue = true)
 
     val tabs = if (isSprintWeekend) {
         listOf("FP1", "Sprint Q", "Sprint Race", "Qualifying", "Results")
@@ -130,23 +139,21 @@ private fun ResultContent(
     }
     val pagerState = rememberPagerState(pageCount = { tabs.size })
 
+//    DisposableEffect(context) {
+//        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+//        context.registerReceiver(receiver, filter)
+//         onDispose {
+//             context.unregisterReceiver(receiver)
+//         }
+//
+//    }
+
     LaunchedEffect(fp1State, fp2State, fp3State, qualifyState, resultState) {
-        if (fp1State !is UiState.Loading &&
-            fp2State !is UiState.Loading &&
-            fp3State !is UiState.Loading &&
-            qualifyState !is UiState.Loading &&
-            resultState !is UiState.Loading
-        ) {
-            isRefreshing = false
-        }
     }
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
-        onRefresh = {
-            isRefreshing = true
-            onRefresh()
-        },
+        onRefresh = onRefresh,
         state = pullToRefreshState,
         indicator = {
             PullToRefreshDefaults.LoadingIndicator(
@@ -202,31 +209,36 @@ private fun ResultContent(
                         0 -> SessionTabs(
                             state = fp1State,
                             isRefreshing = isRefreshing,
-                            loadingMessage = "Loading practice results..."
+                            loadingMessage = "Loading practice results...",
+                            isConnected = isConnected
                         )
 
                         1 -> SessionTabs(
                             state = fp2State,
                             isRefreshing = isRefreshing,
-                            loadingMessage = if (isSprintWeekend) "Loading sprint qualifying results..." else "Loading practice results..."
+                            loadingMessage = if (isSprintWeekend) "Loading sprint qualifying results..." else "Loading practice results...",
+                            isConnected = isConnected
                         )
 
                         2 -> SessionTabs(
                             state = fp3State,
                             isRefreshing = isRefreshing,
-                            loadingMessage = if (isSprintWeekend) "Loading sprint race results..." else "Loading practice results..."
+                            loadingMessage = if (isSprintWeekend) "Loading sprint race results..." else "Loading practice results...",
+                            isConnected = isConnected
                         )
 
                         3 -> SessionTabs(
                             state = qualifyState,
                             isRefreshing = isRefreshing,
-                            loadingMessage = "Loading qualifying results..."
+                            loadingMessage = "Loading qualifying results...",
+                            isConnected = isConnected
                         )
 
                         4 -> SessionTabs(
                             state = resultState,
                             isRefreshing = isRefreshing,
-                            loadingMessage = "Loading race results..."
+                            loadingMessage = "Loading race results...",
+                            isConnected = isConnected
                         )
                     }
                 }
@@ -241,6 +253,7 @@ private fun SessionTabs(
     state: UiState<SessionResultUiState>,
     isRefreshing: Boolean,
     loadingMessage: String,
+    isConnected: Boolean,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
@@ -252,7 +265,36 @@ private fun SessionTabs(
             }
 
             is UiState.Error -> {
-                item(contentType = "Error") { ErrorView(state.message) }
+                if (!isConnected) {
+                    item(contentType = "Error") {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.SignalWifiStatusbarConnectedNoInternet4,
+                                contentDescription = "No internet connection",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                "No internet connection",
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                } else {
+                    item {
+                        Text(
+                            text = "Something went wrong",
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                }
+
             }
 
             is UiState.Success -> {

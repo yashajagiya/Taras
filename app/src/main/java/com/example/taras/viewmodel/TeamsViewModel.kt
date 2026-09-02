@@ -38,6 +38,9 @@ class TeamsViewModel : ViewModel() {
         MutableStateFlow<UiState<ImmutableList<F1TeamsInfoResponse>>>(UiState.Loading)
     val teamsInfoData = _teamsInfoData.asStateFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
     private val tarasDataService =
         NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
 
@@ -129,13 +132,17 @@ class TeamsViewModel : ViewModel() {
     )
 
     init {
-        fetchTeams()
+        fetchTeams(isRefresh = false)
     }
 
-    fun fetchTeams() {
+    fun fetchTeams(isRefresh: Boolean = false) {
         viewModelScope.launch {
-            _teams.value = UiState.Loading
-            _teamsInfoData.value = UiState.Loading
+            if (isRefresh) {
+                _isRefreshing.value = true
+            } else if (_teams.value !is UiState.Success) {
+                _teams.value = UiState.Loading
+                _teamsInfoData.value = UiState.Loading
+            }
 
 //            _teamsImage.value = UiState.Loading
 
@@ -182,6 +189,8 @@ class TeamsViewModel : ViewModel() {
                 _teamsInfoData.value = UiState.Error("Something went wrong")
 
 //                _teamsImage.value = UiState.Error("Something went wrong")
+            } finally {
+                _isRefreshing.value = false
             }
         }
     }

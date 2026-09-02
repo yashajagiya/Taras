@@ -1,4 +1,4 @@
-package com.example.taras.navigation
+package com.example.taras.core.navigation
 
 import androidx.compose.runtime.Immutable
 import androidx.navigation3.runtime.NavKey
@@ -19,7 +19,8 @@ sealed class MainNavRoutes : NavKey {
 
     @Serializable
     data object F1Results : MainNavRoutes()
-
+    @Serializable
+    data object DrawerSetting : MainNavRoutes()
     @Serializable
     data class DriverProfile(val numberOrName: String) : MainNavRoutes()
 

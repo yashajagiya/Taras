@@ -2,7 +2,7 @@
 [versions]
 agp = "9.3.2"
 chartsBom = "2.4.0"
-coilCompose = "3.5.0"
+coilCompose = "3.6.1"
 coreKtx = "1.19.0"
 datastorePreferences = "1.2.1"
 glanceAppwidget = "1.1.1"
@@ -18,17 +18,18 @@ activityCompose = "1.13.0"
 kotlin = "2.4.10"
 composeBom = "2026.08.00"
 kotlinxSerialization = "1.11.0"
-jetbrainsCompose = "1.11.1"
-material3 = "1.5.0-alpha26"
+jetbrainsCompose = "1.12.0"
+material3 = "1.5.0-alpha27"
+okio = "3.18.1"
 retrofit = "3.0.0"
-nav3Core = "1.1.6"
+nav3Core = "1.1.7"
 lifecycleViewmodelNav3 = "2.11.0"
 kotlinSerialization = "2.4.10"
 materialIconsExtended = "1.7.8"
 kotlinxCollectionsImmutable = "0.5.1"
 foundationLayout = "1.12.0"
-room3Runtime = "3.0.1"
 roomRuntime = "2.8.4"
+accompanistPermissions = "0.37.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,8 +38,6 @@ androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", versi
 androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glanceAppwidget" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
-androidx-room3-compiler = { group = "androidx.room3", name = "room3-compiler", version.ref = "room3Runtime" }
-androidx-room3-runtime = { group = "androidx.room3", name = "room3-runtime", version.ref = "room3Runtime" }
 charts-bom = { module = "io.github.dautovicharis:charts-bom", version.ref = "chartsBom" }
 charts-line = { module = "io.github.dautovicharis:charts-line" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
@@ -58,6 +57,7 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }
 ksoup-network = { module = "com.fleeksoft.ksoup:ksoup-network", version.ref = "ksoupNetwork" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
@@ -69,6 +69,7 @@ retrofit-converter-kotlinx-serialization = { group = "com.squareup.retrofit2", n
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
+google-accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 
 
 [plugins]
@@ -76,6 +77,5 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinSerialization"}
-compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "jetbrainsCompose" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 

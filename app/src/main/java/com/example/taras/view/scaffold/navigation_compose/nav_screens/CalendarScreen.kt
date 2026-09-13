@@ -87,16 +87,18 @@ fun CalendarComposable(
             },
             state = pullToRefreshState,
             indicator = {
-                PullToRefreshDefaults.LoadingIndicator(
-                    state = pullToRefreshState,
-                    isRefreshing = isRefreshing,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
+                if (!(isAnyLoading || isRefreshing)) {
+                    PullToRefreshDefaults.LoadingIndicator(
+                        state = pullToRefreshState,
+                        isRefreshing = false,
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
+                }
             }
         ) {
             Surface(color = Color.Transparent) {
 
-                if (isAnyLoading && !isRefreshing) {
+                if (isAnyLoading || isRefreshing) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,

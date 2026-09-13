@@ -1,4 +1,4 @@
-package com.example.taras
+package com.example.taras.core.common
 
 import android.app.Application
 import coil3.ImageLoader
@@ -20,7 +20,7 @@ class TarasApplication : Application(), SingletonImageLoader.Factory {
             .diskCache {
                 DiskCache.Builder()
                     .directory(cacheDir.resolve("image_cache"))
-                    .maxSizeBytes(100L * 1024 * 1024) // 100 MB disk cache
+                    .maxSizeBytes(100L * 1024 * 1024) 
                     .build()
             }
             .crossfade(true)

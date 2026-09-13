@@ -110,26 +110,26 @@ fun CircuitProfileContent(
             },
             state = pullToRefreshState,
             indicator = {
-                PullToRefreshDefaults.LoadingIndicator(
-                    state = pullToRefreshState,
-                    isRefreshing = isRefreshing,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
+                if (!isRefreshing) {
+                    PullToRefreshDefaults.LoadingIndicator(
+                        state = pullToRefreshState,
+                        isRefreshing = false,
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
+                }
             }
         ) {
             Surface(color = Color.Transparent) {
                 when (racesState) {
                     is UiState.Loading -> {
-                        if (!isRefreshing) {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                LoadingIndicator()
-                                Spacer(Modifier.requiredHeight(30.dp))
-                                Text("Loading Circuit Data...")
-                            }
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            LoadingIndicator()
+                            Spacer(Modifier.requiredHeight(30.dp))
+                            Text("Loading Circuit Data...")
                         }
                     }
 

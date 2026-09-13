@@ -151,11 +151,13 @@ fun PaddockContent(
             onRefresh = onRefresh,
             state = pullToRefreshState,
             indicator = {
-                PullToRefreshDefaults.LoadingIndicator(
-                    state = pullToRefreshState,
-                    isRefreshing = isRefreshing,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
+                if (!(isEssentialLoading || isRefreshing)) {
+                    PullToRefreshDefaults.LoadingIndicator(
+                        state = pullToRefreshState,
+                        isRefreshing = false,
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
+                }
             }
         ) {
             Surface(
@@ -163,7 +165,7 @@ fun PaddockContent(
                 color = Color.Transparent
             ) {
 
-                if (isEssentialLoading && !isRefreshing) {
+                if (isEssentialLoading || isRefreshing) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,

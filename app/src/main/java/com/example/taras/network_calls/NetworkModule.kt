@@ -7,8 +7,9 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 object NetworkModule {
 
-    private val json = Json {
+    val json = Json {
         ignoreUnknownKeys = true
+        coerceInputValues = true
     }
 
     private fun createRetrofit(baseUrl: String): Retrofit {

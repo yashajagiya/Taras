@@ -297,21 +297,19 @@ fun CurrentRaceExtended(
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
+            modifier = Modifier.fillMaxWidth()
         ) {
             AsyncImage(
                 model = race.trackImage.ifEmpty { "https://f1tv.formula1.com/static/favicon.ico" },
                 contentDescription = "track",
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop,
                 alpha = 0.4f
             )
 
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .matchParentSize()
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
@@ -382,9 +380,9 @@ fun CurrentRaceExtended(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                val nameParts = race.gpName.split(" ")
+                val nameParts = remember(race.gpName) { race.gpName.split(" ") }
                 val firstName = nameParts.firstOrNull() ?: ""
-                val remainingName = remember { nameParts.drop(1).joinToString(" ") }
+                val remainingName = remember(race.gpName) { nameParts.drop(1).joinToString(" ") }
 
                 Column {
                     Text(

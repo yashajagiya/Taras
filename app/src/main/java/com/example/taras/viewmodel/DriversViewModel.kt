@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
@@ -94,6 +95,10 @@ class DriversViewModel(
         } else {
             UiState.Loading
         }
+    }.onEach { state ->
+        if (state is UiState.Success) {
+            saveTopThreeToDb(state.data.take(3))
+        }
     }.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
@@ -103,7 +108,6 @@ class DriversViewModel(
     val topThree = combine(combinedLowDrivers, topThreeDriversDAO.getAll()) { state, dbList ->
         if (state is UiState.Success) {
             val top3 = state.data.take(3).toImmutableList()
-            saveTopThreeToDb(top3)
             UiState.Success(top3)
         } else if (dbList.isNotEmpty()) {
             val combined = dbList.map { entity ->
@@ -130,10 +134,16 @@ class DriversViewModel(
         UiState.Loading
     )
 
+    private var lastSavedTopThree: List<DriverUiModel>? = null
+
     private fun saveTopThreeToDb(drivers: List<DriverUiModel>) {
+        val top3 = drivers.take(3)
+        if (top3 == lastSavedTopThree) return
+        lastSavedTopThree = top3
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val entities = drivers.take(3).mapIndexed { index, uiModel ->
+                val entities = top3.mapIndexed { index, uiModel ->
                     TopThreeDriversEntity(
                         id = index + 1,
                         position = uiModel.rank,

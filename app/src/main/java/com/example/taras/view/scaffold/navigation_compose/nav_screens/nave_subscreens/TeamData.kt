@@ -81,12 +81,14 @@ fun TeamsData(
     teamsViewModel: TeamsViewModel = viewModel()
 ) {
     val teamsDetailsState by teamsViewModel.combinedDetailedTeams.collectAsStateWithLifecycle()
+    val isRefreshing by teamsViewModel.isRefreshing.collectAsStateWithLifecycle()
 
     TeamProfileContent(
         tName = teamName,
-        modifier = modifier,
         teamsDetailsState = teamsDetailsState,
-        onRefresh = { teamsViewModel.fetchTeams() }
+        isRefreshing = isRefreshing,
+        onRefresh = { teamsViewModel.fetchTeams(isRefresh = true) },
+        modifier = modifier
     )
 }
 
@@ -96,42 +98,29 @@ fun TeamProfileContent(
     tName: String,
     teamsDetailsState: UiState<ImmutableList<DetailedTeamUiModel>>,
     onRefresh: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isRefreshing: Boolean = false
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        var isRefreshing by remember { mutableStateOf(false) }
         val pullToRefreshState = rememberPullToRefreshState()
-
-        LaunchedEffect(teamsDetailsState, tName) {
-            if (teamsDetailsState !is UiState.Loading && tName.isNotEmpty()) {
-                isRefreshing = false
-            } else if (teamsDetailsState is UiState.Error && tName.isEmpty()) {
-                isRefreshing = false
-            }
-        }
 
         PullToRefreshBox(
             isRefreshing = isRefreshing,
-            onRefresh = {
-                isRefreshing = true
-                onRefresh()
-            },
+            onRefresh = onRefresh,
             state = pullToRefreshState,
             indicator = {
-                if (!isRefreshing) {
-                    PullToRefreshDefaults.LoadingIndicator(
-                        state = pullToRefreshState,
-                        isRefreshing = false,
-                        modifier = Modifier.align(Alignment.TopCenter)
-                    )
-                }
+                PullToRefreshDefaults.LoadingIndicator(
+                    state = pullToRefreshState,
+                    isRefreshing = isRefreshing,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
             }
         ) {
             Surface(color = Color.Transparent) {
                 val isAnyLoading = teamsDetailsState is UiState.Loading
                 val isAnyError = teamsDetailsState is UiState.Error || tName.isEmpty()
 
-                if (!isAnyError && isAnyLoading) {
+                if (!isAnyError && isAnyLoading && !isRefreshing) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,

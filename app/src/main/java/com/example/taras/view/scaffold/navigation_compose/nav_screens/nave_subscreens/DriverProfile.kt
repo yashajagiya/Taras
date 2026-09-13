@@ -42,7 +42,6 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -90,11 +89,13 @@ fun DriverProfile(
     )
 ) {
     val driverDetailsState by driversViewModel.combinedDetailedDrivers.collectAsStateWithLifecycle()
+    val isRefreshing by driversViewModel.isRefreshing.collectAsStateWithLifecycle()
 
     DriverProfileContent(
         driverNumber = driverNumber,
         driverDetailsState = driverDetailsState,
-        onRefresh = { driversViewModel.fetchDriverData() },
+        isRefreshing = isRefreshing,
+        onRefresh = { driversViewModel.fetchDriverData(isRefresh = true) },
         modifier = modifier
     )
 }
@@ -106,43 +107,31 @@ fun DriverProfile(
 @Composable
 fun DriverProfileContent(
     driverNumber: String,
-    onRefresh: () -> Unit,
     driverDetailsState: UiState<ImmutableList<DriverDetailUiModel>>,
-    modifier: Modifier = Modifier
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier,
+    isRefreshing: Boolean = false
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        var isRefreshing by remember { mutableStateOf(false) }
         val pullToRefreshState = rememberPullToRefreshState()
 
-        LaunchedEffect(driverDetailsState, driverNumber) {
-            if (driverDetailsState !is UiState.Loading && driverNumber.isNotBlank()) {
-                isRefreshing = false
-            } else if (driverDetailsState is UiState.Error && driverNumber.isEmpty()) {
-
-                isRefreshing = false
-            }
-        }
-
-
-        PullToRefreshBox(isRefreshing = isRefreshing, onRefresh = {
-            isRefreshing = true
-            onRefresh()
-        }, state = pullToRefreshState, indicator = {
-            if (!isRefreshing) {
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
+            state = pullToRefreshState,
+            indicator = {
                 PullToRefreshDefaults.LoadingIndicator(
                     state = pullToRefreshState,
-                    isRefreshing = false,
+                    isRefreshing = isRefreshing,
                     modifier = Modifier.align(Alignment.TopCenter)
                 )
             }
-        }) {
+        ) {
             Surface(color = Color.Transparent) {
                 val isAnyLoading = driverDetailsState is UiState.Loading
-
                 val isAnyError = driverDetailsState is UiState.Error || driverNumber.isEmpty()
 
-
-                if (!isAnyError && isAnyLoading) {
+                if (!isAnyError && isAnyLoading && !isRefreshing) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,

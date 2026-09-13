@@ -31,14 +31,14 @@ class RaceRepository {
             try {
                 val currentData = CurrentData(context)
                 val today = getTodayDate().toRemoveDateExtra()
-                val currentRace = racesData.races.firstOrNull { it.schedule.race.date.toRemoveDateExtra() >= today }
+                val currentRace = racesData.races.firstOrNull { (it.schedule.race?.date?.toRemoveDateExtra() ?: 0) >= today }
                     ?: racesData.races.lastOrNull()
                 
                 val cacheData = if (currentRace != null) {
                     racesData.copy(races = listOf(currentRace))
                 } else racesData
                 
-                val json = Json.encodeToString(cacheData)
+                val json = NetworkModule.json.encodeToString(cacheData)
                 currentData.saveRacesData(json)
             } catch (e: Exception) {
                 Log.e("RaceRepository", "Error saving to cache", e)
@@ -53,7 +53,7 @@ class RaceRepository {
                 val currentData = CurrentData(context)
                 val cachedJson = currentData.racesData.firstOrNull()
                 if (cachedJson != null) {
-                    val cachedData = Json.decodeFromString<com.example.taras.network_calls.taras.model.F1RacesInfoResponse>(cachedJson)
+                    val cachedData = NetworkModule.json.decodeFromString<F1RacesInfoResponse>(cachedJson)
                     val result = processRacesData(cachedData)
                     raceCurrentState = result.first
                     nextSessionInfo = result.second
@@ -74,7 +74,7 @@ class RaceRepository {
         val today = getTodayDate().toRemoveDateExtra()
 
         var upcomingRaces = races.mapNotNull { race ->
-            val raceDate = race.schedule.race.date.toRemoveDateExtra()
+            val raceDate = race.schedule.race?.date?.toRemoveDateExtra() ?: 0
             if (raceDate >= today) {
                 mapToCurrentRace(race)
             } else null
@@ -112,7 +112,7 @@ class RaceRepository {
 
     private fun mapToCurrentRace(race: com.example.taras.network_calls.taras.model.RaceEvent): CurrentRace {
         val parsedSessions = listOfNotNull(
-            createParsedSession("FP1", race.schedule.fp1.date, race.schedule.fp1.time),
+            createParsedSession("FP1", race.schedule.fp1?.date, race.schedule.fp1?.time),
             createParsedSession("FP2", race.schedule.fp2?.date, race.schedule.fp2?.time),
             createParsedSession("FP3", race.schedule.fp3?.date, race.schedule.fp3?.time),
             createParsedSession(
@@ -125,8 +125,8 @@ class RaceRepository {
                 race.schedule.sprintRace?.date,
                 race.schedule.sprintRace?.time
             ),
-            createParsedSession("Qualifying", race.schedule.qualy.date, race.schedule.qualy.time),
-            createParsedSession("Race", race.schedule.race.date, race.schedule.race.time)
+            createParsedSession("Qualifying", race.schedule.qualy?.date, race.schedule.qualy?.time),
+            createParsedSession("Race", race.schedule.race?.date, race.schedule.race?.time)
         )
 
         return CurrentRace(
@@ -138,7 +138,7 @@ class RaceRepository {
             name = race.winner?.fullName ?: "",
             number = race.winner?.drivernumber ?: 0,
             winnerTeam = race.winner?.teamWinner ?: "",
-            trackImage = race.circuit.trackImage,
+            trackImage = race.circuit.trackImage.orEmpty(),
             parsedSessions = parsedSessions.toImmutableList()
         )
     }

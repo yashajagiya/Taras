@@ -146,8 +146,6 @@ class TeamsViewModel : ViewModel() {
 
 //            _teamsImage.value = UiState.Loading
 
-            delay(1000.milliseconds)
-
             try {
                 supervisorScope {
                     val teamsDataDeferred =

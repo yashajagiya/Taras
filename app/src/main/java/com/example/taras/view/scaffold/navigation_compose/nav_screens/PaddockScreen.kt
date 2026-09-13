@@ -60,6 +60,11 @@ import com.example.taras.core.notification.NotificationScheduler
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import androidx.core.net.toUri
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Instant
+import kotlinx.coroutines.delay
+import com.example.taras.core.helpercore.formatCountdown
 
 
 @OptIn(
@@ -91,6 +96,8 @@ fun NavPaddockScreen(
     val isTeamsRefreshing by teamsViewModel.isRefreshing.collectAsStateWithLifecycle()
     val isNewsRefreshing by newsRepository.isRefreshing.collectAsStateWithLifecycle()
     val isRacesRefreshing by racesViewModel.isRefreshing.collectAsStateWithLifecycle()
+
+    StartNofi()
 
     PaddockContent(
         modifier = modifier,
@@ -127,7 +134,6 @@ fun PaddockContent(
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
-        StartNofi()
         val pullToRefreshState = rememberPullToRefreshState()
 
         val isAnyError = driverTopThree is UiState.Error ||
@@ -145,13 +151,11 @@ fun PaddockContent(
             onRefresh = onRefresh,
             state = pullToRefreshState,
             indicator = {
-                if (!(isEssentialLoading || isRefreshing)) {
-                    PullToRefreshDefaults.LoadingIndicator(
-                        state = pullToRefreshState,
-                        isRefreshing = false,
-                        modifier = Modifier.align(Alignment.TopCenter)
-                    )
-                }
+                PullToRefreshDefaults.LoadingIndicator(
+                    state = pullToRefreshState,
+                    isRefreshing = isRefreshing,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
             }
         ) {
             Surface(
@@ -159,7 +163,7 @@ fun PaddockContent(
                 color = Color.Transparent
             ) {
 
-                if (isEssentialLoading || isRefreshing) {
+                if (isEssentialLoading && !isRefreshing) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -241,11 +245,9 @@ fun PaddockContent(
                                         maxLines = 2
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
-                                    Text(
-                                        text = nextSessionInfo?.countdown ?: "00:00:00",
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        style = MaterialTheme.typography.displayMedium,
-                                        fontWeight = FontWeight.Bold
+                                    NextSessionCountdownText(
+                                        targetInstant = nextSessionInfo?.targetInstant,
+                                        fallbackCountdown = nextSessionInfo?.countdown ?: "00:00:00"
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
@@ -531,3 +533,37 @@ private fun requestBatteryOptimizationExemption(
     }
     NotificationScheduler.scheduleNotificationSync(context)
 }
+
+@Composable
+fun NextSessionCountdownText(
+    targetInstant: Instant?,
+    fallbackCountdown: String,
+    modifier: Modifier = Modifier
+) {
+    var countdown by remember(targetInstant) {
+        mutableStateOf(
+            if (targetInstant != null) {
+                formatCountdown(targetInstant - Clock.System.now())
+            } else {
+                fallbackCountdown
+            }
+        )
+    }
+
+    LaunchedEffect(targetInstant) {
+        if (targetInstant == null) return@LaunchedEffect
+        while (true) {
+            val duration = targetInstant - Clock.System.now()
+            countdown = formatCountdown(duration)
+            delay(1000.milliseconds)
+        }
+    }
+
+    Text(
+        text = countdown,
+        color = MaterialTheme.colorScheme.onPrimaryContainer,
+        style = MaterialTheme.typography.displayMedium,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier
+    )
+}

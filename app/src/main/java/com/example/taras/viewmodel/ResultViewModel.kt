@@ -377,7 +377,6 @@ class ResultViewModel : ViewModel() {
         }
 
         viewModelScope.launch {
-            delay(1000.milliseconds)
             try {
                 // All launch blocks below are independent, they should run in parallel
                 // We'll wrap them to handle the finally block correctly
@@ -389,7 +388,7 @@ class ResultViewModel : ViewModel() {
                             val now = getCurrentMoment()
 
                             val nextRaceIndex =
-                                raceInfo.races.indexOfFirst { it.schedule.race.date.toRemoveDateExtra() >= today }
+                                raceInfo.races.indexOfFirst { (it.schedule.race?.date?.toRemoveDateExtra() ?: 0) >= today }
                             val nextRace =
                                 if (nextRaceIndex != -1) raceInfo.races[nextRaceIndex] else raceInfo.races.lastOrNull()
 

@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -56,12 +57,15 @@ fun NewsCarousel(
             .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
     ) { index ->
         val item = items[index]
-        val cardColor = getNewsColor(
-            newsItem = item,
-            defaultColor = MaterialTheme.colorScheme.surfaceContainer,
-            drivers = drivers,
-            teams = teams
-        )
+        val defaultColor = MaterialTheme.colorScheme.surfaceContainer
+        val cardColor = remember(item.title, item.description, drivers, teams, defaultColor) {
+            getNewsColor(
+                newsItem = item,
+                defaultColor = defaultColor,
+                drivers = drivers,
+                teams = teams
+            )
+        }
 
         Card(
             colors = CardDefaults.cardColors(containerColor = cardColor),

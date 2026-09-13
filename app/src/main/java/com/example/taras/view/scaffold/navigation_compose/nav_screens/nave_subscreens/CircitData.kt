@@ -288,7 +288,7 @@ fun CircuitHeader(
                     .aspectRatio(1.2f) // Taller aspect ratio to make image feel bigger
             ) {
                 AsyncImage(
-                    model = race.trackImage,
+                    model = race.trackImage.ifEmpty { "https://f1tv.formula1.com/static/favicon.ico" },
                     contentDescription = "Circuit Map",
                     modifier = Modifier
                         .fillMaxSize()
@@ -372,7 +372,7 @@ fun TechnicalSpecsCard(race: RaceClearData, modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            SpecRow(label = "CORNERS", value = race.corners.toString())
+            SpecRow(label = "CORNERS", value = race.corners?.toString() ?: "N/A")
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 12.dp),
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
@@ -414,7 +414,7 @@ fun TechnicalSpecsCard(race: RaceClearData, modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(vertical = 12.dp),
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
             )
-            SpecRow(label = "FIRST GP", value = race.firstParticipationYear.toString())
+            SpecRow(label = "FIRST GP", value = race.firstParticipationYear?.toString() ?: "N/A")
             if (race.laps != null) {
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 12.dp),

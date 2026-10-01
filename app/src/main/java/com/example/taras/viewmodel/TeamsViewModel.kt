@@ -8,8 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.taras.network_calls.NetworkModule
 import com.example.taras.network_calls.taras.TarasDataService
 import com.example.taras.network_calls.taras.model.TeamsPerRaceResponse
-import com.example.taras.core.common.UiState
 import com.example.taras.network_calls.taras.model.F1TeamsInfoResponse
+import com.example.taras.core.common.AppError
+import com.example.taras.core.common.UiState
+import com.example.taras.core.common.toAppError
+import com.example.taras.core.repository.F1InfoRepository
 import com.example.taras.network_calls.taras.model.Racedata
 import com.example.taras.network_calls.taras.model.SeasonStats
 import com.example.taras.network_calls.taras.model.TeamProfile
@@ -29,7 +32,9 @@ import kotlinx.coroutines.supervisorScope
 import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
-class TeamsViewModel : ViewModel() {
+class TeamsViewModel(
+    private val f1InfoRepository: F1InfoRepository = F1InfoRepository.instance
+) : ViewModel() {
     private val logTag = "TeamsViewModel"
 
     private val _teams = MutableStateFlow<UiState<TeamsPerRaceResponse>>(UiState.Loading)
@@ -43,15 +48,6 @@ class TeamsViewModel : ViewModel() {
 
     private val tarasDataService =
         NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
-
-
-    //  private val openF1Service = NetworkModule.openF1Retrofit.create(OpenF1Service::class.java)
-
-    // private val _teams = MutableStateFlow<UiState<List<TeamStanding>>>(UiState.Loading)
-
-//    private val _teamsImage = MutableStateFlow<UiState<ImmutableList<TeamsImageResponse>>>(UiState.Loading)
-//    val teamsImage = _teamsImage.asStateFlow()
-
 
     val combinedTeams = combine(_teams, _teamsInfoData) { teamsState, teamsInfoData ->
         if (teamsState is UiState.Success) {
@@ -69,8 +65,10 @@ class TeamsViewModel : ViewModel() {
                 )
             }.toImmutableList()
             UiState.Success(combined)
-        } else if (teamsState is UiState.Error || teamsInfoData is UiState.Error) {
-            UiState.Error("Something went wrong")
+        } else if (teamsState is UiState.Error) {
+            UiState.Error(teamsState.appError ?: AppError.Unknown(teamsState.message))
+        } else if (teamsInfoData is UiState.Error) {
+            UiState.Error(teamsInfoData.appError ?: AppError.Unknown(teamsInfoData.message))
         } else {
             UiState.Loading
         }
@@ -119,9 +117,9 @@ class TeamsViewModel : ViewModel() {
             UiState.Success(combinedList)
 
         } else if (teamsState is UiState.Error) {
-            UiState.Error(teamsState.message ?: "Failed to load team standings.")
+            UiState.Error(teamsState.appError ?: AppError.Unknown(teamsState.message))
         } else if (teamsInfoState is UiState.Error) {
-            UiState.Error(teamsInfoState.message ?: "Failed to load team details.")
+            UiState.Error(teamsInfoState.appError ?: AppError.Unknown(teamsInfoState.message))
         } else {
             UiState.Loading
         }
@@ -144,49 +142,34 @@ class TeamsViewModel : ViewModel() {
                 _teamsInfoData.value = UiState.Loading
             }
 
-//            _teamsImage.value = UiState.Loading
-
             try {
                 supervisorScope {
                     val teamsDataDeferred =
                         async(Dispatchers.IO) { tarasDataService.getTeamStandings() }
 
                     val teamsInfoDeferred =
-                        async(Dispatchers.IO) { tarasDataService.getTeamsInfoData() }
+                        async(Dispatchers.IO) { f1InfoRepository.getTeamsInfoData(forceRefresh = isRefresh) }
 
                     try {
                         _teams.value = UiState.Success(teamsDataDeferred.await())
                     } catch (e: Exception) {
                         Log.e(logTag, "Error fetching teams standings", e)
-                        _teams.value = UiState.Error("Something went wrong")
+                        _teams.value = UiState.Error(e.toAppError())
                     }
 
                     try {
                         _teamsInfoData.value =
                             UiState.Success(teamsInfoDeferred.await().toImmutableList())
                     } catch (e: Exception) {
-                        Log.e(logTag, "Error fetching teams standings", e)
-                        _teamsInfoData.value = UiState.Error("Something went wrong")
+                        Log.e(logTag, "Error fetching teams info data", e)
+                        _teamsInfoData.value = UiState.Error(e.toAppError())
                     }
-
-
-                    //                    val teamsImageDataDeferred =
-//                        async(Dispatchers.IO) { tarasDataService.getTeamsImage() }
-
-//                    try {
-//                        _teamsImage.value = UiState.Success(teamsImageDataDeferred.await().toImmutableList())
-//                    } catch (e: Exception) {
-//                        Log.e(logTag, "Error fetching teams images", e)
-//                        _teamsImage.value = UiState.Error("Something went wrong")
-//                    }
-
                 }
             } catch (e: Exception) {
                 Log.e(logTag, "Error in fetchTeams", e)
-                _teams.value = UiState.Error("Something went wrong")
-                _teamsInfoData.value = UiState.Error("Something went wrong")
-
-//                _teamsImage.value = UiState.Error("Something went wrong")
+                val appErr = e.toAppError()
+                _teams.value = UiState.Error(appErr)
+                _teamsInfoData.value = UiState.Error(appErr)
             } finally {
                 _isRefreshing.value = false
             }

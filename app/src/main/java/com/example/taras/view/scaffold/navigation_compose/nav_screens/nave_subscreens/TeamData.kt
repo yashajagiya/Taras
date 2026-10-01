@@ -479,7 +479,7 @@ fun TeamProfileContent(
                                         text = "Points Progression",
                                         style = MaterialTheme.typography.titleLarge,
                                         letterSpacing = 1.sp,
-                                        color = Color.Black,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 32.sp,
                                         fontWeight = FontWeight.ExtraBold,
                                         textAlign = TextAlign.Start,
@@ -501,7 +501,7 @@ fun TeamProfileContent(
                                     text = "Biography",
                                     style = MaterialTheme.typography.titleLarge,
                                     letterSpacing = 1.sp,
-                                    color = Color.Black,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     fontSize = 32.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     textAlign = TextAlign.Start,
@@ -526,6 +526,27 @@ private fun ChartPerTeam(
     perRace: ImmutableList<com.example.taras.network_calls.taras.model.Racedata>,
     points: String
 ) {
+    if (perRace.isEmpty()) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Text(
+                text = "Points progression will appear once the season begins.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                textAlign = TextAlign.Center
+            )
+        }
+        return
+    }
+
     val dataSet = remember(perRace, points) {
         perRace.map { it.value }.toChartDataSet(
             title = "Points Progression +$points",
@@ -540,7 +561,7 @@ private fun ChartPerTeam(
             pointSize = 8f,
             xAxisLabelsVisible = true,
             yAxisLabelsVisible = true,
-            xAxisLabelMaxCount = perRace.size
+            xAxisLabelMaxCount = perRace.size.coerceAtLeast(1)
         )
     )
 }

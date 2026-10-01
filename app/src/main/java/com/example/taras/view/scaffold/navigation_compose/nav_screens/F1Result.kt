@@ -139,18 +139,6 @@ private fun ResultContent(
     }
     val pagerState = rememberPagerState(pageCount = { tabs.size })
 
-//    DisposableEffect(context) {
-//        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-//        context.registerReceiver(receiver, filter)
-//         onDispose {
-//             context.unregisterReceiver(receiver)
-//         }
-//
-//    }
-
-    LaunchedEffect(fp1State, fp2State, fp3State, qualifyState, resultState) {
-    }
-
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = onRefresh,
@@ -311,7 +299,7 @@ private fun SessionTabs(
                     }
                     items(
                         data.results,
-                        key = { it.position + it.number },
+                        key = { "${it.position}_${it.driver}_${it.number}_${it.team}" },
                         contentType = { "Result" }
                     ) { item ->
                         ResultCard(item)
@@ -637,4 +625,4 @@ private fun EmptyView(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
-}
+}

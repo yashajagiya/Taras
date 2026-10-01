@@ -57,6 +57,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.example.taras.core.common.CurrentData
 import com.example.taras.core.common.UiState
+import com.example.taras.core.helpercore.parseSessionTimeToInstant
 import com.example.taras.core.helpercore.removeNameExtra
 import com.example.taras.viewmodel.RaceClearData
 import com.example.taras.viewmodel.RacesViewModel
@@ -64,6 +65,8 @@ import com.example.taras.viewmodel.RacesViewModelFactory
 import com.example.taras.viewmodel.SessionTime
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone.Companion.currentSystemDefault
+import kotlinx.datetime.toLocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -546,6 +549,10 @@ fun SessionTimelineItem(
     isHighlight: Boolean = false,
     isRace: Boolean = false
 ) {
+    val localDateTime = remember(time.date, time.time) {
+        parseSessionTimeToInstant(time.date, time.time)?.toLocalDateTime(currentSystemDefault())
+    }
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -615,14 +622,20 @@ fun SessionTimelineItem(
 
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = formatSessionDay(time.date),
+                        text = localDateTime?.dayOfWeek?.name?.take(3)?.lowercase()
+                            ?.replaceFirstChar { it.uppercase() }
+                            ?: formatSessionDay(time.date),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = if (isHighlight) MaterialTheme.colorScheme.onPrimaryContainer
                         else MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = time.time?.take(5) ?: "--:--",
+                        text = localDateTime?.let {
+                            val hour = it.hour.toString().padStart(2, '0')
+                            val minute = it.minute.toString().padStart(2, '0')
+                            "$hour:$minute"
+                        } ?: time.time?.take(5) ?: "--:--",
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (isHighlight) MaterialTheme.colorScheme.onPrimaryContainer
                         else MaterialTheme.colorScheme.primary,

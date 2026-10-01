@@ -204,6 +204,7 @@ private fun NotificationPermissionItem() {
 
     var showRationaleDialog by remember { mutableStateOf(false) }
     var showSettingsDialog by remember { mutableStateOf(false) }
+    var hasRequestedOnce by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
 
     if (!notificationPermissionState.status.isGranted) {
         NavigationDrawerItem(
@@ -225,9 +226,11 @@ private fun NotificationPermissionItem() {
                     Toast.makeText(context, "Permission already granted", Toast.LENGTH_SHORT).show()
                 } else if (notificationPermissionState.status.shouldShowRationale) {
                     showRationaleDialog = true
-                } else {
-                    notificationPermissionState.launchPermissionRequest()
+                } else if (hasRequestedOnce) {
                     showSettingsDialog = true
+                } else {
+                    hasRequestedOnce = true
+                    notificationPermissionState.launchPermissionRequest()
                 }
             }
         )

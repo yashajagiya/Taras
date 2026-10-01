@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.taras.network_calls.NetworkModule
 import com.example.taras.network_calls.taras.TarasDataService
-import com.example.taras.network_calls.taras.model.DriverPerRaceResponce
+import com.example.taras.network_calls.taras.model.DriverPerRaceResponse
 import com.example.taras.core.common.UiState
 import com.example.taras.network_calls.taras.model.CareerStats
 import com.example.taras.network_calls.taras.model.DriverPerRace
@@ -43,7 +43,7 @@ class DriversViewModel(
     private val tarasDataService =
         NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
 
-    private val _drivers = MutableStateFlow<UiState<DriverPerRaceResponce>>(UiState.Loading)
+    private val _drivers = MutableStateFlow<UiState<DriverPerRaceResponse>>(UiState.Loading)
     val drivers = _drivers.asStateFlow()
 
     private val _driversInfoData =
@@ -56,18 +56,6 @@ class DriversViewModel(
     init {
         fetchDriverData(isRefresh = false)
     }
-
-
-    // code for openf1 api
-    // private val openF1Service = NetworkModule.openF1Retrofit.create(OpenF1Service::class.java)
-
-    //private val _drivers = MutableStateFlow<UiState<List<DriverStanding>>>(UiState.Loading)
-
-//    private val _driverDetails = MutableStateFlow<UiState<List<DriverDetail>>>(UiState.Loading)
-//    val driverDetails = _driverDetails.asStateFlow()
-
-//    private val _driverDetails = MutableStateFlow<UiState<ImmutableList<DriverDetail>>>(UiState.Loading)
-//    val driverDetails = _driverDetails.asStateFlow()
 
 
     val combinedLowDrivers = combine(_drivers, _driversInfoData) { driversState, driverinfoState ->
@@ -254,41 +242,11 @@ class DriversViewModel(
                         Log.e(logTag, "Error fetching driver standings API", e)
                         _drivers.value = UiState.Error("Error fetching driver standings")
                     }
-
-
-                    //  val driversDeferred = async(Dispatchers.IO) { openF1Service.getDriverStandings() }
-                    // val detailsDeferred = async(Dispatchers.IO) { tarasDataService.getDriverDetails() }
-
-//                    val detailsDeferred =
-//                        async(Dispatchers.IO) { tarasDataService.getDriverDetailsANDImage() }
-
-//                    try {
-//                        _driverDetails.value = UiState.Success(detailsDeferred.await())
-//                    } catch (e: Exception) {
-//                        Log.e(logTag, "Error fetching driver details API", e)
-//                        _driverDetails.value = UiState.Error("Something went wrong")
-//                    }
-
-//                    try {
-//                        _driverDetails.value = UiState.Success(detailsDeferred.await().toImmutableList())
-//                    } catch (e: Exception) {
-//                        Log.e(logTag, "Error fetching driver details AND image API", e)
-//                        _driverDetails.value = UiState.Error("Error fetching driver details")
-//                    }
-
-
                 }
             } catch (e: Exception) {
-
                 Log.e(logTag, "Error in fetchDriverData", e)
                 _drivers.value = UiState.Error("Something went wrong")
-
                 _driversInfoData.value = UiState.Error("Error fetching drivers info")
-
-
-                // _driverDetails.value = UiState.Error("Something went wrong")
-
-//                _driverDetails.value = UiState.Error("Something went wrong")
             } finally {
                 _isRefreshing.value = false
             }

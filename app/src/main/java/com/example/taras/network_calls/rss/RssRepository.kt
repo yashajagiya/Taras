@@ -3,11 +3,12 @@ package com.example.taras.network_calls.rss
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.network.parseGetRequest
 import com.fleeksoft.ksoup.parser.Parser
+import kotlinx.coroutines.CancellationException
 
 class RssRepository {
     private val url = "https://www.motorsport.com/rss/f1/news/"
 
-    suspend fun getF1News(): List<RssItem> {
+    suspend fun getF1News(): Result<List<RssItem>> {
         return try {
             val doc = Ksoup.parseGetRequest(
                 url = url,
@@ -15,7 +16,7 @@ class RssRepository {
             )
 
             val items = doc.select("item")
-            items.map { item ->
+            val result = items.map { item ->
                 RssItem(
                     title = item.selectFirst("title")?.text(),
                     link = item.selectFirst("link")?.text(),
@@ -26,9 +27,10 @@ class RssRepository {
                     pubDate = item.selectFirst("pubDate")?.text()
                 )
             }
+            Result.success(result)
         } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
+            if (e is CancellationException) throw e
+            Result.failure(e)
         }
     }
 }

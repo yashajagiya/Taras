@@ -1,4 +1,4 @@
-package com.example.taras.core.helpercore
+package com.example.taras.viewmodel
 
 import android.util.Log
 import androidx.compose.runtime.Stable
@@ -17,14 +17,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @Stable
-class NewsRepository(
+class NewsViewModel(
     private val rssRepository: RssRepository = RssRepository()
 ) : ViewModel() {
 
-    private val logTag = "NewsRepository"
+    private val logTag = "NewsViewModel"
 
-    private val _news = MutableStateFlow<UiState<ImmutableList<com.example.taras.network_calls.rss.RssItem>>>(UiState.Loading)
-    val news: StateFlow<UiState<ImmutableList<com.example.taras.network_calls.rss.RssItem>>> = _news.asStateFlow()
+    private val _news = MutableStateFlow<UiState<ImmutableList<RssItem>>>(UiState.Loading)
+    val news: StateFlow<UiState<ImmutableList<RssItem>>> = _news.asStateFlow()
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
@@ -41,8 +41,14 @@ class NewsRepository(
                 _news.value = UiState.Loading
             }
             try {
-                val newsItems = rssRepository.getF1News().toImmutableList()
-                _news.value = UiState.Success(newsItems)
+                rssRepository.getF1News()
+                    .onSuccess { items ->
+                        _news.value = UiState.Success(items.toImmutableList())
+                    }
+                    .onFailure { e ->
+                        Log.e(logTag, "Error fetching F1 news RSS feed", e)
+                        _news.value = UiState.Error(e.message ?: "Failed to load F1 news")
+                    }
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
 

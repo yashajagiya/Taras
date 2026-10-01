@@ -1,3 +1,5 @@
+package com.example.taras.network_calls.taras.model
+
 import kotlinx.serialization.Serializable
 
 @Serializable

@@ -12,9 +12,9 @@ data class F1DriversInfoResponse(
     val hero: DriverHero,
     val biography: Biography,
     @SerialName("season_2026")
-    val seasonStats: DriverSeasonStats,
+    val seasonStats: DriverSeasonStats? = null,
     @SerialName("career_stats")
-    val careerStats: CareerStats,
+    val careerStats: CareerStats? = null,
 )
 
 @Immutable

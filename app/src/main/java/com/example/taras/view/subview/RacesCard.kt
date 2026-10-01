@@ -70,12 +70,12 @@ fun RacesCards(
     onCircuitClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    if (racesList1 == null || racesCurrentState == null) return
+    if (racesList1 == null) return
 
-    val currentRound = racesCurrentState.roundNumber
+    val currentRound = racesCurrentState?.roundNumber ?: racesList1.firstOrNull()?.roundNumber ?: 1
     val listState = rememberLazyListState()
 
-    val currentIndex = remember(racesList1, racesCurrentState) {
+    val currentIndex = remember(racesList1, currentRound) {
         racesList1.indexOfFirst { it.roundNumber == currentRound }.coerceAtLeast(0)
     }
 
@@ -103,7 +103,8 @@ fun RacesCards(
         ) {
             itemsIndexed(
                 items = racesList1,
-                key = { _, race -> race.circuitId }
+                key = { _, race -> "${race.roundNumber}_${race.circuitId}" },
+                contentType = { _, _ -> "RaceCard" }
             ) { index, race ->
                 val isCurrentRace = race.roundNumber == currentRound
                 val isPastRace = race.roundNumber < currentRound
@@ -244,7 +245,7 @@ fun CollapsedRaceCard(
                         fontFamily = Monospace
                     )
                     Text(
-                        text = localRaceDateTime?.dayOfMonth?.toString()
+                        text = localRaceDateTime?.day?.toString()
                             ?: race.race.date.toString().toGetDate(),
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.titleLarge,

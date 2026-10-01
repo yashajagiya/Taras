@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TopThreeDriversDAO {
 
-    @Query("SELECT * FROM TopThreeDriversEntity")
+    @Query("SELECT * FROM TopThreeDriversEntity ORDER BY position ASC")
     fun getAll(): Flow<List<TopThreeDriversEntity>>
 
     @Upsert
@@ -20,7 +20,7 @@ interface TopThreeDriversDAO {
 
 }
 
-@Database(entities = [TopThreeDriversEntity::class], version = 1)
+@Database(entities = [TopThreeDriversEntity::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun topThreeDriversDao(): TopThreeDriversDAO
 
@@ -32,8 +32,10 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = INSTANCE ?: Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "task_database"
-                ).build()
+                    "taras_database"
+                )
+                    .fallbackToDestructiveMigration(true)
+                    .build()
                 INSTANCE = instance
                 instance
             }

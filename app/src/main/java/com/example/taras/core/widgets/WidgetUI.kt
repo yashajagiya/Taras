@@ -18,8 +18,11 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.material3.ColorProviders
+import androidx.glance.action.clickable
+import androidx.glance.appwidget.action.actionStartActivity
 import com.example.taras.core.common.UiState
 import com.example.taras.ui.theme.DarkColorScheme
+import com.example.taras.view.MainActivity
 import com.example.taras.viewmodel.CurrentRace
 import com.example.taras.viewmodel.SessionInfo
 
@@ -36,10 +39,14 @@ fun NextRaceWidgetUI(
     nextSessionInfoForWidget: SessionInfo?,
     modifier: GlanceModifier = GlanceModifier
 ) {
+    val context = androidx.glance.LocalContext.current
+    val launchIntent = android.content.Intent(context, MainActivity::class.java)
+
     GlanceTheme(colors = TarasWidgetColors) {
         Box(
             modifier = modifier
                 .fillMaxSize()
+                .clickable(actionStartActivity(launchIntent))
                 .background(GlanceTheme.colors.background)
         ) {
             when (raceCurrentState) {
@@ -99,9 +106,13 @@ private fun WidgetSuccessView(
     raceCurrent: CurrentRace?,
     nextSessionInfoForWidget: SessionInfo?
 ) {
+    val context = androidx.glance.LocalContext.current
+    val launchIntent = android.content.Intent(context, MainActivity::class.java)
+
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
+            .clickable(actionStartActivity(launchIntent))
             .background(GlanceTheme.colors.primaryContainer)
             .padding(16.dp)
     ) {

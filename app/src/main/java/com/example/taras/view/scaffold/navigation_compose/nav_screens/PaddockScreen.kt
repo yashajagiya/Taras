@@ -49,7 +49,7 @@ import com.example.taras.viewmodel.CurrentRace
 import com.example.taras.viewmodel.DriverUiModel
 import com.example.taras.viewmodel.DriversViewModel
 import com.example.taras.viewmodel.DriversViewModelFactory
-import com.example.taras.core.helpercore.NewsRepository
+import com.example.taras.viewmodel.NewsViewModel
 import com.example.taras.viewmodel.RacesViewModel
 import com.example.taras.viewmodel.RacesViewModelFactory
 import com.example.taras.viewmodel.SessionInfo
@@ -80,7 +80,7 @@ fun NavPaddockScreen(
         )
     ),
     teamsViewModel: TeamsViewModel = viewModel(),
-    newsRepository: NewsRepository = viewModel(),
+    newsViewModel: NewsViewModel = viewModel(),
     racesViewModel: RacesViewModel = viewModel(
         factory = RacesViewModelFactory(CurrentData(LocalContext.current))
     )
@@ -88,13 +88,13 @@ fun NavPaddockScreen(
     val driverTopThree by driversViewModel.topThree.collectAsStateWithLifecycle()
     val allDrivers by driversViewModel.combinedLowDrivers.collectAsStateWithLifecycle()
     val allTeams by teamsViewModel.combinedTeams.collectAsStateWithLifecycle()
-    val newsState by newsRepository.news.collectAsStateWithLifecycle()
+    val newsState by newsViewModel.news.collectAsStateWithLifecycle()
     val raceCurrentState by racesViewModel.oneRace.collectAsStateWithLifecycle()
     val nextSessionInfo by racesViewModel.nextSessionInfo.collectAsStateWithLifecycle()
 
     val isDriversRefreshing by driversViewModel.isRefreshing.collectAsStateWithLifecycle()
     val isTeamsRefreshing by teamsViewModel.isRefreshing.collectAsStateWithLifecycle()
-    val isNewsRefreshing by newsRepository.isRefreshing.collectAsStateWithLifecycle()
+    val isNewsRefreshing by newsViewModel.isRefreshing.collectAsStateWithLifecycle()
     val isRacesRefreshing by racesViewModel.isRefreshing.collectAsStateWithLifecycle()
 
     StartNofi()
@@ -111,7 +111,7 @@ fun NavPaddockScreen(
         onRefresh = {
             driversViewModel.fetchDriverData(isRefresh = true)
             teamsViewModel.fetchTeams(isRefresh = true)
-            newsRepository.fetchNews(isRefresh = true)
+            newsViewModel.fetchNews(isRefresh = true)
             racesViewModel.fetchRacesData(isRefresh = true)
         }
     )
@@ -480,19 +480,13 @@ private fun RunnerUpDriverCard(
 fun StartNofi() {
     val context = LocalContext.current
 
-    val batteryOptLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) {
-        NotificationScheduler.scheduleNotificationSync(context)
-    }
-
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
             Toast.makeText(context, "Notifications enabled for race updates", Toast.LENGTH_SHORT).show()
         }
-        requestBatteryOptimizationExemption(context, batteryOptLauncher)
+        NotificationScheduler.scheduleNotificationSync(context)
     }
 
     LaunchedEffect(Unit) {
@@ -506,34 +500,12 @@ fun StartNofi() {
             if (!hasPermission) {
                 permissionLauncher.launch(permission)
             } else {
-                requestBatteryOptimizationExemption(context, batteryOptLauncher)
+                NotificationScheduler.scheduleNotificationSync(context)
             }
         } else {
-            requestBatteryOptimizationExemption(context, batteryOptLauncher)
+            NotificationScheduler.scheduleNotificationSync(context)
         }
     }
-}
-
-@SuppressLint("BatteryLife")
-private fun requestBatteryOptimizationExemption(
-    context: Context,
-    launcher: ManagedActivityResultLauncher<Intent, ActivityResult>
-) {
-    val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-    if (!pm.isIgnoringBatteryOptimizations(context.packageName)) {
-        try {
-            val intent = Intent(
-                Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                "package:${context.packageName}".toUri()
-            )
-            launcher.launch(intent)
-            return
-        } catch (e: Exception) {
-            Log.e("PaddockScreen", "Failed to launch battery optimization intent", e)
-            Toast.makeText(context, "Please allow background activity in settings", Toast.LENGTH_LONG).show()
-        }
-    }
-    NotificationScheduler.scheduleNotificationSync(context)
 }
 
 @Composable

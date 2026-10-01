@@ -29,4 +29,8 @@ sealed class MainNavRoutes : NavKey {
 
 
     @Serializable
-    data class TeamsData(val numberOrName: String) : MainNavRoutes()}
+    data class TeamsData(val numberOrName: String) : MainNavRoutes()
+
+    @Serializable
+    data class Comparison(val initialDriver1: String = "", val initialDriver2: String = "") : MainNavRoutes()
+}

@@ -34,9 +34,9 @@ fun TeamCard(
     val contentColor = if (containerColor.luminance() > 0.5f) Color.Black else Color.White
 
     Card(
-        modifier
+        onClick = { onTeamClick(teamData.teamName) },
+        modifier = modifier
             .fillMaxWidth()
-            .clickable { onTeamClick(teamData.teamName) }
             .padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = containerColor,

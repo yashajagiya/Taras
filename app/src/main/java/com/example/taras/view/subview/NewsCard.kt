@@ -72,9 +72,17 @@ fun NewsCarousel(
             modifier = Modifier
                 .maskClip(MaterialTheme.shapes.extraLarge)
                 .clickable {
-                    item.link?.let {
-                        val intent = Intent(Intent.ACTION_VIEW, it.toUri())
-                        context.startActivity(intent)
+                    item.link?.let { linkUrl ->
+                        try {
+                            val intent = Intent(Intent.ACTION_VIEW, linkUrl.toUri())
+                            context.startActivity(intent)
+                        } catch (e: Exception) {
+                            android.widget.Toast.makeText(
+                                context,
+                                "Unable to open article link",
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
         ) {

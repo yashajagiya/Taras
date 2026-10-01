@@ -12,7 +12,10 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.SignalWifiStatusbarConnectedNoInternet4
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -61,6 +64,7 @@ import kotlinx.collections.immutable.ImmutableList
 fun NavGridScreen(
     onDriverClick: (String) -> Unit,
     onTeamClick: (String) -> Unit,
+    onCompareClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     driversViewModel: DriversViewModel = viewModel(
         factory = DriversViewModelFactory(
@@ -84,6 +88,7 @@ fun NavGridScreen(
         },
         onDriverClick = onDriverClick,
         onTeamClick = onTeamClick,
+        onCompareClick = onCompareClick,
         modifier = modifier
     )
 }
@@ -100,6 +105,7 @@ fun GridContent(
     onRefresh: () -> Unit,
     onDriverClick: (String) -> Unit,
     onTeamClick: (String) -> Unit,
+    onCompareClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -126,18 +132,33 @@ fun GridContent(
             }
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                PrimaryTabRow(selectedTabIndex = selectedTabIndex) {
-                    tabs.forEachIndexed { index, title ->
-                        Tab(
-                            selected = selectedTabIndex == index,
-                            onClick = { selectedTabIndex = index },
-                            text = {
-                                Text(
-                                    text = title,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    PrimaryTabRow(
+                        selectedTabIndex = selectedTabIndex,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        tabs.forEachIndexed { index, title ->
+                            Tab(
+                                selected = selectedTabIndex == index,
+                                onClick = { selectedTabIndex = index },
+                                text = {
+                                    Text(
+                                        text = title,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            )
+                        }
+                    }
+                    IconButton(onClick = onCompareClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.CompareArrows,
+                            contentDescription = "Compare Drivers",
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -212,7 +233,8 @@ fun GridContent(
                                         } else {
                                             items(
                                                 items = drivers,
-                                                key = { it.driverNumber ?: it.name }
+                                                key = { it.driverNumber ?: it.name },
+                                                contentType = { "DriverCard" }
                                             ) { driver ->
                                                 DriverCard(
                                                     driver = driver,
@@ -231,7 +253,7 @@ fun GridContent(
                                 when (teamsState) {
                                     is UiState.Loading -> {
                                         if (!isRefreshing) {
-                                            item {
+                                            item(contentType = "Loading") {
                                                 Column(
                                                     modifier = Modifier
                                                         .fillMaxWidth()
@@ -248,7 +270,7 @@ fun GridContent(
                                     }
 
                                     is UiState.Error -> {
-                                        item {
+                                        item(contentType = "Error") {
                                             Text(
                                                 text = "Error: ${teamsState.message}",
                                                 color = MaterialTheme.colorScheme.error,
@@ -260,7 +282,7 @@ fun GridContent(
                                     is UiState.Success -> {
                                         val teamsResponse = teamsState.data
                                         if (teamsResponse.isEmpty()) {
-                                            item {
+                                            item(contentType = "Empty") {
                                                 Text(
                                                     "No Teams Found",
                                                     modifier = Modifier.padding(16.dp)
@@ -269,7 +291,8 @@ fun GridContent(
                                         } else {
                                             items(
                                                 items = teamsResponse,
-                                                key = { it.teamName }
+                                                key = { it.teamName },
+                                                contentType = { "TeamCard" }
                                             ) { teamData ->
                                                 TeamCard(
                                                     teamData = teamData,

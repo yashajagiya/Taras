@@ -84,18 +84,15 @@ class GithubNotificationWorker(
                 .get()
                 .build()
 
-            // 2. Execute the network call
-            val response = client.newCall(request).execute()
-
-            // Handle network errors (Result.retry() tells WorkManager to try again later)
-            if (!response.isSuccessful) {
-                Log.w(TAG, "HTTP ${response.code}")
-                return@withContext Result.retry()
+            // 2. Execute the network call with automatic resource closing
+            val notification = client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    Log.w(TAG, "HTTP ${response.code}")
+                    return@withContext Result.retry()
+                }
+                val body = response.body?.string() ?: return@withContext Result.retry()
+                json.decodeFromString<GithubNotification>(body)
             }
-
-            // 3. Parse the JSON body into our GithubNotification data class
-            val body = response.body?.string() ?: return@withContext Result.retry()
-            val notification = json.decodeFromString<GithubNotification>(body)
 
             val currentId = notification.id
             val rawTitle = notification.title

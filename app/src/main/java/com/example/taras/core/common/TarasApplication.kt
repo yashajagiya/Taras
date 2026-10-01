@@ -10,6 +10,16 @@ import coil3.memory.MemoryCache
 import coil3.request.crossfade
 
 class TarasApplication : Application(), SingletonImageLoader.Factory {
+    companion object {
+        lateinit var instance: TarasApplication
+            private set
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        instance = this
+    }
+
     override fun newImageLoader(context: PlatformContext): ImageLoader {
         return ImageLoader.Builder(context)
             .memoryCache {

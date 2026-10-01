@@ -27,9 +27,14 @@ fun MainNavHost(
     userViewModel: UserViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     NavDisplay(
         modifier = modifier.fillMaxSize(),
-        onBack = { navigator.goBack() },
+        onBack = {
+            if (!navigator.goBack()) {
+                (context as? android.app.Activity)?.finish()
+            }
+        },
         entries = navigationState.toEntries(
             entryProvider {
                 entry<MainNavRoutes.Paddock> {
@@ -43,6 +48,9 @@ fun MainNavHost(
                         },
                         onTeamClick = { teamName ->
                             navigator.navigate(MainNavRoutes.TeamsData(teamName))
+                        },
+                        onCompareClick = {
+                            navigator.navigate(MainNavRoutes.Comparison())
                         })
                 }
                 entry<MainNavRoutes.Calendar> {
@@ -70,6 +78,13 @@ fun MainNavHost(
                 }
                 entry<MainNavRoutes.TeamsData> { route ->
                     TeamsData(route.numberOrName)
+                }
+                entry<MainNavRoutes.Comparison> { route ->
+                    com.example.taras.view.scaffold.navigation_compose.nav_screens.nave_subscreens.ComparisonScreen(
+                        initialDriver1 = route.initialDriver1,
+                        initialDriver2 = route.initialDriver2,
+                        onBackClick = { navigator.goBack() }
+                    )
                 }
             }
         )

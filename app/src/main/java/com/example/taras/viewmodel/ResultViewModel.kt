@@ -5,7 +5,11 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taras.core.common.AppError
 import com.example.taras.core.common.UiState
+import com.example.taras.core.common.toAppError
+import com.example.taras.core.engine.RaceStateEngine
+import com.example.taras.core.repository.F1InfoRepository
 import com.example.taras.network_calls.NetworkModule
 import com.example.taras.network_calls.taras.TarasDataService
 import com.example.taras.network_calls.taras.model.DriverRaceQualifyingResponse
@@ -15,7 +19,7 @@ import com.example.taras.network_calls.taras.model.Fp1Response
 import com.example.taras.network_calls.taras.model.Fp2Response
 import com.example.taras.network_calls.taras.model.Fp3Response
 import com.example.taras.network_calls.taras.model.SprintQulyResponse
-import SprintResultResponse
+import com.example.taras.network_calls.taras.model.SprintResultResponse
 import com.example.taras.core.helpercore.getTodayDate
 import com.example.taras.core.helpercore.toRemoveDateExtra
 import com.example.taras.core.helpercore.formatToLocalFull
@@ -63,7 +67,9 @@ data class SessionResultUiState(
 )
 
 @Stable
-class ResultViewModel : ViewModel() {
+class ResultViewModel(
+    private val f1InfoRepository: F1InfoRepository = F1InfoRepository.instance
+) : ViewModel() {
 
     private val lagtag = "ResultViewModel"
 
@@ -378,77 +384,45 @@ class ResultViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                // All launch blocks below are independent, they should run in parallel
-                // We'll wrap them to handle the finally block correctly
-                val jobs = listOf(
-                    launch(Dispatchers.IO) {
-                        try {
-                            val raceInfo = tarasDataService.getRaceInfoData()
-                            val today = getTodayDate().toRemoveDateExtra()
-                            val now = getCurrentMoment()
-
-                            val nextRaceIndex =
-                                raceInfo.races.indexOfFirst { (it.schedule.race?.date?.toRemoveDateExtra() ?: 0) >= today }
-                            val nextRace =
-                                if (nextRaceIndex != -1) raceInfo.races[nextRaceIndex] else raceInfo.races.lastOrNull()
-
-                            val fp1Start =
-                                nextRace?.schedule?.fp1?.let {
-                                    parseSessionTimeToInstant(
-                                        it.date,
-                                        it.time
-                                    )
-                                }
-
-                            val activeRace = if (fp1Start != null && fp1Start > now) {
-                                if (nextRaceIndex > 0) raceInfo.races[nextRaceIndex - 1] else nextRace
-                            } else {
-                                nextRace
-                            }
-
-                            activeRace?.let { race ->
-                                _activeSchedule.value = race.schedule
-                                _isSprintWeekend.value =
-                                    race.schedule.fp2 == null && race.schedule.fp3 == null
-                            }
-                        } catch (e: Exception) {
-                            Log.e(lagtag, "Error fetching race info", e)
+                val scheduleJob = launch(Dispatchers.IO) {
+                    try {
+                        val raceInfo = tarasDataService.getRaceInfoData()
+                        val activeRace = RaceStateEngine.findSelectedRaceForResult(raceInfo.races)
+                        activeRace?.let { race ->
+                            _activeSchedule.value = race.schedule
+                            _isSprintWeekend.value =
+                                race.schedule.fp2 == null && race.schedule.fp3 == null
                         }
-                    },
-                    launch(Dispatchers.IO) {
-                        _driversInfoData.value =
-                            safeApiCall { tarasDataService.getDriverInfoData() }
-                    },
-                    launch(Dispatchers.IO) {
-                        _racesFp1Result.value =
-                            safeApiCall { tarasDataService.getDriverFp1Standings() }
-                    },
-                    launch(Dispatchers.IO) {
-                        _racesFp2Result.value =
-                            safeApiCall { tarasDataService.getDriverFp2Standings() }
-                    },
-                    launch(Dispatchers.IO) {
-                        _racesFp3Result.value =
-                            safeApiCall { tarasDataService.getDriverFp3Standings() }
-                    },
-                    launch(Dispatchers.IO) {
-                        _racesSprintQualyResult.value =
-                            safeApiCall { tarasDataService.getDriverSprintQualifyingStandings() }
-                    },
-                    launch(Dispatchers.IO) {
-                        _racesSprintRaceResult.value =
-                            safeApiCall { tarasDataService.getDriverSprintResultStandings() }
-                    },
-                    launch(Dispatchers.IO) {
-                        _racesQulyResult.value =
-                            safeApiCall { tarasDataService.getDriverRaceQualifyingStandings() }
-                    },
-                    launch(Dispatchers.IO) {
-                        _racesResult.value =
-                            safeApiCall { tarasDataService.getDriverRaceResultStandings() }
+                    } catch (e: Exception) {
+                        Log.e(lagtag, "Error fetching race info", e)
                     }
-                )
-                jobs.joinAll()
+                }
+                val driversJob = launch(Dispatchers.IO) {
+                    _driversInfoData.value =
+                        safeApiCall { f1InfoRepository.getDriverInfoData(forceRefresh = isRefresh) }
+                }
+                val commonSessionsJob = launch(Dispatchers.IO) {
+                    val fp1Job = launch { _racesFp1Result.value = safeApiCall { tarasDataService.getDriverFp1Standings() } }
+                    val qualiJob = launch { _racesQulyResult.value = safeApiCall { tarasDataService.getDriverRaceQualifyingStandings() } }
+                    val raceJob = launch { _racesResult.value = safeApiCall { tarasDataService.getDriverRaceResultStandings() } }
+                    listOf(fp1Job, qualiJob, raceJob).joinAll()
+                }
+
+                scheduleJob.join()
+
+                val conditionalSessionsJob = launch(Dispatchers.IO) {
+                    if (_isSprintWeekend.value) {
+                        val sqJob = launch { _racesSprintQualyResult.value = safeApiCall { tarasDataService.getDriverSprintQualifyingStandings() } }
+                        val srJob = launch { _racesSprintRaceResult.value = safeApiCall { tarasDataService.getDriverSprintResultStandings() } }
+                        listOf(sqJob, srJob).joinAll()
+                    } else {
+                        val fp2Job = launch { _racesFp2Result.value = safeApiCall { tarasDataService.getDriverFp2Standings() } }
+                        val fp3Job = launch { _racesFp3Result.value = safeApiCall { tarasDataService.getDriverFp3Standings() } }
+                        listOf(fp2Job, fp3Job).joinAll()
+                    }
+                }
+
+                listOf(driversJob, commonSessionsJob, conditionalSessionsJob).joinAll()
             } finally {
                 _isRefreshing.value = false
             }
@@ -460,17 +434,33 @@ class ResultViewModel : ViewModel() {
             UiState.Success(apiCall())
         } catch (e: Exception) {
             Log.e(lagtag, "API Error: ${e.message}", e)
-            UiState.Error("Data unavailable")
+            UiState.Error(e.toAppError())
         }
     }
 
+    private var cachedDriverDetailsList: List<F1DriversInfoResponse>? = null
+    private var cachedDriverNameMap: Map<String, F1DriversInfoResponse> = emptyMap()
 
     private fun findDriverInfo(
         driverName: String,
         details: UiState<List<F1DriversInfoResponse>>
     ): F1DriversInfoResponse? {
         val detailList = (details as? UiState.Success)?.data ?: return null
-        return detailList.find { d ->
+        if (cachedDriverDetailsList !== detailList) {
+            cachedDriverDetailsList = detailList
+            val map = HashMap<String, F1DriversInfoResponse>()
+            for (d in detailList) {
+                val fullName = "${d.hero.firstName} ${d.hero.lastName}".trim().lowercase()
+                val lastName = d.hero.lastName.trim().lowercase()
+                val shortName = d.hero.firstName.trim().lowercase()
+                if (fullName.isNotEmpty()) map[fullName] = d
+                if (lastName.isNotEmpty()) map[lastName] = d
+                if (shortName.isNotEmpty()) map.putIfAbsent(shortName, d)
+            }
+            cachedDriverNameMap = map
+        }
+        val query = driverName.trim().lowercase()
+        return cachedDriverNameMap[query] ?: detailList.find { d ->
             val fullName = "${d.hero.firstName} ${d.hero.lastName}"
             fullName.contains(driverName, ignoreCase = true) ||
                     d.hero.lastName.contains(driverName, ignoreCase = true)

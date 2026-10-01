@@ -15,16 +15,20 @@ class Navigator<T : NavKey>(val state: NavState<T>) {
         }
     }
 
-    fun goBack() {
-        val currentStack = state.backStacks[state.topLevelRoute] ?: return
-        val currentRoute = currentStack.lastOrNull() ?: return
+    fun goBack(): Boolean {
+        val currentStack = state.backStacks[state.topLevelRoute] ?: return false
+        val currentRoute = currentStack.lastOrNull() ?: return false
 
-        if (currentRoute == state.topLevelRoute) {
+        return if (currentRoute == state.topLevelRoute) {
             if (state.topLevelRoute != state.startRoute) {
                 state.topLevelRoute = state.startRoute
+                true
+            } else {
+                false
             }
         } else {
             currentStack.removeAt(currentStack.size - 1)
+            true
         }
     }
 }

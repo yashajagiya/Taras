@@ -11,8 +11,6 @@ import kotlin.time.Clock
 
 fun getCurrentMoment(): Instant = Clock.System.now()
 
-//fun getDatetimeInUtc(): LocalDateTime = getCurrentMoment().toLocalDateTime(TimeZone.UTC)
-
 fun getTodayDate(): String =
     getCurrentMoment().toLocalDateTime(currentSystemDefault()).date.toString()
 
@@ -98,30 +96,29 @@ fun formatCountdownWidgets(duration: Duration): String {
 }
 
 fun String.toMonthes(): String {
-    return when (this) {
-        "01" -> "Jan"
-        "02" -> "Feb"
-        "03" -> "Mar"
-        "04" -> "Apr"
-        "05" -> "May"
-        "06" -> "Jun"
-        "07" -> "Jul"
-        "08" -> "Aug"
-        "09" -> "Sep"
+    return when (this.trim()) {
+        "01", "1" -> "Jan"
+        "02", "2" -> "Feb"
+        "03", "3" -> "Mar"
+        "04", "4" -> "Apr"
+        "05", "5" -> "May"
+        "06", "6" -> "Jun"
+        "07", "7" -> "Jul"
+        "08", "8" -> "Aug"
+        "09", "9" -> "Sep"
         "10" -> "Oct"
         "11" -> "Nov"
         "12" -> "Dec"
         else -> "N/A"
     }
-
 }
 
 fun String.toGetMonths(): String {
     val date = this.split("-")
-    return date[1]
+    return date.getOrNull(1)?.trim() ?: "01"
 }
 
 fun String.toGetDate(): String {
     val date = this.split("-")
-    return date[2]
+    return date.getOrNull(2)?.trim() ?: "01"
 }

@@ -292,9 +292,6 @@ fun DriverProfileContent(
                                     colors = CardDefaults.cardColors(
                                         containerColor = MaterialTheme.colorScheme.surfaceContainer
                                     )
-//                                    elevation = CardDefaults.cardElevation(
-//                                        defaultElevation = 4.dp
-//                                    )
                                 )
                                 {
                                     Row(
@@ -345,7 +342,7 @@ fun DriverProfileContent(
                                         text = "2026 Performance",
                                         style = MaterialTheme.typography.titleLarge,
                                         letterSpacing = 1.sp,
-                                        color = Color.Black,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         textAlign = TextAlign.Start,
                                         fontSize = 32.sp,
                                         fontWeight = FontWeight.ExtraBold
@@ -364,7 +361,7 @@ fun DriverProfileContent(
                                         "Sprint Races" to (stats?.sprintRaces ?: "0"),
                                         "Sprint Wins" to (stats?.sprintWins ?: "0"),
                                         "Sprint Podiums" to (stats?.sprintPodiums ?: "0"),
-                                        "Sprint Poles" to (stats?.sprintPodiums ?: "0")
+                                        "Sprint Poles" to (stats?.sprintPoles ?: "0")
                                     )
 
                                     FlowRow(
@@ -399,7 +396,7 @@ fun DriverProfileContent(
                                         text = "Career Stats",
                                         style = MaterialTheme.typography.titleLarge,
                                         letterSpacing = 1.sp,
-                                        color = Color.Black,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         textAlign = TextAlign.Start,
                                         fontSize = 32.sp,
                                         fontWeight = FontWeight.ExtraBold
@@ -501,7 +498,7 @@ fun DriverProfileContent(
                                         text = "Recent Form",
                                         style = MaterialTheme.typography.titleLarge,
                                         letterSpacing = 1.sp,
-                                        color = Color.Black,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 32.sp,
                                         fontWeight = FontWeight.ExtraBold,
                                         textAlign = TextAlign.Start,
@@ -530,7 +527,7 @@ fun DriverProfileContent(
                                         text = "Biography",
                                         style = MaterialTheme.typography.titleLarge,
                                         letterSpacing = 1.sp,
-                                        color = Color.Black,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 32.sp,
                                         fontWeight = FontWeight.ExtraBold,
                                         textAlign = TextAlign.Start,
@@ -559,6 +556,26 @@ fun ChartPerRace(
     perRace: ImmutableList<com.example.taras.network_calls.taras.model.DriverPerRace>,
     points: String
 ) {
+    if (perRace.isEmpty()) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Text(
+                text = "Points progression will appear once the season begins.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                textAlign = TextAlign.Center
+            )
+        }
+        return
+    }
 
     val dataSet = remember(perRace, points) {
         perRace.map { it.value }.toChartDataSet(
@@ -574,7 +591,7 @@ fun ChartPerRace(
             pointSize = 8f,
             xAxisLabelsVisible = true,
             yAxisLabelsVisible = true,
-            xAxisLabelMaxCount = perRace.size
+            xAxisLabelMaxCount = perRace.size.coerceAtLeast(1)
         )
     )
 }
@@ -768,9 +785,6 @@ fun BioCard(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
         shape = RoundedCornerShape(24.dp)
-//        elevation = CardDefaults.cardElevation(
-//            defaultElevation = 4.dp
-//        )
     ) {
         Column(
             modifier = Modifier

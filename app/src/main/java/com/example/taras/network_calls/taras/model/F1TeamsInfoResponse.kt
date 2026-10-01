@@ -8,13 +8,13 @@ data class F1TeamsInfoResponse(
     val slug: String,
     val url: String,
     val hero: Hero,
-    val biography: String,
+    val biography: String = "",
     @SerialName("season_2026")
-    val seasonStats: SeasonStats,
+    val seasonStats: SeasonStats? = null,
     @SerialName("team_summary")
-    val teamSummary: TeamSummary,
+    val teamSummary: TeamSummary? = null,
     @SerialName("team_profile")
-    val teamProfile: TeamProfile,
+    val teamProfile: TeamProfile? = null,
 )
 
 @Serializable

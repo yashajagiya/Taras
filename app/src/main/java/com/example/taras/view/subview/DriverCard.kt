@@ -38,9 +38,9 @@ fun DriverCard(
     val containerColor = driver.teamColor?.toComposeColor() ?: Color.White
 
     Card(
+        onClick = { onDriverClick(driver.driverNumber?.toString() ?: driver.name) },
         modifier = modifier
             .fillMaxWidth()
-            .clickable{onDriverClick(driver.driverNumber?.toString() ?: driver.name)}
             .padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),

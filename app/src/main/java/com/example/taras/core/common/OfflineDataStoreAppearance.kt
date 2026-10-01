@@ -13,13 +13,8 @@ class OfflineDataStoreAppearance(private val context: Context) {
     companion object {
         val APPEARANCE = stringPreferencesKey("appearance")
     }
-//    suspend fun saveData (json: String) {
-//        context.appearanceDataStore.edit {
-//            it[APPEARANCE] = json
-//        }
-//    }
     val appearanceData : Flow<String>  = context.appearanceDataStore.data.map {
-        it[APPEARANCE] ?: "Light"
+        it[APPEARANCE] ?: "System Default"
     }
     suspend fun saveAppearance(appearance: String) {
         context.appearanceDataStore.edit {

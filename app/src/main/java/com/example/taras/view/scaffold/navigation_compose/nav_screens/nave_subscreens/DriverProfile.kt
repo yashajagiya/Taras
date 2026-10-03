@@ -102,7 +102,8 @@ fun DriverProfile(
     driversViewModel: DriversViewModel = viewModel(
         factory = DriversViewModelFactory(AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao())
     ),
-    onCompareTeammatesClick: (String, String) -> Unit = { _, _ -> }
+    onCompareTeammatesClick: (String, String) -> Unit = { _, _ -> },
+    onDriverClick: (String) -> Unit = {}
 ) {
     val driverDetailsState by driversViewModel.combinedDetailedDrivers.collectAsStateWithLifecycle()
     val isRefreshing by driversViewModel.isRefreshing.collectAsStateWithLifecycle()
@@ -125,6 +126,7 @@ fun DriverProfile(
         },
         onRefresh = { driversViewModel.fetchDriverData(isRefresh = true) },
         onCompareTeammatesClick = onCompareTeammatesClick,
+        onDriverClick = onDriverClick,
         modifier = modifier
     )
 }
@@ -142,6 +144,7 @@ fun DriverProfileContent(
     isFavorite: Boolean = false,
     onToggleFavorite: () -> Unit = {},
     onCompareTeammatesClick: (String, String) -> Unit = { _, _ -> },
+    onDriverClick: (String) -> Unit = {},
     isRefreshing: Boolean = false
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -386,49 +389,31 @@ fun DriverProfileContent(
                             }
 
                             if (teammate != null) {
-                                item(contentType = "TeammateBattleHeader") {
+                                item(contentType = "TeammateHeader") {
                                     Spacer(modifier = Modifier.height(16.dp))
-                                    Row(
+                                    Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(horizontal = 16.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween
+                                        horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                imageVector = Icons.AutoMirrored.Filled.CompareArrows,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(22.dp)
-                                            )
-                                            Spacer(Modifier.width(8.dp))
-                                            Text(
-                                                text = "Teammate Battle",
-                                                style = MaterialTheme.typography.titleLarge,
-                                                fontWeight = FontWeight.ExtraBold
-                                            )
-                                        }
-                                        Surface(
-                                            shape = RoundedCornerShape(12.dp),
-                                            color = MaterialTheme.colorScheme.primaryContainer
-                                        ) {
-                                            Text(
-                                                text = "HEAD-TO-HEAD",
-                                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                                style = MaterialTheme.typography.labelSmall,
-                                                fontWeight = FontWeight.Bold,
-                                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                                            )
-                                        }
+                                        Text(
+                                            text = "Teammate",
+                                            style = MaterialTheme.typography.titleLarge,
+                                            letterSpacing = 1.sp,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            fontSize = 32.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            textAlign = TextAlign.Center
+                                        )
                                     }
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Spacer(modifier = Modifier.height(8.dp))
                                 }
 
                                 item(contentType = "TeammateDriverCard") {
                                     DriverCard(
                                         driver = teammate.toDriverUiModel(),
-                                        onDriverClick = { onCompareTeammatesClick(driver.driverNumber, teammate.driverNumber) }
+                                        onDriverClick = { onDriverClick(teammate.driverNumber) }
                                     )
                                 }
 
@@ -481,7 +466,7 @@ fun DriverProfileContent(
                                         style = MaterialTheme.typography.titleLarge,
                                         letterSpacing = 1.sp,
                                         color = MaterialTheme.colorScheme.onSurface,
-                                        textAlign = TextAlign.Start,
+                                        textAlign = TextAlign.Center,
                                         fontSize = 32.sp,
                                         fontWeight = FontWeight.ExtraBold
                                     )
@@ -535,7 +520,7 @@ fun DriverProfileContent(
                                         style = MaterialTheme.typography.titleLarge,
                                         letterSpacing = 1.sp,
                                         color = MaterialTheme.colorScheme.onSurface,
-                                        textAlign = TextAlign.Start,
+                                        textAlign = TextAlign.Center,
                                         fontSize = 32.sp,
                                         fontWeight = FontWeight.ExtraBold
                                     )
@@ -639,7 +624,7 @@ fun DriverProfileContent(
                                         color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 32.sp,
                                         fontWeight = FontWeight.ExtraBold,
-                                        textAlign = TextAlign.Start,
+                                        textAlign = TextAlign.Center,
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(horizontal = 16.dp)
@@ -668,7 +653,7 @@ fun DriverProfileContent(
                                         color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 32.sp,
                                         fontWeight = FontWeight.ExtraBold,
-                                        textAlign = TextAlign.Start,
+                                        textAlign = TextAlign.Center,
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(horizontal = 16.dp)

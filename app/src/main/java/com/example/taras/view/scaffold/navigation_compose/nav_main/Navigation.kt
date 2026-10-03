@@ -86,6 +86,9 @@ fun MainNavHost(
                         userViewModel = userViewModel,
                         onCompareTeammatesClick = { d1, d2 ->
                             navigator.navigate(MainNavRoutes.Comparison(initialDriver1 = d1, initialDriver2 = d2))
+                        },
+                        onDriverClick = { teammateNum ->
+                            navigator.navigate(MainNavRoutes.DriverProfile(teammateNum))
                         }
                     )
                 }

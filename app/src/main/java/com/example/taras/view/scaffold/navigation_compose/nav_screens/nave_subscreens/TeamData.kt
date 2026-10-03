@@ -382,42 +382,24 @@ fun TeamProfileContent(
 
                             if (teamDrivers.isNotEmpty()) {
                                 item(contentType = "TeamDriversHeader") {
-                                    Row(
+                                    Spacer(Modifier.height(16.dp))
+                                    Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 4.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween
+                                            .padding(horizontal = 16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(
-                                                imageVector = Icons.Default.Groups,
-                                                contentDescription = null,
-                                                tint = team.teamColor.toComposeColor(),
-                                                modifier = Modifier.size(22.dp)
-                                            )
-                                            Spacer(Modifier.width(8.dp))
-                                            Text(
-                                                text = "Team Drivers",
-                                                style = MaterialTheme.typography.titleLarge,
-                                                fontWeight = FontWeight.ExtraBold
-                                            )
-                                        }
-                                        if (teamDrivers.size >= 2) {
-                                            Surface(
-                                                shape = RoundedCornerShape(12.dp),
-                                                color = team.teamColor.toComposeColor().copy(alpha = 0.15f)
-                                            ) {
-                                                Text(
-                                                    text = "TEAMMATES",
-                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                                    style = MaterialTheme.typography.labelSmall,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = team.teamColor.toComposeColor()
-                                                )
-                                            }
-                                        }
+                                        Text(
+                                            text = "Team Drivers",
+                                            style = MaterialTheme.typography.titleLarge,
+                                            letterSpacing = 1.sp,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            fontSize = 32.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            textAlign = TextAlign.Center
+                                        )
                                     }
+                                    Spacer(Modifier.height(8.dp))
                                 }
 
                                 items(
@@ -473,11 +455,17 @@ fun TeamProfileContent(
                             item(contentType = "Management") {
                                 Text(
                                     text = "Management & Technical",
-                                    modifier = Modifier.padding(horizontal = 24.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 24.dp),
                                     style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.ExtraBold
+                                    letterSpacing = 1.sp,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontSize = 32.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    textAlign = TextAlign.Center
                                 )
-                                Spacer(Modifier.height(12.dp))
+                                Spacer(Modifier.height(16.dp))
 
                                 Column(modifier = Modifier.padding(horizontal = 24.dp)) {
                                     ManagementDetailCard(
@@ -515,9 +503,15 @@ fun TeamProfileContent(
                                 item(contentType = "Performance") {
                                     Text(
                                         text = "2026 Performance",
-                                        modifier = Modifier.padding(horizontal = 24.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 24.dp),
                                         style = MaterialTheme.typography.titleLarge,
-                                        fontWeight = FontWeight.ExtraBold
+                                        letterSpacing = 1.sp,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        fontSize = 32.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        textAlign = TextAlign.Center
                                     )
                                     Spacer(Modifier.height(16.dp))
 
@@ -557,13 +551,15 @@ fun TeamProfileContent(
                                 item(contentType = "History") {
                                     Text(
                                         text = "Team History",
-                                        modifier = Modifier.padding(horizontal = 24.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 24.dp),
                                         style = MaterialTheme.typography.titleLarge,
                                         letterSpacing = 1.sp,
-                                        color = Color.Black,
-                                        textAlign = TextAlign.Start,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 32.sp,
-                                        fontWeight = FontWeight.ExtraBold
+                                        fontWeight = FontWeight.ExtraBold,
+                                        textAlign = TextAlign.Center
                                     )
                                     Spacer(Modifier.height(16.dp))
 
@@ -640,7 +636,7 @@ fun TeamProfileContent(
                                         color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 32.sp,
                                         fontWeight = FontWeight.ExtraBold,
-                                        textAlign = TextAlign.Start,
+                                        textAlign = TextAlign.Center,
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(horizontal = 24.dp)
@@ -662,12 +658,12 @@ fun TeamProfileContent(
                                     color = MaterialTheme.colorScheme.onSurface,
                                     fontSize = 32.sp,
                                     fontWeight = FontWeight.ExtraBold,
-                                    textAlign = TextAlign.Start,
+                                    textAlign = TextAlign.Center,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 24.dp)
                                 )
-                                Spacer(Modifier.height(12.dp))
+                                Spacer(Modifier.height(16.dp))
                                 TeamBioCard(bioText = team.biography)
                                 Spacer(Modifier.height(24.dp))
                             }

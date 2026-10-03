@@ -14,15 +14,20 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
+import com.example.taras.network_calls.rss.NewsSource
+import com.example.taras.network_calls.rss.NewsSources
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -111,6 +116,7 @@ fun NavPaddockScreen(
     val isTeamsRefreshing by teamsViewModel.isRefreshing.collectAsStateWithLifecycle()
     val isNewsRefreshing by newsViewModel.isRefreshing.collectAsStateWithLifecycle()
     val isRacesRefreshing by racesViewModel.isRefreshing.collectAsStateWithLifecycle()
+    val selectedSourceId by newsViewModel.selectedSourceId.collectAsStateWithLifecycle()
 
     StartNofi()
 
@@ -138,7 +144,10 @@ fun NavPaddockScreen(
             teamsViewModel.fetchTeams(isRefresh = true)
             newsViewModel.fetchNews(isRefresh = true)
             racesViewModel.fetchRacesData(isRefresh = true)
-        }
+        },
+        newsSources = newsViewModel.availableSources,
+        selectedNewsSourceId = selectedSourceId,
+        onSelectNewsSource = { newsViewModel.setSourceFilter(it) }
     )
 }
 
@@ -164,6 +173,9 @@ fun PaddockContent(
     onUpdateDriverStats: (String, String, String) -> Unit = { _, _, _ -> },
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
+    newsSources: List<NewsSource> = NewsSources.FILTER_OPTIONS,
+    selectedNewsSourceId: String = NewsSources.ALL.id,
+    onSelectNewsSource: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -640,6 +652,15 @@ fun PaddockContent(
                         }
 
                         item {
+                            NewsSourceFilterRow(
+                                sources = newsSources,
+                                selectedSourceId = selectedNewsSourceId,
+                                onSelectSource = onSelectNewsSource,
+                                modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+                            )
+                        }
+
+                        item {
                             NewsCarousel(
                                 newsState = newsState,
                                 modifier = Modifier.padding(vertical = 8.dp),
@@ -789,4 +810,69 @@ fun NextSessionCountdownText(
         fontWeight = FontWeight.Bold,
         modifier = modifier
     )
+}
+
+@Composable
+fun NewsSourceFilterRow(
+    sources: List<NewsSource>,
+    selectedSourceId: String,
+    onSelectSource: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(sources, key = { it.id }) { source ->
+            val isSelected = source.id == selectedSourceId
+            val brandColor = remember(source.brandColorHex) {
+                try {
+                    Color(android.graphics.Color.parseColor(source.brandColorHex))
+                } catch (_: Exception) {
+                    Color(0xFFE10600)
+                }
+            }
+
+            Surface(
+                onClick = { onSelectSource(source.id) },
+                shape = RoundedCornerShape(20.dp),
+                color = if (isSelected) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceContainer
+                },
+                border = if (isSelected) {
+                    BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                } else {
+                    BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                }
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (source.id != NewsSources.ALL.id) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(brandColor)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                    }
+                    Text(
+                        text = source.name,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        color = if (isSelected) {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        }
+                    )
+                }
+            }
+        }
+    }
 }

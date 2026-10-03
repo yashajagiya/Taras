@@ -56,6 +56,11 @@ import com.example.taras.viewmodel.TeamUiModel
 import com.example.taras.viewmodel.TeamsViewModel
 import kotlinx.collections.immutable.ImmutableList
 
+import com.example.taras.core.common.UserPreferences
+import com.example.taras.viewmodel.UserViewModel
+import com.example.taras.viewmodel.UserViewModelFactory
+import kotlinx.collections.immutable.toImmutableList
+
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalMaterial3ExpressiveApi::class
@@ -65,6 +70,9 @@ fun NavGridScreen(
     onDriverClick: (String) -> Unit,
     onTeamClick: (String) -> Unit,
     onCompareClick: () -> Unit = {},
+    userViewModel: UserViewModel = viewModel(
+        factory = UserViewModelFactory(UserPreferences(LocalContext.current))
+    ),
     modifier: Modifier = Modifier,
     driversViewModel: DriversViewModel = viewModel(
         factory = DriversViewModelFactory(
@@ -81,6 +89,7 @@ fun NavGridScreen(
     GridContent(
         driversState = driversState,
         teamsState = teamsState,
+        userViewModel = userViewModel,
         isRefreshing = isDriversRefreshing || isTeamsRefreshing,
         onRefresh = {
             driversViewModel.fetchDriverData(isRefresh = true)
@@ -106,8 +115,32 @@ fun GridContent(
     onDriverClick: (String) -> Unit,
     onTeamClick: (String) -> Unit,
     onCompareClick: () -> Unit = {},
+    userViewModel: UserViewModel = viewModel(
+        factory = UserViewModelFactory(UserPreferences(LocalContext.current))
+    ),
     modifier: Modifier = Modifier
 ) {
+    val favoriteDriverNumber by userViewModel.favoriteDriverNumber.collectAsStateWithLifecycle()
+    val favoriteTeam by userViewModel.favoriteTeam.collectAsStateWithLifecycle()
+
+    val sortedDrivers = remember(driversState, favoriteDriverNumber) {
+        if (driversState is UiState.Success && !favoriteDriverNumber.isNullOrEmpty()) {
+            val (favs, others) = driversState.data.partition {
+                it.driverNumber?.toString() == favoriteDriverNumber
+            }
+            (favs + others).toImmutableList()
+        } else (driversState as? UiState.Success)?.data
+    }
+
+    val sortedTeams = remember(teamsState, favoriteTeam) {
+        if (teamsState is UiState.Success && !favoriteTeam.isNullOrEmpty()) {
+            val (favs, others) = teamsState.data.partition {
+                it.teamName.equals(favoriteTeam, ignoreCase = true)
+            }
+            (favs + others).toImmutableList()
+        } else (teamsState as? UiState.Success)?.data
+    }
+
     Box(modifier = modifier) {
 
         var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -222,7 +255,7 @@ fun GridContent(
                                     }
 
                                     is UiState.Success -> {
-                                        val drivers = driversState.data
+                                        val drivers = sortedDrivers ?: driversState.data
                                         if (drivers.isEmpty()) {
                                             item {
                                                 Text(
@@ -238,7 +271,8 @@ fun GridContent(
                                             ) { driver ->
                                                 DriverCard(
                                                     driver = driver,
-                                                    onDriverClick,
+                                                    onDriverClick = onDriverClick,
+                                                    isFavorite = driver.driverNumber?.toString() == favoriteDriverNumber,
                                                     modifier = Modifier
                                                 )
                                             }
@@ -280,7 +314,7 @@ fun GridContent(
                                     }
 
                                     is UiState.Success -> {
-                                        val teamsResponse = teamsState.data
+                                        val teamsResponse = sortedTeams ?: teamsState.data
                                         if (teamsResponse.isEmpty()) {
                                             item(contentType = "Empty") {
                                                 Text(
@@ -297,6 +331,7 @@ fun GridContent(
                                                 TeamCard(
                                                     teamData = teamData,
                                                     onTeamClick = onTeamClick,
+                                                    isFavorite = teamData.teamName.equals(favoriteTeam, ignoreCase = true),
                                                     modifier = Modifier
                                                 )
                                             }

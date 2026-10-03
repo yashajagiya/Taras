@@ -305,6 +305,21 @@ data class DriverDetailUiModel(
     val careerStats: CareerStats?
 )
 
+fun DriverDetailUiModel.toDriverUiModel(): DriverUiModel {
+    return DriverUiModel(
+        driverNumber = driverNumber.toIntOrNull(),
+        rank = rank,
+        name = fullName,
+        teamName = teamName,
+        points = championshipPointsDisplay,
+        teamColor = teamColor,
+        headshotUrl = headshotUrl,
+        carNumberImage = carNumberImage,
+        fullName = fullName,
+        nationality = nationality
+    )
+}
+
 class DriversViewModelFactory(private val dao: TopThreeDriversDAO) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DriversViewModel::class.java)) {

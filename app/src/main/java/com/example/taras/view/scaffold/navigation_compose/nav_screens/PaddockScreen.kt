@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
@@ -52,9 +54,12 @@ import com.example.taras.viewmodel.DriversViewModelFactory
 import com.example.taras.viewmodel.NewsViewModel
 import com.example.taras.viewmodel.RacesViewModel
 import com.example.taras.viewmodel.RacesViewModelFactory
+import com.example.taras.core.common.UserPreferences
 import com.example.taras.viewmodel.SessionInfo
 import com.example.taras.viewmodel.TeamUiModel
 import com.example.taras.viewmodel.TeamsViewModel
+import com.example.taras.viewmodel.UserViewModel
+import com.example.taras.viewmodel.UserViewModelFactory
 import com.example.taras.network_calls.rss.RssItem
 import com.example.taras.core.notification.NotificationScheduler
 import kotlinx.collections.immutable.ImmutableList
@@ -74,6 +79,9 @@ import com.example.taras.core.helpercore.formatCountdown
 @Composable
 fun NavPaddockScreen(
     modifier: Modifier = Modifier,
+    userViewModel: UserViewModel = viewModel(
+        factory = UserViewModelFactory(UserPreferences(LocalContext.current))
+    ),
     driversViewModel: DriversViewModel = viewModel(
         factory = DriversViewModelFactory(
             AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao()
@@ -83,7 +91,9 @@ fun NavPaddockScreen(
     newsViewModel: NewsViewModel = viewModel(),
     racesViewModel: RacesViewModel = viewModel(
         factory = RacesViewModelFactory(CurrentData(LocalContext.current))
-    )
+    ),
+    onDriverClick: (String) -> Unit = {},
+    onTeamClick: (String) -> Unit = {}
 ) {
     val driverTopThree by driversViewModel.topThree.collectAsStateWithLifecycle()
     val allDrivers by driversViewModel.combinedLowDrivers.collectAsStateWithLifecycle()
@@ -91,6 +101,11 @@ fun NavPaddockScreen(
     val newsState by newsViewModel.news.collectAsStateWithLifecycle()
     val raceCurrentState by racesViewModel.oneRace.collectAsStateWithLifecycle()
     val nextSessionInfo by racesViewModel.nextSessionInfo.collectAsStateWithLifecycle()
+
+    val userName by userViewModel.userName.collectAsStateWithLifecycle()
+    val favoriteDriverNumber by userViewModel.favoriteDriverNumber.collectAsStateWithLifecycle()
+    val favoriteTeam by userViewModel.favoriteTeam.collectAsStateWithLifecycle()
+    val hasSeenWelcome by userViewModel.hasSeenWelcome.collectAsStateWithLifecycle()
 
     val isDriversRefreshing by driversViewModel.isRefreshing.collectAsStateWithLifecycle()
     val isTeamsRefreshing by teamsViewModel.isRefreshing.collectAsStateWithLifecycle()
@@ -107,6 +122,16 @@ fun NavPaddockScreen(
         newsState = newsState,
         raceCurrentState = raceCurrentState,
         nextSessionInfo = nextSessionInfo,
+        userName = userName,
+        favoriteDriverNumber = favoriteDriverNumber,
+        favoriteTeam = favoriteTeam,
+        hasSeenWelcome = hasSeenWelcome,
+        onDismissWelcome = { userViewModel.setHasSeenWelcome(true) },
+        onDriverClick = onDriverClick,
+        onTeamClick = onTeamClick,
+        onUpdateDriverStats = { number, rank, points ->
+            userViewModel.updateFavoriteDriverStats(number, rank, points)
+        },
         isRefreshing = isDriversRefreshing || isTeamsRefreshing || isNewsRefreshing || isRacesRefreshing,
         onRefresh = {
             driversViewModel.fetchDriverData(isRefresh = true)
@@ -129,6 +154,14 @@ fun PaddockContent(
     newsState: UiState<ImmutableList<RssItem>>,
     raceCurrentState: UiState<CurrentRace?>,
     nextSessionInfo: SessionInfo?,
+    userName: String = "Guest",
+    favoriteDriverNumber: String? = null,
+    favoriteTeam: String? = null,
+    hasSeenWelcome: Boolean? = true,
+    onDismissWelcome: () -> Unit = {},
+    onDriverClick: (String) -> Unit = {},
+    onTeamClick: (String) -> Unit = {},
+    onUpdateDriverStats: (String, String, String) -> Unit = { _, _, _ -> },
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
@@ -200,12 +233,221 @@ fun PaddockContent(
                         contentPadding = PaddingValues(bottom = 24.dp)
                     ) {
                         item {
+                            val favDriver = remember(allDrivers, favoriteDriverNumber) {
+                                if (!favoriteDriverNumber.isNullOrEmpty() && allDrivers is UiState.Success) {
+                                    allDrivers.data.find { it.driverNumber?.toString() == favoriteDriverNumber }
+                                } else null
+                            }
+
+                            LaunchedEffect(favDriver) {
+                                if (favDriver != null && !favoriteDriverNumber.isNullOrEmpty()) {
+                                    onUpdateDriverStats(
+                                        favoriteDriverNumber,
+                                        favDriver.rank.toString(),
+                                        favDriver.points
+                                    )
+                                }
+                            }
+
+                            // 1. First-time Welcome Card: ONLY shown when hasSeenWelcome is false
+                            if (hasSeenWelcome == false) {
+                                DisposableEffect(Unit) {
+                                    onDispose {
+                                        onDismissWelcome()
+                                    }
+                                }
+
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
+                                    shape = RoundedCornerShape(24.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                                    ),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp)
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = if (userName.isNotBlank() && userName != "Guest") "Welcome to Taras, $userName! 👋" else "Welcome to Taras! 👋",
+                                                style = MaterialTheme.typography.titleMedium,
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                            )
+                                            IconButton(
+                                                onClick = onDismissWelcome,
+                                                modifier = Modifier.size(28.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Close,
+                                                    contentDescription = "Dismiss welcome message",
+                                                    tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                                                    modifier = Modifier.size(18.dp)
+                                                )
+                                            }
+                                        }
+
+                                        Spacer(modifier = Modifier.height(6.dp))
+
+                                        Text(
+                                            text = "Your home for live Formula 1 session countdowns, standings, and news. Tap ⭐ on any driver or team in the Grid to pin them here!",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
+                                        )
+
+                                        Spacer(modifier = Modifier.height(12.dp))
+
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.End
+                                        ) {
+                                            FilledTonalButton(
+                                                onClick = onDismissWelcome,
+                                                shape = RoundedCornerShape(12.dp),
+                                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp)
+                                            ) {
+                                                Text(
+                                                    text = "Got it",
+                                                    style = MaterialTheme.typography.labelLarge,
+                                                    fontWeight = FontWeight.SemiBold
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // 2. Favorite Driver or Team Banner: Shown without welcome greeting
+                            if (favDriver != null) {
+                                Card(
+                                    onClick = {
+                                        val driverNum = favDriver.driverNumber?.toString() ?: favoriteDriverNumber
+                                        if (!driverNum.isNullOrEmpty()) {
+                                            onDriverClick(driverNum)
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    ),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = "⭐ FAVORITE DRIVER",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                            Spacer(modifier = Modifier.height(2.dp))
+                                            Text(
+                                                text = "${favDriver.fullName ?: favDriver.name} is P${favDriver.rank} with ${favDriver.points} pts",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                        Surface(
+                                            shape = RoundedCornerShape(50),
+                                            color = MaterialTheme.colorScheme.primaryContainer
+                                        ) {
+                                            Text(
+                                                text = "P${favDriver.rank}",
+                                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                                style = MaterialTheme.typography.labelMedium,
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                            )
+                                        }
+                                    }
+                                }
+                            } else if (!favoriteTeam.isNullOrBlank()) {
+                                val team = (allTeams as? UiState.Success)?.data?.find {
+                                    it.teamName.equals(favoriteTeam, ignoreCase = true)
+                                }
+                                Card(
+                                    onClick = {
+                                        if (!favoriteTeam.isNullOrBlank()) {
+                                            onTeamClick(favoriteTeam)
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    ),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = "🏎️ FAVORITE TEAM",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                            Spacer(modifier = Modifier.height(2.dp))
+                                            Text(
+                                                text = if (team != null) "${team.teamName} is P${team.rank} with ${team.points} pts"
+                                                       else favoriteTeam,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                        if (team != null) {
+                                            Surface(
+                                                shape = RoundedCornerShape(50),
+                                                color = MaterialTheme.colorScheme.primaryContainer
+                                            ) {
+                                                Text(
+                                                    text = "P${team.rank}",
+                                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                                    style = MaterialTheme.typography.labelMedium,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        item {
                             val raceCurrent = (raceCurrentState as? UiState.Success)?.data
 
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp),
+                                    .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 12.dp),
                                 shape = RoundedCornerShape(24.dp),
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -280,6 +522,9 @@ fun PaddockContent(
                             ) {
                                 // P1 Leader Card
                                 Card(
+                                    onClick = {
+                                        p1Driver?.driverNumber?.let { onDriverClick(it.toString()) }
+                                    },
                                     modifier = Modifier.weight(1f),
                                     shape = RoundedCornerShape(24.dp),
                                     colors = CardDefaults.cardColors
@@ -372,8 +617,8 @@ fun PaddockContent(
                                     modifier = Modifier.weight(1f),
                                     verticalArrangement = Arrangement.spacedBy(16.dp)
                                 ) {
-                                    RunnerUpDriverCard(driver = p2Driver, positionLabel = "P2")
-                                    RunnerUpDriverCard(driver = p3Driver, positionLabel = "P3")
+                                    RunnerUpDriverCard(driver = p2Driver, positionLabel = "P2", onDriverClick = onDriverClick)
+                                    RunnerUpDriverCard(driver = p3Driver, positionLabel = "P3", onDriverClick = onDriverClick)
                                 }
                             }
                         }
@@ -415,9 +660,13 @@ fun PaddockContent(
 @Composable
 private fun RunnerUpDriverCard(
     driver: DriverUiModel?,
-    positionLabel: String
+    positionLabel: String,
+    onDriverClick: (String) -> Unit = {}
 ) {
     Card(
+        onClick = {
+            driver?.driverNumber?.let { onDriverClick(it.toString()) }
+        },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(

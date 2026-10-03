@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,6 +60,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -191,6 +193,12 @@ fun ComparisonScreen(
 // DRIVER COMPARISON VIEW
 // =========================================================================
 
+private data class TeammatePair(
+    val teamName: String,
+    val driver1: DriverDetailUiModel,
+    val driver2: DriverDetailUiModel
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DriverComparisonView(
@@ -207,6 +215,20 @@ private fun DriverComparisonView(
         )
     }
 
+    val teammatePairs = remember(sortedDrivers) {
+        sortedDrivers
+            .filter { it.teamName.isNotBlank() }
+            .groupBy { it.teamName }
+            .filter { it.value.size >= 2 }
+            .map { (teamName, teamDrivers) ->
+                TeammatePair(
+                    teamName = teamName,
+                    driver1 = teamDrivers[0],
+                    driver2 = teamDrivers[1]
+                )
+            }
+    }
+
     var selectedDriver1Number by rememberSaveable {
         mutableStateOf(
             if (initialDriver1.isNotBlank()) initialDriver1
@@ -220,6 +242,15 @@ private fun DriverComparisonView(
             else sortedDrivers.getOrNull(1)?.driverNumber
                 ?: sortedDrivers.getOrNull(0)?.driverNumber.orEmpty()
         )
+    }
+
+    LaunchedEffect(initialDriver1, initialDriver2) {
+        if (initialDriver1.isNotBlank()) {
+            selectedDriver1Number = initialDriver1
+        }
+        if (initialDriver2.isNotBlank() && initialDriver2 != initialDriver1) {
+            selectedDriver2Number = initialDriver2
+        }
     }
 
     val selectedDriver1 = remember(selectedDriver1Number, sortedDrivers) {
@@ -286,6 +317,98 @@ private fun DriverComparisonView(
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
+        // Teammates Auto-Suggestions
+        if (teammatePairs.isNotEmpty()) {
+            item(contentType = "TeammateShortcuts") {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 4.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Groups,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = "TEAMMATE BATTLES",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 0.5.sp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        Text(
+                            text = "Quick Select",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(teammatePairs, key = { it.teamName }) { pair ->
+                            val isSelected = (
+                                (selectedDriver1.driverNumber == pair.driver1.driverNumber && selectedDriver2.driverNumber == pair.driver2.driverNumber) ||
+                                (selectedDriver1.driverNumber == pair.driver2.driverNumber && selectedDriver2.driverNumber == pair.driver1.driverNumber)
+                            )
+                            val teamColor = pair.driver1.teamColor.toComposeColor()
+
+                            Surface(
+                                onClick = {
+                                    selectedDriver1Number = pair.driver1.driverNumber
+                                    selectedDriver2Number = pair.driver2.driverNumber
+                                },
+                                shape = RoundedCornerShape(12.dp),
+                                color = if (isSelected) {
+                                    MaterialTheme.colorScheme.primaryContainer
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceContainer
+                                },
+                                border = if (isSelected) {
+                                    androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary)
+                                } else {
+                                    null
+                                }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .clip(CircleShape)
+                                            .background(teamColor)
+                                    )
+                                    Spacer(Modifier.width(6.dp))
+                                    Text(
+                                        text = pair.teamName.split(" ").first(),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = ": ${pair.driver1.abbreviation} vs ${pair.driver2.abbreviation}",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Driver Hero Card
         item(contentType = "Hero") {
             DriverVersusHero(
@@ -302,6 +425,95 @@ private fun DriverComparisonView(
                     selectedDriver2Number = temp
                 }
             )
+        }
+
+        // Section: Head-to-Head Overview
+        item(contentType = "DuelSummary") {
+            val r1 = if (selectedDriver1.rank > 0) selectedDriver1.rank else 99
+            val r2 = if (selectedDriver2.rank > 0) selectedDriver2.rank else 99
+
+            var d1Metrics = 0
+            var d2Metrics = 0
+
+            // 1. Points
+            if (selectedDriver1.championshipPoints > selectedDriver2.championshipPoints) d1Metrics++
+            else if (selectedDriver2.championshipPoints > selectedDriver1.championshipPoints) d2Metrics++
+
+            // 2. Standing Rank (lower number is better)
+            if (r1 < r2) d1Metrics++
+            else if (r2 < r1) d2Metrics++
+
+            val d1s = selectedDriver1.seasonStats
+            val d2s = selectedDriver2.seasonStats
+
+            // 3. Wins
+            val w1 = d1s?.grandPrixWins?.toFloatOrNull() ?: 0f
+            val w2 = d2s?.grandPrixWins?.toFloatOrNull() ?: 0f
+            if (w1 > w2) d1Metrics++ else if (w2 > w1) d2Metrics++
+
+            // 4. Podiums
+            val p1 = d1s?.grandPrixPodiums?.toFloatOrNull() ?: 0f
+            val p2 = d2s?.grandPrixPodiums?.toFloatOrNull() ?: 0f
+            if (p1 > p2) d1Metrics++ else if (p2 > p1) d2Metrics++
+
+            // 5. Poles
+            val pol1 = d1s?.grandPrixPoles?.toFloatOrNull() ?: 0f
+            val pol2 = d2s?.grandPrixPoles?.toFloatOrNull() ?: 0f
+            if (pol1 > pol2) d1Metrics++ else if (pol2 > pol1) d2Metrics++
+
+            // 6. Fastest Laps
+            val f1 = d1s?.dhlFastestLaps?.toFloatOrNull() ?: 0f
+            val f2 = d2s?.dhlFastestLaps?.toFloatOrNull() ?: 0f
+            if (f1 > f2) d1Metrics++ else if (f2 > f1) d2Metrics++
+
+            // 7. Top 10s
+            val t1 = d1s?.grandPrixTop10s?.toFloatOrNull() ?: 0f
+            val t2 = d2s?.grandPrixTop10s?.toFloatOrNull() ?: 0f
+            if (t1 > t2) d1Metrics++ else if (t2 > t1) d2Metrics++
+
+            // 8. Sprint Points
+            val sp1 = d1s?.sprintPoints?.toFloatOrNull() ?: 0f
+            val sp2 = d2s?.sprintPoints?.toFloatOrNull() ?: 0f
+            if (sp1 > sp2) d1Metrics++ else if (sp2 > sp1) d2Metrics++
+
+            val leaderText = when {
+                d1Metrics > d2Metrics -> "${selectedDriver1.abbreviation} leads $d1Metrics – $d2Metrics"
+                d2Metrics > d1Metrics -> "${selectedDriver2.abbreviation} leads $d2Metrics – $d1Metrics"
+                else -> "Tied $d1Metrics – $d2Metrics"
+            }
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.surfaceContainer
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (isSameTeam) "Teammate Head-to-Head" else "Driver Head-to-Head",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Surface(
+                        shape = RoundedCornerShape(50),
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    ) {
+                        Text(
+                            text = leaderText,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+            }
         }
 
         // Section: 2026 Season Performance
@@ -328,18 +540,20 @@ private fun DriverComparisonView(
         }
 
         item(contentType = "StatCard") {
+            val r1 = if (selectedDriver1.rank > 0) selectedDriver1.rank else 99
+            val r2 = if (selectedDriver2.rank > 0) selectedDriver2.rank else 99
             ComparisonMetricCard(
-                label = "Standings Rank",
-                val1 = (100 - selectedDriver1.rank).toFloat(),
-                val2 = (100 - selectedDriver2.rank).toFloat(),
-                display1 = "P${selectedDriver1.rank}",
-                display2 = "P${selectedDriver2.rank}",
+                label = "Championship Standing",
+                val1 = r1.toFloat(),
+                val2 = r2.toFloat(),
+                display1 = if (selectedDriver1.rank > 0) "P${selectedDriver1.rank}" else "N/A",
+                display2 = if (selectedDriver2.rank > 0) "P${selectedDriver2.rank}" else "N/A",
                 color1 = d1Color,
                 color2 = d2Color,
                 lowerIsBetter = true,
                 tag1 = selectedDriver1.abbreviation,
                 tag2 = selectedDriver2.abbreviation,
-                unit = "POS"
+                unit = "PLACES"
             )
         }
 
@@ -373,7 +587,7 @@ private fun DriverComparisonView(
                 color2 = d2Color,
                 tag1 = selectedDriver1.abbreviation,
                 tag2 = selectedDriver2.abbreviation,
-                unit = "POD"
+                unit = "PODIUMS"
             )
         }
 
@@ -682,18 +896,20 @@ private fun TeamComparisonView(teams: List<DetailedTeamUiModel>) {
         }
 
         item(contentType = "StatCard") {
+            val r1 = if (selectedTeam1.rank > 0) selectedTeam1.rank else 99
+            val r2 = if (selectedTeam2.rank > 0) selectedTeam2.rank else 99
             ComparisonMetricCard(
-                label = "Standings Position",
-                val1 = (100 - selectedTeam1.rank).toFloat(),
-                val2 = (100 - selectedTeam2.rank).toFloat(),
-                display1 = "P${selectedTeam1.rank}",
-                display2 = "P${selectedTeam2.rank}",
+                label = "Championship Standing",
+                val1 = r1.toFloat(),
+                val2 = r2.toFloat(),
+                display1 = if (selectedTeam1.rank > 0) "P${selectedTeam1.rank}" else "N/A",
+                display2 = if (selectedTeam2.rank > 0) "P${selectedTeam2.rank}" else "N/A",
                 color1 = t1Color,
                 color2 = t2Color,
                 lowerIsBetter = true,
                 tag1 = selectedTeam1.teamName.take(3).uppercase(),
                 tag2 = selectedTeam2.teamName.take(3).uppercase(),
-                unit = "POS"
+                unit = "PLACES"
             )
         }
 
@@ -727,7 +943,7 @@ private fun TeamComparisonView(teams: List<DetailedTeamUiModel>) {
                 color2 = t2Color,
                 tag1 = selectedTeam1.teamName.take(3).uppercase(),
                 tag2 = selectedTeam2.teamName.take(3).uppercase(),
-                unit = "POD"
+                unit = "PODIUMS"
             )
         }
 
@@ -1261,8 +1477,31 @@ private fun ComparisonMetricCard(
 ) {
     val isBothZero = val1 <= 0f && val2 <= 0f
     val isTie = val1 == val2
-    val d1Wins = if (isBothZero) false else if (lowerIsBetter) (val1 < val2 && val1 > 0f) else val1 > val2
-    val d2Wins = if (isBothZero) false else if (lowerIsBetter) (val2 < val1 && val2 > 0f) else val2 > val1
+
+    // Correct winner determination
+    val d1Wins = when {
+        isTie -> false
+        lowerIsBetter -> {
+            val valid1 = val1 > 0f && val1 < 99f
+            val valid2 = val2 > 0f && val2 < 99f
+            if (valid1 && valid2) val1 < val2
+            else if (valid1 && !valid2) true
+            else false
+        }
+        else -> if (isBothZero) false else val1 > val2
+    }
+
+    val d2Wins = when {
+        isTie -> false
+        lowerIsBetter -> {
+            val valid1 = val1 > 0f && val1 < 99f
+            val valid2 = val2 > 0f && val2 < 99f
+            if (valid1 && valid2) val2 < val1
+            else if (valid2 && !valid1) true
+            else false
+        }
+        else -> if (isBothZero) false else val2 > val1
+    }
 
     val diffValue = kotlin.math.abs(val1 - val2)
     val diffDisplay = if (diffValue % 1f == 0f) {
@@ -1275,8 +1514,19 @@ private fun ComparisonMetricCard(
         isBothZero -> 0.5f // Perfectly balanced 50/50 when both have 0 championships/wins!
         isTie -> 0.5f
         lowerIsBetter -> {
-            val total = val1 + val2
-            if (total > 0f) (val1 / total).coerceIn(0.12f, 0.88f) else 0.5f
+            // When lower is better (e.g. rank 6 vs rank 8), the lower rank gets the larger share
+            val valid1 = val1 > 0f && val1 < 99f
+            val valid2 = val2 > 0f && val2 < 99f
+            if (valid1 && valid2) {
+                val total = val1 + val2
+                if (total > 0f) (val2 / total).coerceIn(0.15f, 0.85f) else 0.5f
+            } else if (valid1 && !valid2) {
+                0.85f
+            } else if (!valid1 && valid2) {
+                0.15f
+            } else {
+                0.5f
+            }
         }
         else -> {
             val total = val1 + val2
@@ -1331,13 +1581,21 @@ private fun ComparisonMetricCard(
                     }
                 } else if (!isTie) {
                     val winnerTag = if (d1Wins) tag1 else tag2
-                    val unitSuffix = if (unit.isNotBlank()) " $unit" else ""
+                    val badgeText = when {
+                        lowerIsBetter && (val1 >= 99f || val2 >= 99f) -> "$winnerTag RANKED"
+                        unit.equals("PLACES", ignoreCase = true) || unit.equals("POS", ignoreCase = true) -> {
+                            val count = diffValue.toInt()
+                            if (count == 1) "$winnerTag +1 PLACE" else "$winnerTag +$count PLACES"
+                        }
+                        unit.isNotBlank() -> "$winnerTag +$diffDisplay $unit"
+                        else -> "$winnerTag +$diffDisplay"
+                    }
                     Surface(
                         shape = RoundedCornerShape(4.dp),
                         color = MaterialTheme.colorScheme.surfaceVariant
                     ) {
                         Text(
-                            text = "$winnerTag +$diffDisplay$unitSuffix",
+                            text = badgeText,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1385,8 +1643,13 @@ private fun ComparisonMetricCard(
                 }
 
                 if (!isBothZero && !isTie) {
+                    val deltaText = if (lowerIsBetter && (val1 >= 99f || val2 >= 99f)) {
+                        "—"
+                    } else {
+                        "Δ $diffDisplay"
+                    }
                     Text(
-                        text = "Δ $diffDisplay",
+                        text = deltaText,
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
@@ -1679,6 +1942,77 @@ private fun DriverSelectionSheet(
             )
 
             Spacer(modifier = Modifier.height(10.dp))
+
+            val otherDriver = remember(excludedDriverNumber, drivers) {
+                drivers.find { it.driverNumber == excludedDriverNumber }
+            }
+            val suggestedTeammate = remember(otherDriver, drivers) {
+                otherDriver?.let { other ->
+                    drivers.find { candidate ->
+                        candidate.driverNumber != other.driverNumber &&
+                        candidate.teamName.isNotBlank() && (
+                            candidate.teamName.equals(other.teamName, ignoreCase = true) ||
+                            candidate.teamName.contains(other.teamName, ignoreCase = true) ||
+                            other.teamName.contains(candidate.teamName, ignoreCase = true)
+                        )
+                    }
+                }
+            }
+
+            if (suggestedTeammate != null && searchQuery.isBlank()) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onSelect(suggestedTeammate) },
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Groups,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "SUGGESTED TEAMMATE",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 0.5.sp
+                            )
+                            Text(
+                                text = "${suggestedTeammate.fullName} (${suggestedTeammate.teamName})",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = MaterialTheme.colorScheme.primary
+                        ) {
+                            Text(
+                                text = "Select ⚔️",
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+            }
 
             LazyColumn(
                 modifier = Modifier

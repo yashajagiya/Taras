@@ -33,10 +33,17 @@ private val TarasWidgetColors = ColorProviders(
 
 
 
+data class FavoriteDriverWidgetInfo(
+    val name: String,
+    val position: String,
+    val points: String? = null
+)
+
 @Composable
 fun NextRaceWidgetUI(
     raceCurrentState: UiState<CurrentRace?>,
     nextSessionInfoForWidget: SessionInfo?,
+    favoriteDriverInfo: FavoriteDriverWidgetInfo? = null,
     modifier: GlanceModifier = GlanceModifier
 ) {
     val context = androidx.glance.LocalContext.current
@@ -59,7 +66,11 @@ fun NextRaceWidgetUI(
                 }
 
                 is UiState.Success -> {
-                    WidgetSuccessView(raceCurrentState.data, nextSessionInfoForWidget)
+                    WidgetSuccessView(
+                        raceCurrent = raceCurrentState.data,
+                        nextSessionInfoForWidget = nextSessionInfoForWidget,
+                        favoriteDriverInfo = favoriteDriverInfo
+                    )
                 }
             }
         }
@@ -104,7 +115,8 @@ private fun WidgetErrorView(message: String) {
 @Composable
 private fun WidgetSuccessView(
     raceCurrent: CurrentRace?,
-    nextSessionInfoForWidget: SessionInfo?
+    nextSessionInfoForWidget: SessionInfo?,
+    favoriteDriverInfo: FavoriteDriverWidgetInfo? = null
 ) {
     val context = androidx.glance.LocalContext.current
     val launchIntent = android.content.Intent(context, MainActivity::class.java)
@@ -163,6 +175,19 @@ private fun WidgetSuccessView(
                         fontSize = 14.sp
                     )
                 )
+
+                if (favoriteDriverInfo != null && favoriteDriverInfo.name.isNotBlank()) {
+                    Spacer(modifier = GlanceModifier.height(6.dp))
+                    Text(
+                        text = "⭐ ${favoriteDriverInfo.name} · ${favoriteDriverInfo.position}" +
+                                (favoriteDriverInfo.points?.let { " ($it)" } ?: ""),
+                        style = TextStyle(
+                            color = GlanceTheme.colors.onPrimaryContainer,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 12.sp
+                        )
+                    )
+                }
             }
 
         }

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,12 +29,15 @@ import androidx.compose.material.icons.filled.FlagCircle
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.PrecisionManufacturing
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -54,6 +58,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -64,12 +69,26 @@ import coil3.compose.AsyncImage
 import com.example.taras.core.common.UiState
 import com.example.taras.core.helpercore.toComposeColor
 import com.example.taras.network_calls.taras.model.Racedata
+import com.example.taras.core.common.UserPreferences
 import com.example.taras.viewmodel.DetailedTeamUiModel
 import com.example.taras.viewmodel.TeamsViewModel
+import com.example.taras.viewmodel.UserViewModel
+import com.example.taras.viewmodel.UserViewModelFactory
 import io.github.dautovicharis.charts.LineChart
 import io.github.dautovicharis.charts.model.toChartDataSet
 import io.github.dautovicharis.charts.style.ChartViewDefaults
 import io.github.dautovicharis.charts.style.ChartViewStyle
+import androidx.compose.foundation.clickable
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.text.style.TextOverflow
+import com.example.taras.core.db.AppDatabase
+import com.example.taras.viewmodel.DriverDetailUiModel
+import com.example.taras.viewmodel.DriversViewModel
+import com.example.taras.viewmodel.DriversViewModelFactory
+import com.example.taras.view.subview.DriverCard
+import com.example.taras.viewmodel.toDriverUiModel
 import io.github.dautovicharis.charts.style.LineChartDefaults
 import kotlinx.collections.immutable.ImmutableList
 
@@ -78,16 +97,35 @@ import kotlinx.collections.immutable.ImmutableList
 fun TeamsData(
     teamName: String,
     modifier: Modifier = Modifier,
-    teamsViewModel: TeamsViewModel = viewModel()
+    userViewModel: UserViewModel = viewModel(
+        factory = UserViewModelFactory(UserPreferences(LocalContext.current))
+    ),
+    teamsViewModel: TeamsViewModel = viewModel(),
+    driversViewModel: DriversViewModel = viewModel(
+        factory = DriversViewModelFactory(AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao())
+    ),
+    onCompareTeammatesClick: (String, String) -> Unit = { _, _ -> },
+    onDriverClick: (String) -> Unit = {}
 ) {
     val teamsDetailsState by teamsViewModel.combinedDetailedTeams.collectAsStateWithLifecycle()
+    val driversState by driversViewModel.combinedDetailedDrivers.collectAsStateWithLifecycle()
     val isRefreshing by teamsViewModel.isRefreshing.collectAsStateWithLifecycle()
+    val favoriteTeam by userViewModel.favoriteTeam.collectAsStateWithLifecycle()
+    val isFavorite = favoriteTeam.equals(teamName, ignoreCase = true)
 
     TeamProfileContent(
         tName = teamName,
         teamsDetailsState = teamsDetailsState,
+        driversState = driversState,
         isRefreshing = isRefreshing,
-        onRefresh = { teamsViewModel.fetchTeams(isRefresh = true) },
+        isFavorite = isFavorite,
+        onToggleFavorite = { userViewModel.toggleFavoriteTeam(teamName) },
+        onRefresh = {
+            teamsViewModel.fetchTeams(isRefresh = true)
+            driversViewModel.fetchDriverData(isRefresh = true)
+        },
+        onCompareTeammatesClick = onCompareTeammatesClick,
+        onDriverClick = onDriverClick,
         modifier = modifier
     )
 }
@@ -97,8 +135,13 @@ fun TeamsData(
 fun TeamProfileContent(
     tName: String,
     teamsDetailsState: UiState<ImmutableList<DetailedTeamUiModel>>,
+    driversState: UiState<ImmutableList<DriverDetailUiModel>> = UiState.Loading,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
+    isFavorite: Boolean = false,
+    onToggleFavorite: () -> Unit = {},
+    onCompareTeammatesClick: (String, String) -> Unit = { _, _ -> },
+    onDriverClick: (String) -> Unit = {},
     isRefreshing: Boolean = false
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -167,6 +210,17 @@ fun TeamProfileContent(
                             )
                         }
                     } else {
+                        val allDrivers = (driversState as? UiState.Success)?.data.orEmpty()
+                        val teamDrivers = remember(allDrivers, team.teamName) {
+                            allDrivers.filter { d ->
+                                d.teamName.isNotBlank() && (
+                                    d.teamName.equals(team.teamName, ignoreCase = true) ||
+                                    d.teamName.contains(team.teamName, ignoreCase = true) ||
+                                    team.teamName.contains(d.teamName, ignoreCase = true)
+                                )
+                            }
+                        }
+
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(bottom = 24.dp)
@@ -209,6 +263,20 @@ fun TeamProfileContent(
                                             alignment = Alignment.Center,
                                             contentScale = ContentScale.Fit
                                         )
+
+                                        IconButton(
+                                            onClick = onToggleFavorite,
+                                            modifier = Modifier
+                                                .align(Alignment.TopEnd)
+                                                .clip(CircleShape)
+                                                .background(Color.Black.copy(alpha = 0.45f))
+                                        ) {
+                                            Icon(
+                                                imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                                                contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+                                                tint = if (isFavorite) Color(0xFFFFD700) else Color.White
+                                            )
+                                        }
                                     }
                                 }
                                 Card(
@@ -311,6 +379,96 @@ fun TeamProfileContent(
                                 }
                                 Spacer(Modifier.height(24.dp))
                             }
+
+                            if (teamDrivers.isNotEmpty()) {
+                                item(contentType = "TeamDriversHeader") {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(
+                                                imageVector = Icons.Default.Groups,
+                                                contentDescription = null,
+                                                tint = team.teamColor.toComposeColor(),
+                                                modifier = Modifier.size(22.dp)
+                                            )
+                                            Spacer(Modifier.width(8.dp))
+                                            Text(
+                                                text = "Team Drivers",
+                                                style = MaterialTheme.typography.titleLarge,
+                                                fontWeight = FontWeight.ExtraBold
+                                            )
+                                        }
+                                        if (teamDrivers.size >= 2) {
+                                            Surface(
+                                                shape = RoundedCornerShape(12.dp),
+                                                color = team.teamColor.toComposeColor().copy(alpha = 0.15f)
+                                            ) {
+                                                Text(
+                                                    text = "TEAMMATES",
+                                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = team.teamColor.toComposeColor()
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+
+                                items(
+                                    items = teamDrivers,
+                                    key = { it.driverNumber },
+                                    contentType = { "DriverCard" }
+                                ) { driverModel ->
+                                    DriverCard(
+                                        driver = driverModel.toDriverUiModel(),
+                                        onDriverClick = onDriverClick
+                                    )
+                                }
+
+                                if (teamDrivers.size >= 2) {
+                                    val d1 = teamDrivers[0]
+                                    val d2 = teamDrivers[1]
+                                    val teamColor = team.teamColor.toComposeColor()
+                                    val contentColor = if (teamColor.luminance() > 0.5f) Color.Black else Color.White
+
+                                    item(contentType = "CompareTeammatesAction") {
+                                        Button(
+                                            onClick = { onCompareTeammatesClick(d1.driverNumber, d2.driverNumber) },
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 16.dp, vertical = 6.dp),
+                                            shape = RoundedCornerShape(14.dp),
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = teamColor,
+                                                contentColor = contentColor
+                                            ),
+                                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.AutoMirrored.Filled.CompareArrows,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                            Spacer(Modifier.width(8.dp))
+                                            Text(
+                                                text = "Compare Teammates",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 14.sp
+                                            )
+                                        }
+                                        Spacer(Modifier.height(4.dp))
+                                    }
+                                }
+
+                                item(contentType = "TeamDriversSpacer") {
+                                    Spacer(Modifier.height(20.dp))
+                                }  }
 
                             item(contentType = "Management") {
                                 Text(

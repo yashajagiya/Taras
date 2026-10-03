@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.shapes
@@ -20,6 +21,9 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Icon
 import com.example.taras.core.helpercore.toComposeColor
 import com.example.taras.viewmodel.TeamUiModel
 
@@ -28,6 +32,7 @@ fun TeamCard(
     teamData: TeamUiModel,
     onTeamClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    isFavorite: Boolean = false,
 ) {
     val containerColor = teamData.teamColor?.toComposeColor() ?: Color.Transparent
 
@@ -60,11 +65,25 @@ fun TeamCard(
                     modifier = Modifier.height(40.dp),
                     contentScale = ContentScale.Fit
                 )
-                Text(
-                    text = teamData.teamName,
-                    modifier = Modifier.padding(start = 8.dp),
-                    style = typography.titleMedium
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = teamData.teamName,
+                        modifier = Modifier.padding(start = 8.dp),
+                        style = typography.titleMedium
+                    )
+                    if (isFavorite) {
+                        Icon(
+                            imageVector = Icons.Filled.Star,
+                            contentDescription = "Favorite Team",
+                            tint = Color(0xFFFFD700),
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
             }
 
             AsyncImage(

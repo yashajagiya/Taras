@@ -55,7 +55,7 @@ val serializerConfig = SavedStateConfiguration {
             subclass(MainNavRoutes.CircuitData::class)
             subclass(MainNavRoutes.TeamsData::class)
             subclass(MainNavRoutes.DrawerSetting::class)
-
+            subclass(MainNavRoutes.Comparison::class)
         }
     }
 }

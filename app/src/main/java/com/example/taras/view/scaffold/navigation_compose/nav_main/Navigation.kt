@@ -38,11 +38,21 @@ fun MainNavHost(
         entries = navigationState.toEntries(
             entryProvider {
                 entry<MainNavRoutes.Paddock> {
-                    NavPaddockScreen(modifier = Modifier.fillMaxSize())
+                    NavPaddockScreen(
+                        userViewModel = userViewModel,
+                        onDriverClick = { driverNum ->
+                            navigator.navigate(MainNavRoutes.DriverProfile(driverNum))
+                        },
+                        onTeamClick = { teamName ->
+                            navigator.navigate(MainNavRoutes.TeamsData(teamName))
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
                 entry<MainNavRoutes.Grid> {
                     NavGridScreen(
                         modifier = Modifier.fillMaxSize(),
+                        userViewModel = userViewModel,
                         onDriverClick = { data ->
                             navigator.navigate(MainNavRoutes.DriverProfile(data))
                         },
@@ -71,13 +81,28 @@ fun MainNavHost(
                     ) { }
                 }
                 entry<MainNavRoutes.DriverProfile> { route ->
-                    DriverProfile(driverNumber = route.numberOrName)
+                    DriverProfile(
+                        driverNumber = route.numberOrName,
+                        userViewModel = userViewModel,
+                        onCompareTeammatesClick = { d1, d2 ->
+                            navigator.navigate(MainNavRoutes.Comparison(initialDriver1 = d1, initialDriver2 = d2))
+                        }
+                    )
                 }
                 entry<MainNavRoutes.CircuitData> { route ->
                     CircuitData(circuitId = route.id)
                 }
                 entry<MainNavRoutes.TeamsData> { route ->
-                    TeamsData(route.numberOrName)
+                    TeamsData(
+                        teamName = route.numberOrName,
+                        userViewModel = userViewModel,
+                        onCompareTeammatesClick = { d1, d2 ->
+                            navigator.navigate(MainNavRoutes.Comparison(initialDriver1 = d1, initialDriver2 = d2))
+                        },
+                        onDriverClick = { driverNum ->
+                            navigator.navigate(MainNavRoutes.DriverProfile(driverNum))
+                        }
+                    )
                 }
                 entry<MainNavRoutes.Comparison> { route ->
                     com.example.taras.view.scaffold.navigation_compose.nav_screens.nave_subscreens.ComparisonScreen(

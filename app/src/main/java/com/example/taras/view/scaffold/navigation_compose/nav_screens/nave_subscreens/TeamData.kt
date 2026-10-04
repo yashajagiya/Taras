@@ -46,6 +46,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import com.example.taras.core.helpercore.RefreshHapticEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -146,6 +147,8 @@ fun TeamProfileContent(
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         val pullToRefreshState = rememberPullToRefreshState()
+
+        RefreshHapticEffect(isRefreshing = isRefreshing, state = pullToRefreshState)
 
         PullToRefreshBox(
             isRefreshing = isRefreshing,

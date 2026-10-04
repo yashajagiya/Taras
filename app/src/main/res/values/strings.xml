@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Taras</string>
+    <string name="widget_next_race_label">Next Session</string>
+    <string name="widget_next_race_desc">Upcoming race session and countdown</string>
+    <string name="widget_standings_label">Championship Standings</string>
+    <string name="widget_standings_desc">Top 3 drivers in the championship standings</string>
+    <string name="widget_favorite_driver_label">Favorite Driver</string>
+    <string name="widget_favorite_driver_desc">Track your favorite driver\'s position, points, and last race result</string>
+    <string name="widget_race_result_label">Last Race Results</string>
+    <string name="widget_race_result_desc">Podium finishers of the latest Grand Prix</string>
 </resources>

@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import com.example.taras.core.helpercore.RefreshHapticEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -151,6 +152,8 @@ fun GridContent(
         val context = LocalContext.current
         val networkObserver = remember { NetworkObserver(context) }
         val isConnected by networkObserver.isConnected.collectAsStateWithLifecycle(initialValue = true)
+
+        RefreshHapticEffect(isRefreshing = isRefreshing, state = pullToRefreshState)
 
         PullToRefreshBox(
             isRefreshing = isRefreshing,

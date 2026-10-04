@@ -1,9 +1,11 @@
 package com.example.taras.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.taras.core.common.UserPreferences
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -31,25 +33,31 @@ class UserViewModel (private val userPreferences: UserPreferences) : ViewModel()
 
     val favoriteDriverName = userPreferences.favoriteDriverNameFlow.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = WhileSubscribed(5000),
         initialValue = null
     )
 
     val favoriteDriverRank = userPreferences.favoriteDriverRankFlow.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = WhileSubscribed(5000),
         initialValue = null
     )
 
     val favoriteDriverPoints = userPreferences.favoriteDriverPointsFlow.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = WhileSubscribed(5000),
+        initialValue = null
+    )
+
+    val favoriteDriverTeam = userPreferences.favoriteDriverTeamFlow.stateIn(
+        scope = viewModelScope,
+        started = WhileSubscribed(5000),
         initialValue = null
     )
 
     val favoriteTeam = userPreferences.favoriteTeamFlow.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = WhileSubscribed(5000),
         initialValue = null
     )
 
@@ -73,14 +81,15 @@ class UserViewModel (private val userPreferences: UserPreferences) : ViewModel()
         driverNumber: String,
         driverName: String = "",
         rank: String = "",
-        points: String = ""
+        points: String = "",
+        teamName: String = ""
     ) {
         viewModelScope.launch {
             val isCurrentFavorite = favoriteDriverNumber.value == driverNumber
             if (isCurrentFavorite) {
                 userPreferences.saveFavoriteDriver(null)
             } else {
-                userPreferences.saveFavoriteDriver(driverNumber, driverName, rank, points)
+                userPreferences.saveFavoriteDriver(driverNumber, driverName, rank, points, teamName)
             }
         }
     }
@@ -96,16 +105,16 @@ class UserViewModel (private val userPreferences: UserPreferences) : ViewModel()
         }
     }
 
-    fun updateFavoriteDriverStats(driverNumber: String, rank: String, points: String) {
+    fun updateFavoriteDriverStats(driverNumber: String, rank: String, points: String, teamName: String? = null) {
         if (favoriteDriverNumber.value == driverNumber) {
             viewModelScope.launch {
-                userPreferences.updateFavoriteDriverStats(rank, points)
+                userPreferences.updateFavoriteDriverStats(rank, points, teamName)
             }
         }
     }
 }
 
-class UserViewModelFactory(private val userPreferences: UserPreferences) : androidx.lifecycle.ViewModelProvider.Factory {
+class UserViewModelFactory(private val userPreferences: UserPreferences) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(UserViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

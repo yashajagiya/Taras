@@ -31,6 +31,7 @@ import com.example.taras.network_calls.rss.NewsSources
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import com.example.taras.core.helpercore.RefreshHapticEffect
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -135,8 +136,8 @@ fun NavPaddockScreen(
         onDismissWelcome = { userViewModel.setHasSeenWelcome(true) },
         onDriverClick = onDriverClick,
         onTeamClick = onTeamClick,
-        onUpdateDriverStats = { number, rank, points ->
-            userViewModel.updateFavoriteDriverStats(number, rank, points)
+        onUpdateDriverStats = { number, rank, points, team ->
+            userViewModel.updateFavoriteDriverStats(number, rank, points, team)
         },
         isRefreshing = isDriversRefreshing || isTeamsRefreshing || isNewsRefreshing || isRacesRefreshing,
         onRefresh = {
@@ -170,7 +171,7 @@ fun PaddockContent(
     onDismissWelcome: () -> Unit = {},
     onDriverClick: (String) -> Unit = {},
     onTeamClick: (String) -> Unit = {},
-    onUpdateDriverStats: (String, String, String) -> Unit = { _, _, _ -> },
+    onUpdateDriverStats: (String, String, String, String?) -> Unit = { _, _, _, _ -> },
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     newsSources: List<NewsSource> = NewsSources.FILTER_OPTIONS,
@@ -190,6 +191,8 @@ fun PaddockContent(
             driverTopThree is UiState.Success && raceCurrentState is UiState.Success
         val isEssentialLoading =
             driverTopThree is UiState.Loading || raceCurrentState is UiState.Loading
+
+        RefreshHapticEffect(isRefreshing = isRefreshing, state = pullToRefreshState)
 
         PullToRefreshBox(
             isRefreshing = isRefreshing,
@@ -256,7 +259,8 @@ fun PaddockContent(
                                     onUpdateDriverStats(
                                         favoriteDriverNumber,
                                         favDriver.rank.toString(),
-                                        favDriver.points
+                                        favDriver.points,
+                                        favDriver.teamName
                                     )
                                 }
                             }

@@ -35,16 +35,21 @@ import com.example.taras.core.common.OfflineDataStoreAppearance
 import com.example.taras.core.common.UserPreferences
 import com.example.taras.viewmodel.AppearanceViewModel
 import com.example.taras.viewmodel.UserViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
 
+    private val navTargetState = MutableStateFlow<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        navTargetState.value = intent?.getStringExtra("nav_target")
 
         setContent {
+            val navTarget by navTargetState.collectAsStateWithLifecycle()
             val context = LocalContext.current
             val appearanceViewModel: AppearanceViewModel = viewModel(
                 factory = object : ViewModelProvider.Factory {
@@ -67,12 +72,26 @@ class MainActivity : ComponentActivity() {
                 else -> isSystemInDarkTheme()
             }
 
+            val startRoute = when (navTarget) {
+                "grid" -> MainNavRoutes.Grid
+                "results" -> MainNavRoutes.F1Results
+                else -> MainNavRoutes.Paddock
+            }
+
             val navigationState = rememberNavigationState(
-                startRoute = MainNavRoutes.Paddock,
+                startRoute = startRoute,
                 topLevelRoutes = NAV_BAR_PARAMETER.keys,
                 serializer = MainNavRoutes.serializer()
             )
             val navigator = remember { Navigator(navigationState) }
+
+            androidx.compose.runtime.LaunchedEffect(navTarget) {
+                when (navTarget) {
+                    "grid" -> navigator.navigate(MainNavRoutes.Grid)
+                    "results" -> navigator.navigate(MainNavRoutes.F1Results)
+                    "paddock" -> navigator.navigate(MainNavRoutes.Paddock)
+                }
+            }
 
             TarasTheme(darkTheme = darkTheme) {
                 val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -123,5 +142,11 @@ class MainActivity : ComponentActivity() {
             }
 
         }
+    }
+
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        navTargetState.value = intent.getStringExtra("nav_target")
     }
 }

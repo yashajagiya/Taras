@@ -44,6 +44,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import com.example.taras.core.helpercore.RefreshHapticEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -121,7 +122,8 @@ fun DriverProfile(
                 driverNumber = driverNumber,
                 driverName = driver?.fullName ?: "",
                 rank = driver?.rank?.toString() ?: "",
-                points = driver?.championshipPointsDisplay ?: ""
+                points = driver?.championshipPointsDisplay ?: "",
+                teamName = driver?.teamName ?: ""
             )
         },
         onRefresh = { driversViewModel.fetchDriverData(isRefresh = true) },
@@ -149,6 +151,8 @@ fun DriverProfileContent(
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         val pullToRefreshState = rememberPullToRefreshState()
+
+        RefreshHapticEffect(isRefreshing = isRefreshing, state = pullToRefreshState)
 
         PullToRefreshBox(
             isRefreshing = isRefreshing,

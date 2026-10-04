@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import com.example.taras.core.helpercore.RefreshHapticEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -79,6 +80,8 @@ fun CalendarComposable(
 
         val isAnyLoading = racesState is UiState.Loading
         val isAnyError = racesState is UiState.Error
+
+        RefreshHapticEffect(isRefreshing = isRefreshing, state = pullToRefreshState)
 
         PullToRefreshBox(
             isRefreshing = isRefreshing,

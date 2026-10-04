@@ -14,6 +14,7 @@ class CurrentData(private val context: Context) {
         val SESSION_NAME_KEY = stringPreferencesKey("sessionName")
         val SESSION_TIME_KEY = stringPreferencesKey("sessionTime")
         val RACES_DATA_KEY = stringPreferencesKey("racesData")
+        val LAST_RACE_RESULT_KEY = stringPreferencesKey("lastRaceResult")
     }
 
     suspend fun saveRacesData(json: String) {
@@ -24,6 +25,16 @@ class CurrentData(private val context: Context) {
 
     val racesData = context.raceSessionDataStore.data.map {
         it[RACES_DATA_KEY]
+    }
+
+    suspend fun saveLastRaceResult(json: String) {
+        context.raceSessionDataStore.edit {
+            it[LAST_RACE_RESULT_KEY] = json
+        }
+    }
+
+    val lastRaceResult = context.raceSessionDataStore.data.map {
+        it[LAST_RACE_RESULT_KEY]
     }
 
     suspend fun saveCurrentSessionStatus(sessionName: String, sessionTime: String) {

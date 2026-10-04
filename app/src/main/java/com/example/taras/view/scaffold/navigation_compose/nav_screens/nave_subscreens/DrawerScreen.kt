@@ -178,6 +178,40 @@ fun SettingDrawer(
                                 }
                             }
 
+                            var widgetThemeExpanded by remember { mutableStateOf(false) }
+                            val widgetTheme by appearanceViewModel.widgetThemeData.collectAsStateWithLifecycle()
+                            val widgetThemeOptions = listOf("System Default", "Dark", "Light")
+
+                            Box {
+                                NavigationDrawerItem(
+                                    label = { Text("Widget Theme: $widgetTheme") },
+                                    selected = false,
+                                    icon = {
+                                        Icon(
+                                            imageVector = Icons.Default.ColorLens,
+                                            contentDescription = "Widget Theme"
+                                        )
+                                    },
+                                    onClick = { widgetThemeExpanded = true }
+                                )
+                                DropdownMenu(
+                                    modifier = Modifier.background(MaterialTheme.colorScheme.surface),
+                                    expanded = widgetThemeExpanded,
+                                    onDismissRequest = { widgetThemeExpanded = false },
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    widgetThemeOptions.forEach {
+                                        DropdownMenuItem(
+                                            text = { Text(text = it) },
+                                            onClick = {
+                                                appearanceViewModel.updateWidgetTheme(it)
+                                                widgetThemeExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 NotificationPermissionItem()
                             }

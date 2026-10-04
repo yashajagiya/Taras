@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
         android:name=".core.common.TarasApplication"
@@ -31,7 +32,8 @@
 
         <receiver
             android:name=".core.widgets.MyAppWidgetReceiver"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/widget_next_race_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -39,6 +41,52 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/next_race_widgets" />
         </receiver>
+
+        <receiver
+            android:name=".core.widgets.StandingsWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_standings_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/standings_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".core.widgets.FavoriteDriverWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_favorite_driver_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/favorite_driver_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".core.widgets.RaceResultWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_race_result_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/race_result_widget_info" />
+        </receiver>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

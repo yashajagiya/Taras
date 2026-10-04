@@ -17,13 +17,30 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.EmojiEvents
+import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material.icons.rounded.Schedule
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.filled.SignalWifiStatusbarConnectedNoInternet4
@@ -39,6 +56,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.ui.text.font.FontFamily
+import com.example.taras.core.helpercore.RaceResultShareHelper
+import com.example.taras.core.helpercore.RefreshHapticEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -138,6 +158,20 @@ private fun ResultContent(
         listOf("FP1", "FP2", "FP3", "Qualifying", "Results")
     }
     val pagerState = rememberPagerState(pageCount = { tabs.size })
+    var shareSessionData by remember { mutableStateOf<Pair<String, SessionResultUiState>?>(null) }
+
+    val currentSessionState = when (pagerState.currentPage) {
+        0 -> fp1State
+        1 -> fp2State
+        2 -> fp3State
+        3 -> qualifyState
+        4 -> resultState
+        else -> resultState
+    }
+    val currentResults = (currentSessionState as? UiState.Success)?.data
+    val canShare = currentResults != null && currentResults.results.isNotEmpty()
+
+    RefreshHapticEffect(isRefreshing = isRefreshing, state = pullToRefreshState)
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
@@ -151,87 +185,128 @@ private fun ResultContent(
             )
         }
     ) {
-        Column(modifier = modifier.fillMaxSize()) {
-            SecondaryScrollableTabRow(
-                selectedTabIndex = pagerState.currentPage,
-                modifier = Modifier,
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.primary,
-                edgePadding = 16.dp,
-                indicator = {
-                    TabRowDefaults.SecondaryIndicator(
-                        Modifier.tabIndicatorOffset(pagerState.currentPage, true)
-                    )
-                },
-                divider = {},
-                tabs = {
-                    tabs.forEachIndexed { index, title ->
-                        Tab(
-                            selected = pagerState.currentPage == index,
-                            onClick = {
-                                scope.launch {
-                                    pagerState.animateScrollToPage(index)
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = modifier.fillMaxSize()) {
+                SecondaryScrollableTabRow(
+                    selectedTabIndex = pagerState.currentPage,
+                    modifier = Modifier,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    edgePadding = 16.dp,
+                    indicator = {
+                        TabRowDefaults.SecondaryIndicator(
+                            Modifier.tabIndicatorOffset(pagerState.currentPage, true)
+                        )
+                    },
+                    divider = {},
+                    tabs = {
+                        tabs.forEachIndexed { index, title ->
+                            Tab(
+                                selected = pagerState.currentPage == index,
+                                onClick = {
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(index)
+                                    }
+                                },
+                                text = {
+                                    Text(
+                                        text = title,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Medium
+                                    )
                                 }
-                            },
-                            text = {
-                                Text(
-                                    text = title,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    style = MaterialTheme.typography.labelLarge,
-                                    fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Medium
-                                )
-                            }
-                        )
+                            )
+                        }
                     }
-                }
-            )
+                )
 
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.weight(1f),
-                userScrollEnabled = true
-            ) { page ->
-                Surface(modifier = Modifier.fillMaxSize(), color = Color.Transparent) {
-                    when (page) {
-                        0 -> SessionTabs(
-                            state = fp1State,
-                            isRefreshing = isRefreshing,
-                            loadingMessage = "Loading practice results...",
-                            isConnected = isConnected
-                        )
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.weight(1f),
+                    userScrollEnabled = true
+                ) { page ->
+                    Surface(modifier = Modifier.fillMaxSize(), color = Color.Transparent) {
+                        when (page) {
+                            0 -> SessionTabs(
+                                state = fp1State,
+                                isRefreshing = isRefreshing,
+                                loadingMessage = "Loading practice results...",
+                                isConnected = isConnected,
+                                onShareClick = { shareSessionData = tabs[0] to it }
+                            )
 
-                        1 -> SessionTabs(
-                            state = fp2State,
-                            isRefreshing = isRefreshing,
-                            loadingMessage = if (isSprintWeekend) "Loading sprint qualifying results..." else "Loading practice results...",
-                            isConnected = isConnected
-                        )
+                            1 -> SessionTabs(
+                                state = fp2State,
+                                isRefreshing = isRefreshing,
+                                loadingMessage = if (isSprintWeekend) "Loading sprint qualifying results..." else "Loading practice results...",
+                                isConnected = isConnected,
+                                onShareClick = { shareSessionData = tabs[1] to it }
+                            )
 
-                        2 -> SessionTabs(
-                            state = fp3State,
-                            isRefreshing = isRefreshing,
-                            loadingMessage = if (isSprintWeekend) "Loading sprint race results..." else "Loading practice results...",
-                            isConnected = isConnected
-                        )
+                            2 -> SessionTabs(
+                                state = fp3State,
+                                isRefreshing = isRefreshing,
+                                loadingMessage = if (isSprintWeekend) "Loading sprint race results..." else "Loading practice results...",
+                                isConnected = isConnected,
+                                onShareClick = { shareSessionData = tabs[2] to it }
+                            )
 
-                        3 -> SessionTabs(
-                            state = qualifyState,
-                            isRefreshing = isRefreshing,
-                            loadingMessage = "Loading qualifying results...",
-                            isConnected = isConnected
-                        )
+                            3 -> SessionTabs(
+                                state = qualifyState,
+                                isRefreshing = isRefreshing,
+                                loadingMessage = "Loading qualifying results...",
+                                isConnected = isConnected,
+                                onShareClick = { shareSessionData = tabs[3] to it }
+                            )
 
-                        4 -> SessionTabs(
-                            state = resultState,
-                            isRefreshing = isRefreshing,
-                            loadingMessage = "Loading race results...",
-                            isConnected = isConnected
-                        )
+                            4 -> SessionTabs(
+                                state = resultState,
+                                isRefreshing = isRefreshing,
+                                loadingMessage = "Loading race results...",
+                                isConnected = isConnected,
+                                onShareClick = { shareSessionData = tabs[4] to it }
+                            )
+                        }
                     }
                 }
             }
+
+            if (canShare) {
+                ExtendedFloatingActionButton(
+                    onClick = {
+                        shareSessionData = tabs[pagerState.currentPage] to currentResults
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Rounded.Share,
+                            contentDescription = "Share",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = "Share",
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 16.dp, bottom = 20.dp),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
+    }
+
+    shareSessionData?.let { (sessionTitle, sessionData) ->
+        ShareResultBottomSheet(
+            sessionName = sessionTitle,
+            data = sessionData,
+            onDismiss = { shareSessionData = null }
+        )
     }
 }
 
@@ -242,6 +317,7 @@ private fun SessionTabs(
     isRefreshing: Boolean,
     loadingMessage: String,
     isConnected: Boolean,
+    onShareClick: (SessionResultUiState) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
@@ -295,7 +371,12 @@ private fun SessionTabs(
                     item(contentType = "Empty") { EmptyView() }
                 } else {
                     if (data.header != null) {
-                        item(contentType = "Header") { SessionHeader(data.header) }
+                        item(contentType = "Header") {
+                            SessionHeader(
+                                header = data.header,
+                                onShareClick = { onShareClick(data) }
+                            )
+                        }
                     }
                     items(
                         data.results,
@@ -311,11 +392,14 @@ private fun SessionTabs(
 }
 
 @Composable
-private fun SessionHeader(header: ResultHeader) {
+private fun SessionHeader(
+    header: ResultHeader,
+    onShareClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -339,6 +423,258 @@ private fun SessionHeader(header: ResultHeader) {
             thickness = 3.dp,
             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
         )
+        Spacer(modifier = Modifier.height(10.dp))
+        FilledTonalButton(
+            onClick = onShareClick,
+            shape = RoundedCornerShape(999.dp),
+            colors = ButtonDefaults.filledTonalButtonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Share,
+                contentDescription = "Share",
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = "Share Results",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShareResultBottomSheet(
+    sessionName: String,
+    data: SessionResultUiState,
+    onDismiss: () -> Unit
+) {
+    @Suppress("DEPRECATION")
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val context = LocalContext.current
+    var selectedLimit by remember { mutableStateOf(3) } // 3 = Podium, 10 = Top 10, -1 = All
+
+    val raceName = data.header?.raceName ?: "Formula 1 Grand Prix"
+    val circuitName = data.header?.circuitName ?: ""
+    val results = data.results
+
+    val formattedSummary = remember(raceName, sessionName, results, selectedLimit) {
+        RaceResultShareHelper.generateRaceResultSummary(
+            raceName = raceName,
+            sessionName = sessionName,
+            results = results,
+            limit = selectedLimit
+        )
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        dragHandle = { BottomSheetDefaults.DragHandle() }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 32.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            // Header Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Share Results",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "Formatted summary ready to share or copy",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                IconButton(onClick = onDismiss) {
+                    Icon(
+                        imageVector = Icons.Rounded.Close,
+                        contentDescription = "Close",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Limit Selector Chips
+            Text(
+                text = "SUMMARY FORMAT",
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                letterSpacing = 1.sp
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(
+                    selected = selectedLimit == 3,
+                    onClick = { selectedLimit = 3 },
+                    label = { Text("Podium (Top 3)") },
+                    shape = RoundedCornerShape(999.dp)
+                )
+
+                if (results.size >= 10) {
+                    FilterChip(
+                        selected = selectedLimit == 10,
+                        onClick = { selectedLimit = 10 },
+                        label = { Text("Top 10") },
+                        shape = RoundedCornerShape(999.dp)
+                    )
+                }
+
+                FilterChip(
+                    selected = selectedLimit == -1,
+                    onClick = { selectedLimit = -1 },
+                    label = { Text("All (${results.size})") },
+                    shape = RoundedCornerShape(999.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Formatted Text Preview Card
+            Text(
+                text = "PREVIEW",
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                letterSpacing = 1.sp
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                ),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text(
+                    text = formattedSummary,
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontFamily = FontFamily.Monospace,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Primary Share Actions
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                // Copy Button
+                FilledTonalButton(
+                    onClick = {
+                        RaceResultShareHelper.copyToClipboard(context, formattedSummary)
+                    },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(999.dp),
+                    contentPadding = PaddingValues(vertical = 12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.ContentCopy,
+                        contentDescription = "Copy",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Copy Text",
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                // Share Button (Native Share Sheet)
+                Button(
+                    onClick = {
+                        RaceResultShareHelper.shareRaceResultText(
+                            context = context,
+                            summaryText = formattedSummary,
+                            subject = "$raceName $sessionName"
+                        )
+                    },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(999.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    contentPadding = PaddingValues(vertical = 12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Share,
+                        contentDescription = "Share",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Share Text",
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Share Graphic Card (Image)
+            OutlinedButton(
+                onClick = {
+                    val bitmap = RaceResultShareHelper.generateRaceResultCardBitmap(
+                        raceName = raceName,
+                        sessionName = sessionName,
+                        circuitName = circuitName,
+                        results = results
+                    )
+                    RaceResultShareHelper.shareRaceResultImage(
+                        context = context,
+                        bitmap = bitmap,
+                        title = "$raceName - $sessionName Card"
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(999.dp),
+                contentPadding = PaddingValues(vertical = 12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Image,
+                    contentDescription = "Graphic Card",
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Share as Graphic Card (Image)",
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
     }
 }
 

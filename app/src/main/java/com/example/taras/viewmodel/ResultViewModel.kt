@@ -5,7 +5,6 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.taras.core.common.AppError
 import com.example.taras.core.common.UiState
 import com.example.taras.core.common.toAppError
 import com.example.taras.core.engine.RaceStateEngine
@@ -20,8 +19,6 @@ import com.example.taras.network_calls.taras.model.Fp2Response
 import com.example.taras.network_calls.taras.model.Fp3Response
 import com.example.taras.network_calls.taras.model.SprintQulyResponse
 import com.example.taras.network_calls.taras.model.SprintResultResponse
-import com.example.taras.core.helpercore.getTodayDate
-import com.example.taras.core.helpercore.toRemoveDateExtra
 import com.example.taras.core.helpercore.formatToLocalFull
 import com.example.taras.core.helpercore.getCurrentMoment
 import com.example.taras.core.helpercore.parseSessionTimeToInstant
@@ -30,7 +27,6 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,7 +34,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 
 @Immutable
 data class ResultRowData(
@@ -280,7 +275,7 @@ class ResultViewModel(
         _driversInfoData,
         _activeSchedule
     ) { sessionState, detailsState, schedule ->
-        val isStarted = schedule?.qualy?.let {
+        val isStarted = schedule?.qualy?.let { it ->
             parseSessionTimeToInstant(
                 it.date,
                 it.time
@@ -324,7 +319,7 @@ class ResultViewModel(
         _driversInfoData,
         _activeSchedule
     ) { sessionState, detailsState, schedule ->
-        val isStarted = schedule?.race?.let {
+        val isStarted = schedule?.race?.let { it ->
             parseSessionTimeToInstant(
                 it.date,
                 it.time

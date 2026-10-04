@@ -15,13 +15,11 @@ import com.example.taras.core.common.toAppError
 import com.example.taras.core.repository.F1InfoRepository
 import com.example.taras.network_calls.taras.model.Racedata
 import com.example.taras.network_calls.taras.model.SeasonStats
-import com.example.taras.network_calls.taras.model.TeamProfile
 import com.example.taras.network_calls.taras.model.TeamSummary
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,7 +27,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
-import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 class TeamsViewModel(

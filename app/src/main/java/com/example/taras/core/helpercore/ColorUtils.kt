@@ -2,7 +2,7 @@ package com.example.taras.core.helpercore
 
 import androidx.compose.ui.graphics.Color
 
-public fun String.toComposeColor(): Color {
+fun String.toComposeColor(): Color {
     return try {
         val hex = this.removePrefix("0x").removePrefix("#")
         val colorLong = when (hex.length) {

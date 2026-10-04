@@ -9,7 +9,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 fun getNewsColor(
-    newsItem: com.example.taras.network_calls.rss.RssItem,
+    newsItem: RssItem,
     defaultColor: Color,
     drivers: ImmutableList<DriverUiModel> = persistentListOf(),
     teams: ImmutableList<TeamUiModel> = persistentListOf()

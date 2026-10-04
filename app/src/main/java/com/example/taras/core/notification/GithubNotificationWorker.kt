@@ -103,7 +103,7 @@ class GithubNotificationWorker(
             val userName = userPreferences.userNameFlow.first().ifBlank { "User" }
 
             // Personalize the notification by replacing placeholders
-            val placeholders = listOf("[username]", "\$username", "{username}", "\${username}")
+            val placeholders = listOf("[username]", $$"$username", "{username}", $$"${username}")
             
             var title = rawTitle
             var message = rawMessage

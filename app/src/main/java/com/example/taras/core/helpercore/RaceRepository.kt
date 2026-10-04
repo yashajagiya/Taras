@@ -12,7 +12,6 @@ import com.example.taras.network_calls.taras.model.F1RacesInfoResponse
 import com.example.taras.viewmodel.CurrentRace
 import com.example.taras.viewmodel.SessionInfo
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.serialization.encodeToString
 
 class RaceRepository(
     private val racesDataService: TarasDataService = NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)

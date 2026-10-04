@@ -22,17 +22,14 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
-import kotlin.time.Duration.Companion.milliseconds
 
 @Stable
 class DriversViewModel(
@@ -198,9 +195,9 @@ class DriversViewModel(
                 UiState.Success(combined)
 
             } else if (driversState is UiState.Error) {
-                UiState.Error(driversState.message ?: "Error loading driver standings.")
+                UiState.Error(driversState.message)
             } else if (driverInfoState is UiState.Error) {
-                UiState.Error(driverInfoState.message ?: "Error loading driver information.")
+                UiState.Error(driverInfoState.message)
             } else {
                 UiState.Loading
             }

@@ -6,34 +6,21 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.taras.core.common.AppError
 import com.example.taras.core.common.CurrentData
 import com.example.taras.core.common.SessionType
 import com.example.taras.core.common.UiState
 import com.example.taras.core.common.toAppError
 import com.example.taras.core.engine.RaceStateEngine
 import com.example.taras.core.engine.RaceWeekendState
-import com.example.taras.core.helpercore.getTodayDate
-import com.example.taras.core.helpercore.toRemoveDateExtra
-import com.example.taras.core.helpercore.formatCountdown
-import com.example.taras.core.helpercore.formatCountdownWidgets
-import com.example.taras.core.helpercore.parseSessionTimeToInstant
 import com.example.taras.network_calls.NetworkModule
 import com.example.taras.network_calls.taras.TarasDataService
 import com.example.taras.network_calls.taras.model.F1RacesInfoResponse
-import com.example.taras.network_calls.taras.model.RaceEvent
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Clock
 import kotlin.time.Instant
 
 @Stable

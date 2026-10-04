@@ -136,9 +136,7 @@ object RaceStateEngine {
             } else null
         }
 
-        return if (activeOrUpcoming.isNotEmpty()) {
-            activeOrUpcoming
-        } else {
+        return activeOrUpcoming.ifEmpty {
             listOf(mapToCurrentRace(races.last()))
         }
     }

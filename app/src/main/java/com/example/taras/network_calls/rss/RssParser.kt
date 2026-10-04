@@ -73,7 +73,7 @@ object RssParser {
             raw
         }
         return text
-            .replace(Regex("""\s*(Keep reading|Continue reading\.{0,3}|Read more\.{0,3}|Read the full article).*${'$'}""", RegexOption.IGNORE_CASE), "")
+            .replace(Regex("""\s*(Keep reading|Continue reading\.{0,3}|Read more\.{0,3}|Read the full article).*$""", RegexOption.IGNORE_CASE), "")
             .trim()
     }
 
@@ -235,7 +235,7 @@ object RssParser {
                 var imageUrl: String? = null
                 val embedded = obj["_embedded"]?.jsonObject
                 val mediaArray = embedded?.get("wp:featuredmedia")?.jsonArray
-                if (mediaArray != null && mediaArray.isNotEmpty()) {
+                if (!mediaArray.isNullOrEmpty()) {
                     val mediaObj = mediaArray[0].jsonObject
                     val mediaDetails = mediaObj["media_details"]?.jsonObject
                     val sizes = mediaDetails?.get("sizes")?.jsonObject

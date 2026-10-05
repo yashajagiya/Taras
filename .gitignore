@@ -1,0 +1,8 @@
+# Local only — never push to GitHub
+notificationhistory.json
+token.json
+PROJECT.md
+tarasF1Data/
+*token.json
+*notificationhistory.json
+

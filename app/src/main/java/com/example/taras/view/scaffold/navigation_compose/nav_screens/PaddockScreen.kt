@@ -50,6 +50,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import coil3.compose.rememberAsyncImagePainter
+import com.example.taras.network_calls.ApiConstants
 import com.example.taras.core.db.AppDatabase
 import com.example.taras.core.common.CurrentData
 import com.example.taras.core.common.UiState
@@ -521,7 +523,10 @@ fun PaddockContent(
                                         Spacer(modifier = Modifier.height(16.dp))
                                         AsyncImage(
                                             model = p1Driver?.headshotUrl
-                                                ?: "https://f1tv.formula1.com/static/favicon.ico",
+                                                ?: ApiConstants.FALLBACK_DRIVER_IMAGE_URL,
+                                            error = rememberAsyncImagePainter(
+                                                model = ApiConstants.FALLBACK_DRIVER_IMAGE_URL
+                                            ),
                                             contentDescription = "Leader",
                                             modifier = Modifier
                                                 .size(56.dp)

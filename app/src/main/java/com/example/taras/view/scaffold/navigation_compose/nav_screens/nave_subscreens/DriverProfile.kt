@@ -67,6 +67,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import coil3.compose.rememberAsyncImagePainter
+import com.example.taras.network_calls.ApiConstants
 import com.example.taras.core.db.AppDatabase
 import com.example.taras.core.common.UiState
 import com.example.taras.core.helpercore.toComposeColor
@@ -263,12 +265,17 @@ fun DriverProfileContent(
                                                 contentScale = ContentScale.Fit,
                                                 alpha = 0.4f)
 
-                                            AsyncImage(model = driver.headshotUrl.takeIf { !it.isNullOrEmpty() }
-                                                ?: "https://f1tv.formula1.com/static/favicon.ico",
+                                            AsyncImage(
+                                                model = driver.headshotUrl.takeIf { !it.isNullOrEmpty() }
+                                                    ?: ApiConstants.FALLBACK_DRIVER_IMAGE_URL,
+                                                error = rememberAsyncImagePainter(
+                                                    model = ApiConstants.FALLBACK_DRIVER_IMAGE_URL
+                                                ),
                                                 contentDescription = "Driver Image",
                                                 modifier = Modifier.size(400.dp),
                                                 alignment = Alignment.TopCenter,
-                                                contentScale = ContentScale.Crop)
+                                                contentScale = ContentScale.Crop
+                                            )
 
                                             IconButton(
                                                 onClick = onToggleFavorite,

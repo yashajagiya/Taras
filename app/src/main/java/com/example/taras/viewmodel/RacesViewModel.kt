@@ -14,7 +14,7 @@ import com.example.taras.core.engine.RaceStateEngine
 import com.example.taras.core.engine.RaceWeekendState
 import com.example.taras.network_calls.NetworkModule
 import com.example.taras.network_calls.taras.TarasDataService
-import com.example.taras.network_calls.taras.model.F1RacesInfoResponse
+import com.example.taras.network_calls.taras.model.v2.CalendarRaceEvent
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +31,7 @@ class RacesViewModel(
 
     private val racesDataService = NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
 
-    private val _races = MutableStateFlow<UiState<F1RacesInfoResponse>>(UiState.Loading)
+    private val _races = MutableStateFlow<UiState<List<CalendarRaceEvent>>>(UiState.Loading)
     val races = _races.asStateFlow()
 
     private val _isRefreshing = MutableStateFlow(false)
@@ -43,7 +43,7 @@ class RacesViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 currentData.racesData.firstOrNull()?.let { json ->
-                    val cachedData = NetworkModule.json.decodeFromString<F1RacesInfoResponse>(json)
+                    val cachedData = NetworkModule.json.decodeFromString<List<CalendarRaceEvent>>(json)
                     if (_races.value is UiState.Loading) {
                         _races.value = UiState.Success(cachedData)
                     }
@@ -63,10 +63,10 @@ class RacesViewModel(
             }
 
             try {
-                val racesData = racesDataService.getRaceInfoData()
-                _races.value = UiState.Success(racesData)
+                val calendarData = racesDataService.getCalendar()
+                _races.value = UiState.Success(calendarData)
                 try {
-                    val json = NetworkModule.json.encodeToString(racesData)
+                    val json = NetworkModule.json.encodeToString(calendarData)
                     currentData.saveRacesData(json)
                 } catch (e: Exception) {
                     Log.e(logTag, "Error saving races data to cache", e)
@@ -78,7 +78,7 @@ class RacesViewModel(
                 try {
                     val cachedJson = currentData.racesData.first()
                     if (cachedJson != null) {
-                        val cachedData = NetworkModule.json.decodeFromString<F1RacesInfoResponse>(cachedJson)
+                        val cachedData = NetworkModule.json.decodeFromString<List<CalendarRaceEvent>>(cachedJson)
                         _races.value = UiState.Success(cachedData)
                     } else if (_races.value !is UiState.Success) {
                         _races.value = UiState.Error(e.toAppError())
@@ -98,36 +98,37 @@ class RacesViewModel(
     val combinedRaces = _races.map { racesState ->
         when (racesState) {
             is UiState.Success -> {
-                val races = racesState.data.races
+                val races = racesState.data
 
                 val combine = races.map { race ->
+                    val qualySession = race.schedule.qualifying ?: race.schedule.qualy
                     RaceClearData(
-                        raceId = race.raceId,
+                        raceId = race.id,
                         roundNumber = race.round,
-                        raceName = race.raceName,
+                        raceName = race.name,
                         laps = race.laps,
-                        circuitId = race.circuit.circuitId,
-                        circuitName = race.circuit.circuitName,
+                        circuitId = race.circuit.id.ifBlank { race.id },
+                        circuitName = race.circuit.name,
                         country = race.circuit.country,
                         city = race.circuit.city,
-                        circuitLength = race.circuit.circuitLength,
+                        circuitLength = race.circuit.length,
                         lapRecord = race.circuit.lapRecord,
                         firstParticipationYear = race.circuit.firstParticipationYear,
                         corners = race.circuit.corners,
-                        fastestLapDriverId = race.circuit.fastestLapDriverId,
-                        fastestLapTeamId = race.circuit.fastestLapTeamId,
+                        fastestLapDriverId = race.circuit.fastestLapDriver,
+                        fastestLapTeamId = race.circuit.fastestLapTeam,
                         fastestLapYear = race.circuit.fastestLapYear,
                         winnerName = race.winner?.fullName ?: "",
                         winnerNumber = race.winner?.drivernumber ?: 0,
                         winnerTeam = race.winner?.teamWinner ?: "",
                         race = SessionTime(race.schedule.race?.date, race.schedule.race?.time),
-                        qualy = SessionTime(race.schedule.qualy?.date, race.schedule.qualy?.time),
+                        qualy = SessionTime(qualySession?.date, qualySession?.time),
                         fp1 = SessionTime(race.schedule.fp1?.date, race.schedule.fp1?.time),
                         fp2 = SessionTime(race.schedule.fp2?.date, race.schedule.fp2?.time),
                         fp3 = SessionTime(race.schedule.fp3?.date, race.schedule.fp3?.time),
                         sprintQualy = SessionTime(
-                            race.schedule.sprintQualy?.date,
-                            race.schedule.sprintQualy?.time
+                            race.schedule.sprintQualifying?.date,
+                            race.schedule.sprintQualifying?.time
                         ),
                         sprintRace = SessionTime(
                             race.schedule.sprintRace?.date,
@@ -154,11 +155,10 @@ class RacesViewModel(
         UiState.Loading
     )
 
-
     val currentRaces = _races.map { racesState ->
         when (racesState) {
             is UiState.Success -> {
-                val upcomingRaces = RaceStateEngine.findCurrentOrUpcomingRaces(racesState.data.races)
+                val upcomingRaces = RaceStateEngine.findCurrentOrUpcomingRaces(racesState.data)
                 UiState.Success(upcomingRaces.toImmutableList())
             }
 
@@ -235,7 +235,6 @@ class RacesViewModel(
     }
 }
 
-
 @Immutable
 data class SessionTime(
     val date: String?,
@@ -260,7 +259,6 @@ data class ParsedSession(
 ) {
     val name: String get() = sessionType.displayName
 }
-
 
 @Immutable
 data class CurrentRound(

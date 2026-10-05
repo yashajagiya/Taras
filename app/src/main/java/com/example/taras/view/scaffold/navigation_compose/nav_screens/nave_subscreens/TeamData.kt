@@ -75,6 +75,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import coil3.compose.rememberAsyncImagePainter
+import com.example.taras.network_calls.ApiConstants
 import com.example.taras.core.common.UiState
 import com.example.taras.core.helpercore.toComposeColor
 import com.example.taras.network_calls.taras.model.Racedata
@@ -1110,10 +1112,13 @@ private fun TeammateDriverColumn(
         ) {
             AsyncImage(
                 model = if (driver.headshotUrl.isNullOrEmpty()) {
-                    "https://f1tv.formula1.com/static/favicon.ico"
+                    ApiConstants.FALLBACK_DRIVER_IMAGE_URL
                 } else {
                     driver.headshotUrl
                 },
+                error = rememberAsyncImagePainter(
+                    model = ApiConstants.FALLBACK_DRIVER_IMAGE_URL
+                ),
                 contentDescription = driver.fullName,
                 modifier = Modifier
                     .fillMaxSize()

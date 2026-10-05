@@ -25,11 +25,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.compose.rememberAsyncImagePainter
 import com.example.taras.R
 import com.example.taras.core.helpercore.toComposeColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
+import com.example.taras.network_calls.ApiConstants
 import com.example.taras.viewmodel.DriverUiModel
 
 @Composable
@@ -60,10 +62,13 @@ fun DriverCard(
         ) {
             AsyncImage(
                 model = if (driver.headshotUrl.isNullOrEmpty()) {
-                    "https://f1tv.formula1.com/static/favicon.ico"
+                    ApiConstants.FALLBACK_DRIVER_IMAGE_URL
                 } else {
                     driver.headshotUrl
                 },
+                error = rememberAsyncImagePainter(
+                    model = ApiConstants.FALLBACK_DRIVER_IMAGE_URL
+                ),
                 contentDescription = null,
                 modifier = Modifier
                     .size(100.dp)

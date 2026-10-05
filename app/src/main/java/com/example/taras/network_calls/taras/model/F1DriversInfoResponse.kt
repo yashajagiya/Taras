@@ -43,40 +43,40 @@ data class Biography(
 @Immutable
 @Serializable
 data class Quote(
-    val text: String,
-    val author: String,
+    val text: String = "",
+    val author: String = "",
 )
 
 @Immutable
 @Serializable
 data class DriverSeasonStats(
-    @SerialName("Season Position") val seasonPosition: String,
-    @SerialName("Season Points") val seasonPoints: String,
-    @SerialName("Grand Prix Races") val grandPrixRaces: String,
-    @SerialName("Grand Prix Points") val grandPrixPoints: String,
-    @SerialName("Grand Prix Wins") val grandPrixWins: String,
-    @SerialName("Grand Prix Podiums") val grandPrixPodiums: String,
-    @SerialName("Grand Prix Poles") val grandPrixPoles: String,
-    @SerialName("Grand Prix Top 10s") val grandPrixTop10s: String,
-    @SerialName("DHL Fastest Laps") val dhlFastestLaps: String,
-    @SerialName("DNFs") val dnfs: String,
-    @SerialName("Sprint Races") val sprintRaces: String,
-    @SerialName("Sprint Points") val sprintPoints: String,
-    @SerialName("Sprint Wins") val sprintWins: String,
-    @SerialName("Sprint Podiums") val sprintPodiums: String,
-    @SerialName("Sprint Poles") val sprintPoles: String,
-    @SerialName("Sprint Top 10s") val sprintTop10s: String,
+    @SerialName("Season Position") val seasonPosition: String = "",
+    @SerialName("Season Points") val seasonPoints: String = "",
+    @SerialName("Grand Prix Races") val grandPrixRaces: String = "",
+    @SerialName("Grand Prix Points") val grandPrixPoints: String = "",
+    @SerialName("Grand Prix Wins") val grandPrixWins: String = "",
+    @SerialName("Grand Prix Podiums") val grandPrixPodiums: String = "",
+    @SerialName("Grand Prix Poles") val grandPrixPoles: String = "",
+    @SerialName("Grand Prix Top 10s") val grandPrixTop10s: String = "",
+    @SerialName("DHL Fastest Laps") val dhlFastestLaps: String = "",
+    @SerialName("DNFs") val dnfs: String = "",
+    @SerialName("Sprint Races") val sprintRaces: String = "",
+    @SerialName("Sprint Points") val sprintPoints: String = "",
+    @SerialName("Sprint Wins") val sprintWins: String = "",
+    @SerialName("Sprint Podiums") val sprintPodiums: String = "",
+    @SerialName("Sprint Poles") val sprintPoles: String = "",
+    @SerialName("Sprint Top 10s") val sprintTop10s: String = "",
 )
 
 @Immutable
 @Serializable
 data class CareerStats(
-    @SerialName("Grands Prix Entered") val grandsPrixEntered: String,
-    @SerialName("Career Points") val careerPoints: String,
-    @SerialName("Highest Race Finish") val highestRaceFinish: String,
-    @SerialName("Podiums") val podiums: String,
-    @SerialName("Highest Grid Position") val highestGridPosition: String,
-    @SerialName("Pole Positions") val polePositions: String,
-    @SerialName("World Championships") val worldChampionships: String,
-    @SerialName("DNFs") val dnfs: String,
+    @SerialName("Grands Prix Entered") val grandsPrixEntered: String = "",
+    @SerialName("Career Points") val careerPoints: String = "",
+    @SerialName("Highest Race Finish") val highestRaceFinish: String = "",
+    @SerialName("Podiums") val podiums: String = "",
+    @SerialName("Highest Grid Position") val highestGridPosition: String = "",
+    @SerialName("Pole Positions") val polePositions: String = "",
+    @SerialName("World Championships") val worldChampionships: String = "",
+    @SerialName("DNFs") val dnfs: String = "",
 )

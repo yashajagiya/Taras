@@ -5,10 +5,12 @@ import com.example.taras.core.helpercore.formatCountdown
 import com.example.taras.core.helpercore.formatCountdownWidgets
 import com.example.taras.core.helpercore.parseSessionTimeToInstant
 import com.example.taras.network_calls.taras.model.RaceEvent
+import com.example.taras.network_calls.taras.model.v2.CalendarRaceEvent
 import com.example.taras.viewmodel.CurrentRace
 import com.example.taras.viewmodel.ParsedSession
 import com.example.taras.viewmodel.SessionInfo
 import kotlinx.collections.immutable.toImmutableList
+import kotlin.jvm.JvmName
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Instant
@@ -19,7 +21,24 @@ object RaceStateEngine {
     val RACE_COMPLETION_BUFFER = 3.hours
 
     /**
-     * Parses all valid sessions for a [RaceEvent] and returns them ordered chronologically.
+     * Parses all valid sessions for a [CalendarRaceEvent] (v2) and returns them ordered chronologically.
+     */
+    fun parseSessions(race: CalendarRaceEvent): List<ParsedSession> {
+        val schedule = race.schedule
+        val qualySession = schedule.qualifying ?: schedule.qualy
+        return listOfNotNull(
+            createParsedSession(SessionType.FP1, schedule.fp1?.date, schedule.fp1?.time),
+            createParsedSession(SessionType.FP2, schedule.fp2?.date, schedule.fp2?.time),
+            createParsedSession(SessionType.FP3, schedule.fp3?.date, schedule.fp3?.time),
+            createParsedSession(SessionType.SPRINT_QUALIFYING, schedule.sprintQualifying?.date, schedule.sprintQualifying?.time),
+            createParsedSession(SessionType.SPRINT_RACE, schedule.sprintRace?.date, schedule.sprintRace?.time),
+            createParsedSession(SessionType.QUALIFYING, qualySession?.date, qualySession?.time),
+            createParsedSession(SessionType.RACE, schedule.race?.date, schedule.race?.time)
+        ).sortedBy { it.instant }
+    }
+
+    /**
+     * Parses all valid sessions for a [RaceEvent] (v1) and returns them ordered chronologically.
      */
     fun parseSessions(race: RaceEvent): List<ParsedSession> {
         val schedule = race.schedule
@@ -40,7 +59,26 @@ object RaceStateEngine {
     }
 
     /**
-     * Converts a raw [RaceEvent] into a UI-ready [CurrentRace] domain model.
+     * Converts a raw [CalendarRaceEvent] (v2) into a UI-ready [CurrentRace] domain model.
+     */
+    fun mapToCurrentRace(race: CalendarRaceEvent): CurrentRace {
+        val parsedSessions = parseSessions(race)
+        return CurrentRace(
+            roundNumber = race.round,
+            circuitId = race.circuit.id.ifBlank { race.id },
+            raceName = race.name,
+            circuitName = race.circuit.name,
+            driverId = "",
+            name = race.winner?.fullName ?: "",
+            number = race.winner?.drivernumber ?: 0,
+            winnerTeam = race.winner?.teamWinner ?: "",
+            trackImage = race.circuit.trackImage.orEmpty(),
+            parsedSessions = parsedSessions.toImmutableList()
+        )
+    }
+
+    /**
+     * Converts a raw [RaceEvent] (v1) into a UI-ready [CurrentRace] domain model.
      */
     fun mapToCurrentRace(race: RaceEvent): CurrentRace {
         val parsedSessions = parseSessions(race)
@@ -119,6 +157,40 @@ object RaceStateEngine {
     }
 
     /**
+     * Filters all races to those that are currently active or upcoming (v2).
+     */
+    @JvmName("findCurrentOrUpcomingRacesV2")
+    fun findCurrentOrUpcomingRaces(
+        races: List<CalendarRaceEvent>,
+        now: Instant = Clock.System.now()
+    ): List<CurrentRace> {
+        if (races.isEmpty()) return emptyList()
+
+        val activeOrUpcoming = races.mapNotNull { raceEvent ->
+            val mapped = mapToCurrentRace(raceEvent)
+            val weekendEnd = getWeekendEndInstant(mapped.parsedSessions)
+            if (weekendEnd != null && weekendEnd >= now) {
+                mapped
+            } else null
+        }
+
+        return activeOrUpcoming.ifEmpty {
+            listOf(mapToCurrentRace(races.last()))
+        }
+    }
+
+    /**
+     * Finds the single active or next upcoming race (v2).
+     */
+    @JvmName("findCurrentRaceV2")
+    fun findCurrentRace(
+        races: List<CalendarRaceEvent>,
+        now: Instant = Clock.System.now()
+    ): CurrentRace? {
+        return findCurrentOrUpcomingRaces(races, now).firstOrNull()
+    }
+
+    /**
      * Filters all races to those that are currently active or upcoming.
      * If all races in the calendar have passed, returns the final race.
      */
@@ -184,6 +256,40 @@ object RaceStateEngine {
             }
         }
         return null
+    }
+
+    /**
+     * Determines which [CalendarRaceEvent] (v2) should be selected for displaying results in [ResultViewModel].
+     */
+    @JvmName("findSelectedRaceForResultV2")
+    fun findSelectedRaceForResult(
+        races: List<CalendarRaceEvent>,
+        now: Instant = Clock.System.now()
+    ): CalendarRaceEvent? {
+        if (races.isEmpty()) return null
+
+        val nextRaceIndex = races.indexOfFirst { race ->
+            val sessions = parseSessions(race)
+            val weekendEnd = getWeekendEndInstant(sessions)
+            weekendEnd != null && weekendEnd >= now
+        }
+
+        if (nextRaceIndex == -1) {
+            // All races ended
+            return races.lastOrNull()
+        }
+
+        val targetRace = races[nextRaceIndex]
+        val sessions = parseSessions(targetRace)
+        val fp1Start = getWeekendStartInstant(sessions)
+
+        return if (fp1Start != null && fp1Start > now) {
+            // Weekend hasn't started yet; show previous race's results if available
+            if (nextRaceIndex > 0) races[nextRaceIndex - 1] else targetRace
+        } else {
+            // Weekend is underway or completed
+            targetRace
+        }
     }
 
     /**

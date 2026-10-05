@@ -6,46 +6,44 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.taras.core.common.UiState
+import com.example.taras.core.common.toAppError
+import com.example.taras.core.db.TopThreeDriversDAO
+import com.example.taras.core.db.TopThreeDriversEntity
+import com.example.taras.core.repository.F1InfoRepository
 import com.example.taras.network_calls.NetworkModule
 import com.example.taras.network_calls.taras.TarasDataService
-import com.example.taras.network_calls.taras.model.DriverPerRaceResponse
-import com.example.taras.core.common.UiState
 import com.example.taras.network_calls.taras.model.CareerStats
 import com.example.taras.network_calls.taras.model.DriverPerRace
 import com.example.taras.network_calls.taras.model.DriverSeasonStats
-import com.example.taras.network_calls.taras.model.F1DriversInfoResponse
-import com.example.taras.core.db.TopThreeDriversDAO
-import com.example.taras.core.db.TopThreeDriversEntity
 import com.example.taras.network_calls.taras.model.Quote
+import com.example.taras.network_calls.taras.model.v2.DriverDetailResponseV2
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 
 @Stable
 class DriversViewModel(
-    private val topThreeDriversDAO: TopThreeDriversDAO
+    private val topThreeDriversDAO: TopThreeDriversDAO,
+    private val f1InfoRepository: F1InfoRepository = F1InfoRepository.instance
 ) : ViewModel() {
     private val logTag = "DriversViewModel"
 
     private val tarasDataService =
         NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
 
-    private val _drivers = MutableStateFlow<UiState<DriverPerRaceResponse>>(UiState.Loading)
-    val drivers = _drivers.asStateFlow()
-
-    private val _driversInfoData =
-        MutableStateFlow<UiState<ImmutableList<F1DriversInfoResponse>>>(UiState.Loading)
-    val driversInfoData = _driversInfoData.asStateFlow()
+    private val _driversList =
+        MutableStateFlow<UiState<List<DriverDetailResponseV2>>>(UiState.Loading)
+    val driversList = _driversList.asStateFlow()
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
@@ -54,31 +52,27 @@ class DriversViewModel(
         fetchDriverData(isRefresh = false)
     }
 
-
-    val combinedLowDrivers = combine(_drivers, _driversInfoData) { driversState, driverinfoState ->
-        if (driversState is UiState.Success) {
-            val drivers = driversState.data.entries
-            val info = (driverinfoState as? UiState.Success)?.data ?: emptyList()
-            val combined = drivers.map { driver ->
-                val detail = info.find { it.hero.number.toIntOrNull() == driver.driverNumber }
-                DriverUiModel(
-                    driverNumber = driver.driverNumber,
-                    rank = driver.rank,
-                    name = driver.name,
-                    teamName = detail?.hero?.team ?: driver.teamName,
-                    points = driver.championshipPts.displayValue,
-                    teamColor = detail?.hero?.teamColor,
-                    headshotUrl = detail?.hero?.driverImage,
-                    carNumberImage = detail?.hero?.driverNumberLogo,
-                    fullName = driver.name,
-                    nationality = driver.nationality
-                )
-            }.toImmutableList()
-            UiState.Success(combined)
-        } else if (driversState is UiState.Error || driverinfoState is UiState.Error) {
-            UiState.Error("Something went wrong")
-        } else {
-            UiState.Loading
+    val combinedLowDrivers = _driversList.map { state ->
+        when (state) {
+            is UiState.Success -> {
+                val combined = state.data.map { driver ->
+                    DriverUiModel(
+                        driverNumber = driver.number,
+                        rank = driver.standings.rank,
+                        name = driver.name,
+                        teamName = driver.team.name,
+                        points = driver.standings.points.toString(),
+                        teamColor = driver.team.colorHex,
+                        headshotUrl = driver.images.portrait,
+                        carNumberImage = driver.images.numberLogo,
+                        fullName = driver.name,
+                        nationality = driver.nationality
+                    )
+                }.toImmutableList()
+                UiState.Success(combined)
+            }
+            is UiState.Error -> UiState.Error(state.message)
+            UiState.Loading -> UiState.Loading
         }
     }.onEach { state ->
         if (state is UiState.Success) {
@@ -146,112 +140,77 @@ class DriversViewModel(
         }
     }
 
-    val combinedDetailedDrivers =
-        combine(_drivers, _driversInfoData) { driversState, driverInfoState ->
-
-            if (driversState is UiState.Success && driverInfoState is UiState.Success) {
-                val drivers = driversState.data.entries
-                val infoList = driverInfoState.data
-
-                val combined = drivers.map { driver ->
-                    val detail =
-                        infoList.find { it.hero.number.toIntOrNull() == driver.driverNumber }
-
+    val combinedDetailedDrivers = _driversList.map { state ->
+        when (state) {
+            is UiState.Success -> {
+                val combined = state.data.map { driver ->
                     DriverDetailUiModel(
-                        rank = driver.rank,
-                        driverNumber = driver.driverNumber?.toString() ?: driver.name,
-                        slug = detail?.slug.orEmpty(),
-                        url = detail?.url.orEmpty(),
-
+                        rank = driver.standings.rank,
+                        driverNumber = driver.number?.toString() ?: driver.name,
+                        slug = driver.id,
+                        url = driver.f1Url,
                         fullName = driver.name,
-                        firstName = detail?.hero?.firstName.orEmpty(),
-                        lastName = detail?.hero?.lastName.orEmpty(),
-                        shortName = driver.shortName,
-                        abbreviation = driver.abbreviation,
-
+                        firstName = driver.firstName,
+                        lastName = driver.lastName,
+                        shortName = driver.name,
+                        abbreviation = driver.code,
                         nationality = driver.nationality,
-                        country = detail?.hero?.country.orEmpty(),
-                        teamName = detail?.hero?.team ?: driver.teamName,
-                        teamColor = detail?.hero?.teamColor.orEmpty(),
-                        accessibleColor = detail?.hero?.accessibleColor.orEmpty(),
-
-                        headshotUrl = detail?.hero?.driverImage,
-                        carNumberImage = detail?.hero?.driverNumberLogo,
-
-                        dateOfBirth = detail?.biography?.dateOfBirth.orEmpty(),
-                        placeOfBirth = detail?.biography?.placeOfBirth.orEmpty(),
-                        bioText = detail?.biography?.text?.toImmutableList() ?: persistentListOf(),
-                        quote = detail?.biography?.quote,
-
-                        championshipPoints = driver.championshipPts.value,
-                        championshipPointsDisplay = driver.championshipPts.displayValue,
-                        races = driver.races.toImmutableList(),
-
-                        seasonStats = detail?.seasonStats,
-                        careerStats = detail?.careerStats
+                        country = driver.nationality,
+                        teamName = driver.team.name,
+                        teamColor = driver.team.colorHex.orEmpty(),
+                        accessibleColor = driver.team.accessibleColor.orEmpty(),
+                        headshotUrl = driver.images.portrait,
+                        carNumberImage = driver.images.numberLogo,
+                        dateOfBirth = driver.biography.dateOfBirth,
+                        placeOfBirth = driver.biography.placeOfBirth,
+                        bioText = driver.biography.paragraphs.toImmutableList(),
+                        quote = driver.biography.quote,
+                        championshipPoints = driver.standings.points,
+                        championshipPointsDisplay = driver.standings.points.toString(),
+                        races = driver.standings.races.map { r ->
+                            DriverPerRace(
+                                name = r.raceName,
+                                displayName = r.raceCode,
+                                played = r.played,
+                                value = r.points,
+                                displayValue = r.displayValue
+                            )
+                        }.toImmutableList(),
+                        seasonStats = driver.seasonStats,
+                        careerStats = driver.careerStats
                     )
                 }.toImmutableList()
-
                 UiState.Success(combined)
-
-            } else if (driversState is UiState.Error) {
-                UiState.Error(driversState.message)
-            } else if (driverInfoState is UiState.Error) {
-                UiState.Error(driverInfoState.message)
-            } else {
-                UiState.Loading
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = UiState.Loading
-        )
+            is UiState.Error -> UiState.Error(state.message)
+            UiState.Loading -> UiState.Loading
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = UiState.Loading
+    )
 
     fun fetchDriverData(isRefresh: Boolean = false) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (isRefresh) {
                 _isRefreshing.value = true
-            } else if (_drivers.value !is UiState.Success) {
-                _drivers.value = UiState.Loading
-                _driversInfoData.value = UiState.Loading
+            } else if (_driversList.value !is UiState.Success) {
+                _driversList.value = UiState.Loading
             }
 
             try {
-                supervisorScope {
-
-                    val driversDeferred =
-                        async(Dispatchers.IO) { tarasDataService.getDriverStandings() }
-
-                    val driversInfoDeferred =
-                        async(Dispatchers.IO) { tarasDataService.getDriverInfoData() }
-
-                    try {
-                        _driversInfoData.value =
-                            UiState.Success(driversInfoDeferred.await().toImmutableList())
-                    } catch (e: Exception) {
-                        Log.e(logTag, "Error fetching drivers info API", e)
-                        _driversInfoData.value = UiState.Error("Error fetching drivers info")
-                    }
-
-                    try {
-                        _drivers.value = UiState.Success(driversDeferred.await())
-                    } catch (e: Exception) {
-                        Log.e(logTag, "Error fetching driver standings API", e)
-                        _drivers.value = UiState.Error("Error fetching driver standings")
-                    }
-                }
+                val drivers = f1InfoRepository.getDriversV2(forceRefresh = isRefresh)
+                _driversList.value = UiState.Success(drivers)
             } catch (e: Exception) {
                 Log.e(logTag, "Error in fetchDriverData", e)
-                _drivers.value = UiState.Error("Something went wrong")
-                _driversInfoData.value = UiState.Error("Error fetching drivers info")
+                _driversList.value = UiState.Error(e.toAppError())
             } finally {
                 _isRefreshing.value = false
             }
         }
-
     }
 }
-
 
 @Immutable
 data class DriverUiModel(

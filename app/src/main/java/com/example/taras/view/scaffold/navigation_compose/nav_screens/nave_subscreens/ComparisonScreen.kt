@@ -83,6 +83,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import coil3.compose.rememberAsyncImagePainter
+import com.example.taras.network_calls.ApiConstants
 import com.example.taras.R
 import com.example.taras.core.common.UiState
 import com.example.taras.core.db.AppDatabase
@@ -1281,7 +1283,10 @@ private fun DriverProfileHeroCard(
             // Driver Headshot with DriverCard.kt matching styling
             AsyncImage(
                 model = driver.headshotUrl?.takeIf { it.isNotEmpty() }
-                    ?: "https://f1tv.formula1.com/static/favicon.ico",
+                    ?: ApiConstants.FALLBACK_DRIVER_IMAGE_URL,
+                error = rememberAsyncImagePainter(
+                    model = ApiConstants.FALLBACK_DRIVER_IMAGE_URL
+                ),
                 contentDescription = driver.fullName,
                 contentScale = ContentScale.Crop,
                 alignment = Alignment.TopCenter,
@@ -2050,7 +2055,10 @@ private fun DriverSelectionSheet(
                                 contentAlignment = Alignment.Center
                             ) {
                                 AsyncImage(
-                                    model = driver.headshotUrl ?: "https://f1tv.formula1.com/static/favicon.ico",
+                                    model = driver.headshotUrl ?: ApiConstants.FALLBACK_DRIVER_IMAGE_URL,
+                                    error = rememberAsyncImagePainter(
+                                        model = ApiConstants.FALLBACK_DRIVER_IMAGE_URL
+                                    ),
                                     contentDescription = driver.fullName,
                                     contentScale = ContentScale.Crop,
                                     alignment = Alignment.TopCenter,

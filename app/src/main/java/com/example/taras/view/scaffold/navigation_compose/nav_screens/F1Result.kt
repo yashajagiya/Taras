@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.PaddingValues
@@ -83,6 +84,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.taras.core.common.UiState
 import coil3.compose.AsyncImage
+import coil3.compose.rememberAsyncImagePainter
+import com.example.taras.network_calls.ApiConstants
 import com.example.taras.core.common.NetworkObserver
 import com.example.taras.ui.theme.TeamAlpine
 import com.example.taras.ui.theme.TeamAstonMartin
@@ -116,6 +119,8 @@ fun NavF1DriversScreen(
     val raceState by resultViewModel.raceResults.collectAsStateWithLifecycle()
     val isSprintWeekend by resultViewModel.isSprintWeekend.collectAsStateWithLifecycle()
     val isRefreshing by resultViewModel.isRefreshing.collectAsStateWithLifecycle()
+    val selectedRound by resultViewModel.selectedRound.collectAsStateWithLifecycle()
+    val availableRounds by resultViewModel.availableRounds.collectAsStateWithLifecycle()
 
     ResultContent(
         fp1State = fp1State,
@@ -125,6 +130,9 @@ fun NavF1DriversScreen(
         resultState = raceState,
         isSprintWeekend = isSprintWeekend,
         isRefreshing = isRefreshing,
+        selectedRound = selectedRound,
+        availableRounds = availableRounds,
+        onRoundSelected = { resultViewModel.selectRound(it) },
         onRefresh = {
             resultViewModel.fetchRacesResultData(isRefresh = true)
         },
@@ -145,6 +153,9 @@ private fun ResultContent(
     resultState: UiState<SessionResultUiState>,
     isSprintWeekend: Boolean,
     isRefreshing: Boolean,
+    selectedRound: Int?,
+    availableRounds: List<Int>,
+    onRoundSelected: (Int) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -207,6 +218,34 @@ private fun ResultContent(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = modifier.fillMaxSize()) {
+                if (availableRounds.isNotEmpty()) {
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 6.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        items(availableRounds) { round ->
+                            val isSelected = selectedRound == round
+                            val isLatest = round == availableRounds.firstOrNull()
+                            val chipText = if (isLatest) "Round $round (Latest)" else "Round $round"
+                            FilterChip(
+                                selected = isSelected,
+                                onClick = { onRoundSelected(round) },
+                                label = {
+                                    Text(
+                                        text = chipText,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                    )
+                                },
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                        }
+                    }
+                }
+
                 SecondaryScrollableTabRow(
                     selectedTabIndex = pagerState.currentPage,
                     modifier = Modifier,
@@ -778,7 +817,10 @@ private fun ResultCard(
                     )
 
                     AsyncImage(
-                        model = data.headshotUrl ?: "https://f1tv.formula1.com/static/favicon.ico",
+                        model = data.headshotUrl ?: ApiConstants.FALLBACK_DRIVER_IMAGE_URL,
+                        error = rememberAsyncImagePainter(
+                            model = ApiConstants.FALLBACK_DRIVER_IMAGE_URL
+                        ),
                         contentDescription = data.driver,
                         modifier = Modifier
                             .padding(end = 12.dp)

@@ -13,8 +13,25 @@ class CurrentData(private val context: Context) {
     companion object {
         val SESSION_NAME_KEY = stringPreferencesKey("sessionName")
         val SESSION_TIME_KEY = stringPreferencesKey("sessionTime")
-        val RACES_DATA_KEY = stringPreferencesKey("racesData")
-        val LAST_RACE_RESULT_KEY = stringPreferencesKey("lastRaceResult")
+
+        // v2 Namespaced Cache Keys
+        val OVERVIEW_DATA_KEY = stringPreferencesKey("overviewData_v2")
+        val RACES_DATA_KEY = stringPreferencesKey("racesData_v2")
+        val LAST_RACE_RESULT_KEY = stringPreferencesKey("lastRaceResult_v2")
+
+        // Legacy v1 keys (for cleanup)
+        private val LEGACY_RACES_DATA_KEY = stringPreferencesKey("racesData")
+        private val LEGACY_LAST_RACE_RESULT_KEY = stringPreferencesKey("lastRaceResult")
+    }
+
+    suspend fun saveOverviewData(json: String) {
+        context.raceSessionDataStore.edit {
+            it[OVERVIEW_DATA_KEY] = json
+        }
+    }
+
+    val overviewData = context.raceSessionDataStore.data.map {
+        it[OVERVIEW_DATA_KEY]
     }
 
     suspend fun saveRacesData(json: String) {
@@ -47,5 +64,11 @@ class CurrentData(private val context: Context) {
     val isCurrentSessionSaved = context.raceSessionDataStore.data.map {
         it.contains(SESSION_NAME_KEY) && it.contains(SESSION_TIME_KEY)
     }
-}
 
+    suspend fun clearLegacyCache() {
+        context.raceSessionDataStore.edit {
+            it.remove(LEGACY_RACES_DATA_KEY)
+            it.remove(LEGACY_LAST_RACE_RESULT_KEY)
+        }
+    }
+}

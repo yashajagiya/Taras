@@ -17,6 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.res.stringResource
+import com.example.taras.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +49,7 @@ fun TarasTopBar(
             IconButton(onClick = onProfileClick) {
                 Icon(
                     imageVector = Icons.Rounded.AccountCircle,
-                    contentDescription = "User Profile",
+                    contentDescription = stringResource(R.string.topbar_user_profile),
                     modifier = Modifier.size(30.dp)
                 )
             }

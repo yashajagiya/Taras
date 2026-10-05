@@ -109,7 +109,7 @@ fun CalendarComposable(
                     ) {
                         LoadingIndicator()
                         Spacer(Modifier.requiredHeight(30.dp))
-                        Text("Loading...")
+                        Text(androidx.compose.ui.res.stringResource(com.example.taras.R.string.loading))
                     }
                 } else if (isAnyError) {
                     val errorMessage = racesState.message
@@ -129,7 +129,7 @@ fun CalendarComposable(
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(onClick = onRefresh) {
-                            Text("Retry Again")
+                            Text(androidx.compose.ui.res.stringResource(com.example.taras.R.string.retry_again))
                         }
                     }
                 } else {

@@ -41,6 +41,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.ui.res.stringResource
+import com.example.taras.R
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -178,7 +180,7 @@ fun DriverProfileContent(
                     ) {
                         LoadingIndicator()
                         Spacer(Modifier.requiredHeight(30.dp))
-                        Text("Loading...")
+                        Text(stringResource(R.string.loading))
                     }
 
                 } else if (isAnyError && !isRefreshing) {
@@ -190,14 +192,14 @@ fun DriverProfileContent(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Something went wrong",
+                            text = stringResource(R.string.something_went_wrong),
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(onClick = onRefresh) {
-                            Text("Retry Again")
+                            Text(stringResource(R.string.retry_again))
                         }
                     }
                 } else {
@@ -212,7 +214,7 @@ fun DriverProfileContent(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = "Driver not found",
+                                text = stringResource(R.string.driver_not_found),
                                 style = MaterialTheme.typography.titleMedium
                             )
                         }
@@ -277,7 +279,7 @@ fun DriverProfileContent(
                                             ) {
                                                 Icon(
                                                     imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
-                                                    contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+                                                    contentDescription = if (isFavorite) stringResource(R.string.remove_from_favorites) else stringResource(R.string.add_to_favorites),
                                                     tint = if (isFavorite) Color(0xFFFFD700) else Color.White
                                                 )
                                             }
@@ -367,7 +369,7 @@ fun DriverProfileContent(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         DriverStatItem(
-                                            label = "RANK",
+                                            label = stringResource(R.string.stat_rank),
                                             value = "P${driver.rank}"
                                         )
                                         VerticalDivider(
@@ -376,7 +378,7 @@ fun DriverProfileContent(
                                             color = Color.Black.copy(alpha = .7f)
                                         )
                                         DriverStatItem(
-                                            label = "CODE",
+                                            label = stringResource(R.string.stat_code),
                                             value = driver.abbreviation
                                         )
                                         VerticalDivider(
@@ -385,7 +387,7 @@ fun DriverProfileContent(
                                             color = Color.Black.copy(alpha = .7f)
                                         )
                                         DriverStatItem(
-                                            label = "POINTS",
+                                            label = stringResource(R.string.stat_points),
                                             value = driver.championshipPoints.toString()
                                         )
                                     }
@@ -402,7 +404,7 @@ fun DriverProfileContent(
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Text(
-                                            text = "Teammate",
+                                            text = stringResource(R.string.teammate_title),
                                             style = MaterialTheme.typography.titleLarge,
                                             letterSpacing = 1.sp,
                                             color = MaterialTheme.colorScheme.onSurface,
@@ -444,7 +446,7 @@ fun DriverProfileContent(
                                         )
                                         Spacer(Modifier.width(8.dp))
                                         Text(
-                                            text = "Compare Teammates",
+                                            text = stringResource(R.string.compare_teammates),
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 14.sp
                                         )
@@ -466,7 +468,7 @@ fun DriverProfileContent(
                                 )
                                 {
                                     Text(
-                                        text = "2026 Performance",
+                                        text = stringResource(R.string.performance_2026),
                                         style = MaterialTheme.typography.titleLarge,
                                         letterSpacing = 1.sp,
                                         color = MaterialTheme.colorScheme.onSurface,
@@ -478,17 +480,17 @@ fun DriverProfileContent(
 
                                     val stats = driver.seasonStats
                                     val performanceStats = listOf(
-                                        "Grand Prix Races" to (stats?.grandPrixRaces ?: "0"),
-                                        "Wins" to (stats?.grandPrixWins ?: "0"),
-                                        "Poles" to (stats?.grandPrixPoles ?: "0"),
-                                        "Podiums" to (stats?.grandPrixPodiums ?: "0"),
-                                        "Fastest Laps" to (stats?.dhlFastestLaps ?: "0"),
-                                        "Top 10s" to (stats?.grandPrixTop10s ?: "0"),
-                                        "DNF" to (stats?.dnfs ?: "0"),
-                                        "Sprint Races" to (stats?.sprintRaces ?: "0"),
-                                        "Sprint Wins" to (stats?.sprintWins ?: "0"),
-                                        "Sprint Podiums" to (stats?.sprintPodiums ?: "0"),
-                                        "Sprint Poles" to (stats?.sprintPoles ?: "0")
+                                        stringResource(R.string.stat_gp_races) to (stats?.grandPrixRaces ?: "0"),
+                                        stringResource(R.string.stat_wins) to (stats?.grandPrixWins ?: "0"),
+                                        stringResource(R.string.stat_poles) to (stats?.grandPrixPoles ?: "0"),
+                                        stringResource(R.string.stat_podiums) to (stats?.grandPrixPodiums ?: "0"),
+                                        stringResource(R.string.stat_fastest_laps) to (stats?.dhlFastestLaps ?: "0"),
+                                        stringResource(R.string.stat_top_10s) to (stats?.grandPrixTop10s ?: "0"),
+                                        stringResource(R.string.stat_dnfs) to (stats?.dnfs ?: "0"),
+                                        stringResource(R.string.stat_sprint_races) to (stats?.sprintRaces ?: "0"),
+                                        stringResource(R.string.stat_sprint_wins) to (stats?.sprintWins ?: "0"),
+                                        stringResource(R.string.stat_sprint_podiums) to (stats?.sprintPodiums ?: "0"),
+                                        stringResource(R.string.stat_sprint_poles) to (stats?.sprintPoles ?: "0")
                                     )
 
                                     FlowRow(
@@ -520,7 +522,7 @@ fun DriverProfileContent(
                                 )
                                 {
                                     Text(
-                                        text = "Career Stats",
+                                        text = stringResource(R.string.career_stats_title),
                                         style = MaterialTheme.typography.titleLarge,
                                         letterSpacing = 1.sp,
                                         color = MaterialTheme.colorScheme.onSurface,
@@ -534,7 +536,7 @@ fun DriverProfileContent(
                                         if (it > 0) {
                                             CareerStatsCard(
                                                 driver.careerStats.worldChampionships,
-                                                "World Championships",
+                                                stringResource(R.string.stat_world_championships),
                                                 Icons.Default.EmojiEvents,
                                                 MaterialTheme.colorScheme.onPrimary,
                                                 MaterialTheme.colorScheme.onPrimary,
@@ -550,7 +552,7 @@ fun DriverProfileContent(
                                     }
                                     CareerStatsCard(
                                         driver.careerStats?.highestRaceFinish ?: "0",
-                                        "Grand Prix Wins",
+                                        stringResource(R.string.stat_grand_prix_wins),
                                         Icons.Default.FlagCircle,
                                         MaterialTheme.colorScheme.primary.copy(alpha = .5f),
                                         MaterialTheme.colorScheme.primary,
@@ -564,7 +566,7 @@ fun DriverProfileContent(
                                     )
                                     CareerStatsCard(
                                         driver.careerStats?.podiums ?: "0",
-                                        "Podium Finishes",
+                                        stringResource(R.string.stat_podium_finishes),
                                         Icons.Default.BarChart,
                                         MaterialTheme.colorScheme.primary.copy(alpha = .5f),
                                         MaterialTheme.colorScheme.primary,
@@ -579,13 +581,13 @@ fun DriverProfileContent(
 
                                     Row {
                                         CareerStatsMiniCard(
-                                            title = "GP Entered",
+                                            title = stringResource(R.string.stat_gp_entered),
                                             value = driver.careerStats?.grandsPrixEntered ?: "0",
                                             modifier = Modifier.weight(1f)
                                         )
                                         Spacer(modifier = Modifier.width(16.dp))
                                         CareerStatsMiniCard(
-                                            title = "Pole",
+                                            title = stringResource(R.string.stat_pole),
                                             value = driver.careerStats?.polePositions ?: "0",
                                             modifier = Modifier.weight(1f)
                                         )
@@ -598,13 +600,13 @@ fun DriverProfileContent(
 
                                     Row {
                                         CareerStatsMiniCard(
-                                            title = "Career Points",
+                                            title = stringResource(R.string.stat_career_points),
                                             value = driver.careerStats?.careerPoints ?: "0",
                                             modifier = Modifier.weight(1f)
                                         )
                                         Spacer(modifier = Modifier.width(16.dp))
                                         CareerStatsMiniCard(
-                                            title = "DNFs",
+                                            title = stringResource(R.string.stat_dnfs),
                                             value = driver.careerStats?.dnfs ?: "0",
                                             modifier = Modifier.weight(1f)
                                         )
@@ -622,7 +624,7 @@ fun DriverProfileContent(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
-                                        text = "Recent Form",
+                                        text = stringResource(R.string.recent_form_title),
                                         style = MaterialTheme.typography.titleLarge,
                                         letterSpacing = 1.sp,
                                         color = MaterialTheme.colorScheme.onSurface,
@@ -651,7 +653,7 @@ fun DriverProfileContent(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
-                                        text = "Biography",
+                                        text = stringResource(R.string.biography_title),
                                         style = MaterialTheme.typography.titleLarge,
                                         letterSpacing = 1.sp,
                                         color = MaterialTheme.colorScheme.onSurface,
@@ -692,7 +694,7 @@ fun ChartPerRace(
             shape = RoundedCornerShape(16.dp)
         ) {
             Text(
-                text = "Points progression will appear once the season begins.",
+                text = stringResource(R.string.points_progression_placeholder),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
@@ -704,9 +706,10 @@ fun ChartPerRace(
         return
     }
 
-    val dataSet = remember(perRace, points) {
+    val chartTitle = stringResource(R.string.points_progression_title) + " +$points"
+    val dataSet = remember(perRace, points, chartTitle) {
         perRace.map { it.value }.toChartDataSet(
-            title = "Points Progression +$points",
+            title = chartTitle,
             labels = perRace.map { it.name }
         )
     }
@@ -929,11 +932,11 @@ fun BioCard(
                 )
             }
             Spacer(Modifier.height(16.dp))
-            BirthPlaceDate("Born", birthDate)
+            BirthPlaceDate(stringResource(R.string.bio_born), birthDate)
             Spacer(Modifier.height(16.dp))
             HorizontalDivider(thickness = 2.dp, color = Color.Gray.copy(alpha = .7f))
             Spacer(Modifier.height(16.dp))
-            BirthPlaceDate("Birthplace", birthPlace)
+            BirthPlaceDate(stringResource(R.string.bio_birthplace), birthPlace)
             Spacer(Modifier.height(16.dp))
 
             if (quoteText != null && quoteText.text.isNotEmpty()) {

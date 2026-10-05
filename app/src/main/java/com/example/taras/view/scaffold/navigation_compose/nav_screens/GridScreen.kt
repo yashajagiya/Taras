@@ -41,8 +41,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.taras.R
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.taras.core.common.NetworkObserver
@@ -145,7 +147,10 @@ fun GridContent(
     Box(modifier = modifier) {
 
         var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
-        val tabs = listOf("Drivers", "Teams")
+        val tabs = listOf(
+            stringResource(R.string.grid_tab_drivers),
+            stringResource(R.string.grid_tab_teams)
+        )
 
         val pullToRefreshState = rememberPullToRefreshState()
 
@@ -193,7 +198,7 @@ fun GridContent(
                     IconButton(onClick = onCompareClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.CompareArrows,
-                            contentDescription = "Compare Drivers",
+                            contentDescription = stringResource(R.string.grid_compare_drivers),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -219,7 +224,7 @@ fun GridContent(
                                                 ) {
                                                     LoadingIndicator()
                                                     Spacer(Modifier.requiredHeight(30.dp))
-                                                    Text("Loading drivers...")
+                                                    Text(stringResource(R.string.grid_loading_drivers))
                                                 }
                                             }
                                         }
@@ -234,12 +239,12 @@ fun GridContent(
                                                     horizontalAlignment = Alignment.CenterHorizontally) {
                                                     Icon(
                                                         imageVector = Icons.Default.SignalWifiStatusbarConnectedNoInternet4,
-                                                        contentDescription = "No internet connection",
+                                                        contentDescription = stringResource(R.string.no_internet_connection),
                                                         tint = MaterialTheme.colorScheme.error
                                                     )
                                                     Spacer(modifier = Modifier.height(8.dp))
                                                     Text(
-                                                        "No internet connection",
+                                                        stringResource(R.string.no_internet_connection),
                                                         color = MaterialTheme.colorScheme.error,
                                                         modifier = Modifier.padding(16.dp)
                                                     )
@@ -248,7 +253,7 @@ fun GridContent(
                                         } else {
                                             item {
                                                 Text(
-                                                    text = "Something went wrong",
+                                                    text = stringResource(R.string.something_went_wrong),
                                                     color = MaterialTheme.colorScheme.error,
                                                     modifier = Modifier.padding(16.dp)
                                                 )
@@ -262,7 +267,7 @@ fun GridContent(
                                         if (drivers.isEmpty()) {
                                             item {
                                                 Text(
-                                                    "No Drivers Found",
+                                                    stringResource(R.string.grid_no_drivers_found),
                                                     modifier = Modifier.padding(16.dp)
                                                 )
                                             }
@@ -300,7 +305,7 @@ fun GridContent(
                                                 ) {
                                                     LoadingIndicator()
                                                     Spacer(Modifier.requiredHeight(30.dp))
-                                                    Text("Loading teams...")
+                                                    Text(stringResource(R.string.grid_loading_teams))
                                                 }
                                             }
                                         }
@@ -321,7 +326,7 @@ fun GridContent(
                                         if (teamsResponse.isEmpty()) {
                                             item(contentType = "Empty") {
                                                 Text(
-                                                    "No Teams Found",
+                                                    stringResource(R.string.grid_no_teams_found),
                                                     modifier = Modifier.padding(16.dp)
                                                 )
                                             }

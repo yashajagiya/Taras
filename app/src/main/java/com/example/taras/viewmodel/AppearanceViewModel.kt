@@ -17,7 +17,7 @@ class AppearanceViewModel(private val offlineDataStoreAppearance: OfflineDataSto
 
     val widgetThemeData = offlineDataStoreAppearance.widgetThemeData.stateIn(
         scope = viewModelScope,
-        initialValue = "System Default",
+        initialValue = "Dark",
         started = WhileSubscribed(5000)
     )
 

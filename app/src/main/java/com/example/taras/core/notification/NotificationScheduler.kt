@@ -28,4 +28,8 @@ object NotificationScheduler {
             periodicRequest
         )
     }
+
+    fun cancelNotificationSync(context: Context) {
+        WorkManager.getInstance(context).cancelUniqueWork("GithubNotificationSync")
+    }
 }

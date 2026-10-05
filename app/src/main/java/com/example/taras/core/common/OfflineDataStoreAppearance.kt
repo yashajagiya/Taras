@@ -30,7 +30,7 @@ class OfflineDataStoreAppearance(private val context: Context) {
     }
 
     val appearanceData: Flow<String> = context.appearanceDataStore.data.map {
-        it[APPEARANCE] ?: "System Default"
+        it[APPEARANCE] ?: "Light"
     }
 
     suspend fun saveAppearance(appearance: String) {
@@ -41,7 +41,7 @@ class OfflineDataStoreAppearance(private val context: Context) {
     }
 
     val widgetThemeData: Flow<String> = context.appearanceDataStore.data.map {
-        it[WIDGET_THEME] ?: "System Default"
+        it[WIDGET_THEME] ?: "Dark"
     }
 
     suspend fun saveWidgetTheme(widgetTheme: String) {

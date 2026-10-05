@@ -55,15 +55,11 @@ fun getTeamColorProvider(teamName: String?): ColorProvider {
 
 fun resolveWidgetThemeColors(widgetTheme: String?, appTheme: String?): ColorProviders {
     return when (widgetTheme) {
-        "Dark" -> androidx.glance.material3.ColorProviders(
-            light = DarkColorScheme,
-            dark = DarkColorScheme
-        )
         "Light" -> androidx.glance.material3.ColorProviders(
             light = LightColorScheme,
             dark = LightColorScheme
         )
-        else -> {
+        "System Default" -> {
             when (appTheme) {
                 "Dark" -> androidx.glance.material3.ColorProviders(
                     light = DarkColorScheme,
@@ -79,6 +75,11 @@ fun resolveWidgetThemeColors(widgetTheme: String?, appTheme: String?): ColorProv
                 )
             }
         }
+        // Default is "Dark" for widgets
+        else -> androidx.glance.material3.ColorProviders(
+            light = DarkColorScheme,
+            dark = DarkColorScheme
+        )
     }
 }
 
@@ -86,22 +87,22 @@ fun resolveWidgetThemeColors(widgetTheme: String?, appTheme: String?): ColorProv
 fun rememberWidgetThemeColors(): ColorProviders {
     val context = androidx.glance.LocalContext.current
     val appearanceStore = androidx.compose.runtime.remember(context) { OfflineDataStoreAppearance(context) }
-    val widgetTheme by appearanceStore.widgetThemeData.collectAsState(initial = "System Default")
-    val appTheme by appearanceStore.appearanceData.collectAsState(initial = "System Default")
+    val widgetTheme by appearanceStore.widgetThemeData.collectAsState(initial = "Dark")
+    val appTheme by appearanceStore.appearanceData.collectAsState(initial = "Light")
     return resolveWidgetThemeColors(widgetTheme, appTheme)
 }
 
 suspend fun getWidgetThemeColors(context: Context): ColorProviders {
     val appearanceStore = OfflineDataStoreAppearance(context)
     val widgetTheme = try {
-        appearanceStore.widgetThemeData.firstOrNull() ?: "System Default"
+        appearanceStore.widgetThemeData.firstOrNull() ?: "Dark"
     } catch (_: Exception) {
-        "System Default"
+        "Dark"
     }
     val appTheme = try {
-        appearanceStore.appearanceData.firstOrNull() ?: "System Default"
+        appearanceStore.appearanceData.firstOrNull() ?: "Light"
     } catch (_: Exception) {
-        "System Default"
+        "Light"
     }
     return resolveWidgetThemeColors(widgetTheme, appTheme)
 }

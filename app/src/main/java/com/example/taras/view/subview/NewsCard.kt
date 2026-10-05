@@ -35,11 +35,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import com.example.taras.R
 import coil3.compose.AsyncImage
 import com.example.taras.core.common.UiState
 import com.example.taras.core.helpercore.getNewsColor
@@ -87,7 +89,7 @@ fun NewsCarousel(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    text = "No articles found from this outlet right now.",
+                    text = stringResource(R.string.news_empty_title),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -95,7 +97,7 @@ fun NewsCarousel(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Select 'All Sources' or switch to another outlet.",
+                    text = stringResource(R.string.news_empty_desc),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     textAlign = TextAlign.Center
@@ -148,7 +150,7 @@ fun NewsCarousel(
                         } catch (e: Exception) {
                             android.widget.Toast.makeText(
                                 context,
-                                "Unable to open article link",
+                                context.getString(R.string.news_open_error),
                                 android.widget.Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -211,7 +213,7 @@ fun NewsCarousel(
                         }
                         if (!item.author.isNullOrBlank()) {
                             Text(
-                                text = "by ${item.author}",
+                                text = stringResource(R.string.news_by_author, item.author),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                                 maxLines = 1,
@@ -222,7 +224,7 @@ fun NewsCarousel(
                     }
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = item.title ?: "No Title",
+                        text = item.title ?: stringResource(R.string.news_no_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         maxLines = 2,

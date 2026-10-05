@@ -1,6 +1,7 @@
 package com.example.taras.view.scaffold.navigation_compose.nav_screens.nave_subscreens
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -22,8 +23,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.PrivacyTip
+import androidx.compose.material.icons.filled.SportsMotorsports
 import com.example.taras.R
+import com.example.taras.network_calls.ApiConstants
+import com.example.taras.view.subview.PrivacyPolicyDialog
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.DrawerState
@@ -49,11 +55,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -81,9 +90,12 @@ fun SettingDrawer(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     appearanceExpanded: Boolean = false,
     onAppearanceExpandChange: (Boolean) -> Unit = {},
+    onOpenOnboarding: () -> Unit = {},
     content: @Composable () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     val openDialog = remember { mutableStateOf(false) }
+    val openPrivacyDialog = remember { mutableStateOf(false) }
 
     val gitLink = "https://github.com/yashajagiya"
     val uriHandler = LocalUriHandler.current
@@ -107,7 +119,7 @@ fun SettingDrawer(
                             Spacer(Modifier.height(12.dp))
                             Text(
                                 modifier = Modifier.fillMaxWidth(),
-                                text = "TARAS",
+                                text = stringResource(R.string.drawer_title),
                                 maxLines = 1,
                                 fontWeight = FontWeight.Bold,
                                 fontStyle = FontStyle.Italic,
@@ -118,7 +130,7 @@ fun SettingDrawer(
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                             Box {
                                 NavigationDrawerItem(
-                                    label = { Text("Hello $userName") },
+                                    label = { Text(stringResource(R.string.drawer_hello_user, userName)) },
                                     selected = false,
                                     icon = {
                                         Icon(
@@ -137,7 +149,7 @@ fun SettingDrawer(
                                 }
                             }
                             NavigationDrawerItem(
-                                label = { Text("GitHub") },
+                                label = { Text(stringResource(R.string.drawer_github)) },
                                 selected = false,
                                 icon = {
                                     Icon(
@@ -148,9 +160,14 @@ fun SettingDrawer(
                                 onClick = { uriHandler.openUri(gitLink) }
                             )
 
+                            val localizedAppearance = when (appearance) {
+                                "Light" -> stringResource(R.string.theme_light)
+                                "Dark" -> stringResource(R.string.theme_dark)
+                                else -> stringResource(R.string.theme_system_default)
+                            }
                             Box {
                                 NavigationDrawerItem(
-                                    label = { Text("Theme: $appearance") },
+                                    label = { Text(stringResource(R.string.drawer_theme, localizedAppearance)) },
                                     selected = false,
                                     icon = {
                                         Icon(
@@ -167,8 +184,13 @@ fun SettingDrawer(
                                     shape = RoundedCornerShape(8.dp)
                                 ) {
                                     appearanceOptions.forEach {
+                                        val itemLabel = when (it) {
+                                            "Light" -> stringResource(R.string.theme_light)
+                                            "Dark" -> stringResource(R.string.theme_dark)
+                                            else -> stringResource(R.string.theme_system_default)
+                                        }
                                         DropdownMenuItem(
-                                            text = { Text(text = it) },
+                                            text = { Text(text = itemLabel) },
                                             onClick = {
                                                 appearanceViewModel.updateAppearance(it)
                                                 onAppearanceExpandChange(false)
@@ -180,16 +202,21 @@ fun SettingDrawer(
 
                             var widgetThemeExpanded by remember { mutableStateOf(false) }
                             val widgetTheme by appearanceViewModel.widgetThemeData.collectAsStateWithLifecycle()
-                            val widgetThemeOptions = listOf("System Default", "Dark", "Light")
+                            val widgetThemeOptions = listOf("Dark", "Light", "System Default")
+                            val localizedWidgetTheme = when (widgetTheme) {
+                                "Light" -> stringResource(R.string.theme_light)
+                                "Dark" -> stringResource(R.string.theme_dark)
+                                else -> stringResource(R.string.theme_system_default)
+                            }
 
                             Box {
                                 NavigationDrawerItem(
-                                    label = { Text("Widget Theme: $widgetTheme") },
+                                    label = { Text(stringResource(R.string.drawer_widget_theme, localizedWidgetTheme)) },
                                     selected = false,
                                     icon = {
                                         Icon(
                                             imageVector = Icons.Default.ColorLens,
-                                            contentDescription = "Widget Theme"
+                                            contentDescription = null
                                         )
                                     },
                                     onClick = { widgetThemeExpanded = true }
@@ -201,8 +228,13 @@ fun SettingDrawer(
                                     shape = RoundedCornerShape(8.dp)
                                 ) {
                                     widgetThemeOptions.forEach {
+                                        val itemLabel = when (it) {
+                                            "Light" -> stringResource(R.string.theme_light)
+                                            "Dark" -> stringResource(R.string.theme_dark)
+                                            else -> stringResource(R.string.theme_system_default)
+                                        }
                                         DropdownMenuItem(
-                                            text = { Text(text = it) },
+                                            text = { Text(text = itemLabel) },
                                             onClick = {
                                                 appearanceViewModel.updateWidgetTheme(it)
                                                 widgetThemeExpanded = false
@@ -212,8 +244,122 @@ fun SettingDrawer(
                                 }
                             }
 
+                            // Language Selector
+                            var languageExpanded by remember { mutableStateOf(false) }
+                            val drawerContext = LocalContext.current
+                            val currentLocaleTag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                val localeManager = drawerContext.getSystemService(Context.LOCALE_SERVICE) as? android.app.LocaleManager
+                                localeManager?.applicationLocales?.toLanguageTags()?.split(",")?.firstOrNull() ?: ""
+                            } else {
+                                java.util.Locale.getDefault().language
+                            }
+
+                            val languageOptions = listOf(
+                                "" to stringResource(R.string.lang_system_default),
+                                "en" to stringResource(R.string.lang_en),
+                                "hi" to stringResource(R.string.lang_hi),
+                                "es" to stringResource(R.string.lang_es),
+                                "de" to stringResource(R.string.lang_de),
+                                "fr" to stringResource(R.string.lang_fr),
+                                "ja" to stringResource(R.string.lang_ja),
+                                "pt" to stringResource(R.string.lang_pt)
+                            )
+
+                            val currentLangDisplay = languageOptions.firstOrNull { it.first == currentLocaleTag }?.second
+                                ?: languageOptions.firstOrNull { currentLocaleTag.startsWith(it.first) && it.first.isNotEmpty() }?.second
+                                ?: stringResource(R.string.lang_system_default)
+
+                            Box {
+                                NavigationDrawerItem(
+                                    label = { Text(stringResource(R.string.drawer_language, currentLangDisplay)) },
+                                    selected = false,
+                                    icon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Language,
+                                            contentDescription = null
+                                        )
+                                    },
+                                    onClick = { languageExpanded = true }
+                                )
+                                DropdownMenu(
+                                    modifier = Modifier.background(MaterialTheme.colorScheme.surface),
+                                    expanded = languageExpanded,
+                                    onDismissRequest = { languageExpanded = false },
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    languageOptions.forEach { (tag, name) ->
+                                        DropdownMenuItem(
+                                            text = { Text(text = name) },
+                                            onClick = {
+                                                languageExpanded = false
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                                    val localeManager = drawerContext.getSystemService(Context.LOCALE_SERVICE) as? android.app.LocaleManager
+                                                    if (tag.isEmpty()) {
+                                                        localeManager?.applicationLocales = android.os.LocaleList.getEmptyLocaleList()
+                                                    } else {
+                                                        localeManager?.applicationLocales = android.os.LocaleList.forLanguageTags(tag)
+                                                    }
+                                                } else {
+                                                    val locale = if (tag.isEmpty()) java.util.Locale.getDefault() else java.util.Locale.forLanguageTag(tag)
+                                                    java.util.Locale.setDefault(locale)
+                                                    val config = drawerContext.resources.configuration
+                                                    config.setLocale(locale)
+                                                    drawerContext.resources.updateConfiguration(config, drawerContext.resources.displayMetrics)
+                                                    (drawerContext as? android.app.Activity)?.recreate()
+                                                }
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 NotificationPermissionItem()
+                            }
+
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                            NavigationDrawerItem(
+                                label = { Text(stringResource(R.string.drawer_welcome_guide)) },
+                                selected = false,
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.SportsMotorsports,
+                                        contentDescription = "Setup"
+                                    )
+                                },
+                                onClick = {
+                                    scope.launch { drawerState.close() }
+                                    onOpenOnboarding()
+                                }
+                            )
+
+                            NavigationDrawerItem(
+                                label = { Text(stringResource(R.string.drawer_about_privacy)) },
+                                selected = false,
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.PrivacyTip,
+                                        contentDescription = "Privacy Policy"
+                                    )
+                                },
+                                onClick = {
+                                    scope.launch { drawerState.close() }
+                                    openPrivacyDialog.value = true
+                                }
+                            )
+
+                            if (openPrivacyDialog.value) {
+                                PrivacyPolicyDialog(
+                                    onDismiss = { openPrivacyDialog.value = false },
+                                    onOpenOnlinePolicy = {
+                                        try {
+                                            uriHandler.openUri(ApiConstants.PRIVACY_POLICY_URL)
+                                        } catch (e: Exception) {
+                                            Toast.makeText(drawerContext, "Could not open browser", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                )
                             }
                         }
                     }
@@ -242,7 +388,7 @@ private fun NotificationPermissionItem() {
 
     if (!notificationPermissionState.status.isGranted) {
         NavigationDrawerItem(
-            label = { Text("Notification Permission ") },
+            label = { Text(stringResource(R.string.drawer_notification_permission)) },
             selected = false,
             icon = {
                 Icon(
@@ -257,7 +403,7 @@ private fun NotificationPermissionItem() {
                 ) == PackageManager.PERMISSION_GRANTED
 
                 if (hasPermission) {
-                    Toast.makeText(context, "Permission already granted", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.drawer_notifications_already_granted), Toast.LENGTH_SHORT).show()
                 } else if (notificationPermissionState.status.shouldShowRationale) {
                     showRationaleDialog = true
                 } else if (hasRequestedOnce) {
@@ -273,19 +419,19 @@ private fun NotificationPermissionItem() {
     if (showRationaleDialog) {
         AlertDialog(
             onDismissRequest = { showRationaleDialog = false },
-            title = { Text("Enable Notifications") },
-            text = { Text("Stay updated with race schedules, results, and the latest F1 news. Please grant permission in the next screen.") },
+            title = { Text(stringResource(R.string.dialog_enable_notifications_title)) },
+            text = { Text(stringResource(R.string.dialog_enable_notifications_desc)) },
             confirmButton = {
                 TextButton(onClick = {
                     showRationaleDialog = false
                     notificationPermissionState.launchPermissionRequest()
                 }) {
-                    Text("Continue")
+                    Text(stringResource(R.string.continue_text))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showRationaleDialog = false }) {
-                    Text("Dismiss")
+                    Text(stringResource(R.string.dismiss))
                 }
             }
         )
@@ -294,8 +440,8 @@ private fun NotificationPermissionItem() {
     if (showSettingsDialog && !notificationPermissionState.status.shouldShowRationale) {
         AlertDialog(
             onDismissRequest = { showSettingsDialog = false },
-            title = { Text("Permissions Required") },
-            text = { Text("It seems notification permissions are disabled or permanently denied. Please enable them in the App Settings to receive updates.") },
+            title = { Text(stringResource(R.string.dialog_permissions_required_title)) },
+            text = { Text(stringResource(R.string.dialog_permissions_required_desc)) },
             confirmButton = {
                 TextButton(onClick = {
                     showSettingsDialog = false
@@ -305,15 +451,15 @@ private fun NotificationPermissionItem() {
                         }
                         context.startActivity(intent)
                     } catch (e: Exception) {
-                        Toast.makeText(context, "Could not open settings", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.drawer_could_not_open_settings), Toast.LENGTH_SHORT).show()
                     }
                 }) {
-                    Text("Open Settings")
+                    Text(stringResource(R.string.dialog_open_settings))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showSettingsDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -342,14 +488,14 @@ fun UserNameAlertDialog(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "Enter your name",
+                    text = stringResource(R.string.drawer_user_name_dialog_title),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
                     value = tempName.value,
                     onValueChange = { tempName.value = it },
-                    label = { Text("Name") },
+                    label = { Text(stringResource(R.string.drawer_name_label)) },
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(24.dp))
@@ -358,7 +504,7 @@ fun UserNameAlertDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                     TextButton(
                         onClick = {
@@ -366,7 +512,7 @@ fun UserNameAlertDialog(
                             onDismiss()
                         }
                     ) {
-                        Text("Done")
+                        Text(stringResource(R.string.done))
                     }
                 }
             }

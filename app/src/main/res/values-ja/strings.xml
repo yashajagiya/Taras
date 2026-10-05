@@ -1,0 +1,279 @@
+<resources>
+    <string name="app_name">Taras</string>
+    <string name="widget_next_race_label">次のセッション</string>
+    <string name="widget_next_race_desc">次のレースセッションとカウントダウン</string>
+    <string name="widget_standings_label">チャンピオンシップ順位</string>
+    <string name="widget_standings_desc">チャンピオンシップ上位3名のドライバー</string>
+    <string name="widget_favorite_driver_label">お気に入りドライバー</string>
+    <string name="widget_favorite_driver_desc">お気に入りドライバーの順位、ポイント、直近結果を表示</string>
+    <string name="widget_race_result_label">前戦リザルト</string>
+    <string name="widget_race_result_desc">直近グランプリの表彰台獲得者</string>
+
+    <!-- Navigation -->
+    <string name="nav_paddock">パドック</string>
+    <string name="nav_grid">グリッド</string>
+    <string name="nav_calendar">カレンダー</string>
+    <string name="nav_results">リザルト</string>
+    <string name="topbar_user_profile">ユーザープロファイル</string>
+    <string name="action_back">戻る</string>
+
+    <!-- Common Actions & Statuses -->
+    <string name="loading">読み込み中…</string>
+    <string name="retry_again">もう一度試す</string>
+    <string name="retry">再試行</string>
+    <string name="something_went_wrong">問題が発生しました</string>
+    <string name="no_internet_connection">インターネット接続がありません</string>
+    <string name="share">共有</string>
+    <string name="close">閉じる</string>
+    <string name="copy">コピー</string>
+    <string name="done">完了</string>
+    <string name="cancel">キャンセル</string>
+    <string name="continue_text">続ける</string>
+    <string name="dismiss">閉じる</string>
+    <string name="skip">スキップ</string>
+    <string name="clear">クリア</string>
+    <string name="pos_prefix">順位: %1$s</string>
+    <string name="pts_prefix">Pts: %1$s</string>
+    <string name="points_pts">PTS</string>
+    <string name="live_badge">ライブ</string>
+    <string name="upcoming_badge">開催予定</string>
+    <string name="first_place">1位</string>
+
+    <!-- Drawer / Settings -->
+    <string name="drawer_title">TARAS</string>
+    <string name="drawer_hello_user">こんにちは、%1$sさん</string>
+    <string name="drawer_user_name_dialog_title">名前を入力</string>
+    <string name="drawer_name_label">名前</string>
+    <string name="drawer_github">GitHub</string>
+    <string name="drawer_theme">テーマ: %1$s</string>
+    <string name="drawer_widget_theme">ウィジェットテーマ: %1$s</string>
+    <string name="drawer_language">言語: %1$s</string>
+    <string name="drawer_notification_permission">通知の許可</string>
+    <string name="drawer_welcome_guide">初期設定ガイド</string>
+    <string name="drawer_about_privacy">アプリについて・プライバシーポリシー</string>
+
+    <!-- In-App Privacy Policy -->
+    <string name="privacy_policy_title">プライバシーポリシー</string>
+    <string name="privacy_badge_no_data">100%プライベート・データ収集なし</string>
+    <string name="privacy_core_commitment">基本方針</string>
+    <string name="privacy_core_commitment_desc">個人データは一切収集しません。お名前やお気に入りドライバーの設定は、DataStoreを使用して端末内にのみ保存されます。サーバーへデータが送信されることはありません。ニュースは公開RSSフィードから取得されます。</string>
+    <string name="privacy_sec_no_data_title">個人データの不収集</string>
+    <string name="privacy_sec_no_data_p1">Tarasはオープンソースの非営利F1アプリです。透明性とプライバシーを最優先しています:</string>
+    <string name="privacy_sec_no_data_item1">氏名、メールアドレス、電話番号、アカウント登録なし</string>
+    <string name="privacy_sec_no_data_item2">位置情報の追跡なし</string>
+    <string name="privacy_sec_no_data_item3">広告ID (GAID) や端末識別子、IPログの収集なし</string>
+    <string name="privacy_sec_no_data_item4">商用広告SDK、マーケティングトラッカー、解析ツールなし</string>
+    <string name="privacy_sec_storage_title">端末内のみでのローカル保存</string>
+    <string name="privacy_sec_storage_desc">お気に入り設定やテーマは、Android Jetpack DataStoreおよびRoomにより端末内にのみ保存されます。外部サーバーへの送信は一切ありません。アプリのストレージ消去またはアンインストールでいつでも完全削除できます。</string>
+    <string name="privacy_sec_network_title">公開データと暗号化通信</string>
+    <string name="privacy_sec_network_desc">レース結果や日程はGitHub上の公開静的ファイルから取得し、ニュースは公開RSSから取得します。すべての通信は安全なHTTPSで保護されています。</string>
+    <string name="privacy_sec_notifications_title">端末の権限について</string>
+    <string name="privacy_sec_notifications_desc">通知権限は端末内のWorkManagerによるレースリマインダーにのみ使用され、プッシュ通知トークン等は一切収集されません。</string>
+    <string name="privacy_sec_opensource_title">オープンソースの透明性</string>
+    <string name="privacy_sec_opensource_desc">Tarasは完全オープンソースです。GitHubでソースコードをいつでもご確認いただけます。</string>
+    <string name="privacy_btn_view_online">オンライン版を見る</string>
+    <string name="privacy_btn_got_it">確認しました</string>
+    <string name="drawer_notifications_already_granted">すでに許可されています</string>
+    <string name="drawer_could_not_open_settings">設定を開けませんでした</string>
+    <string name="theme_light">ライト</string>
+    <string name="theme_dark">ダーク</string>
+    <string name="theme_system">システム</string>
+    <string name="theme_system_default">システムデフォルト</string>
+
+    <!-- Language Names -->
+    <string name="lang_system_default">システムデフォルト</string>
+    <string name="lang_en">English (英語)</string>
+    <string name="lang_hi">हिन्दी (ヒンディー語)</string>
+    <string name="lang_es">Español (スペイン語)</string>
+    <string name="lang_de">Deutsch (ドイツ語)</string>
+    <string name="lang_fr">Français (フランス語)</string>
+    <string name="lang_ja">日本語 (Japanese)</string>
+    <string name="lang_pt">Português (ポルトガル語)</string>
+
+    <!-- Notification Dialogs -->
+    <string name="dialog_enable_notifications_title">通知を有効にする</string>
+    <string name="dialog_enable_notifications_desc">レーススケジュール、結果、最新のF1ニュースを受け取るには、次の画面で通知を許可してください。</string>
+    <string name="dialog_permissions_required_title">権限が必要です</string>
+    <string name="dialog_permissions_required_desc">通知が無効になっています。最新情報を受け取るには、アプリ設定から通知を有効にしてください。</string>
+    <string name="dialog_open_settings">設定を開く</string>
+
+    <!-- Paddock Screen -->
+    <string name="paddock_fav_driver_badge">⭐ お気に入りドライバー</string>
+    <string name="paddock_fav_driver_desc">%1$s: %2$s位 (%3$s pts)</string>
+    <string name="paddock_fav_team_badge">🏎️ お気に入りチーム</string>
+    <string name="paddock_fav_team_desc">%1$s: %2$s位 (%3$s pts)</string>
+    <string name="paddock_next_session">次のセッション</string>
+    <string name="paddock_upcoming_race">次のレース</string>
+    <string name="paddock_until_session">%1$s · %2$s まで</string>
+    <string name="paddock_no_upcoming_sessions">今後のセッションはありません · %1$s</string>
+    <string name="paddock_championship">チャンピオンシップ</string>
+    <string name="paddock_latest_news_title">パドック最新ニュース....</string>
+    <string name="paddock_notifications_toast">レース通知が有効になりました</string>
+
+    <!-- Grid Screen -->
+    <string name="grid_tab_drivers">ドライバー</string>
+    <string name="grid_tab_teams">チーム</string>
+    <string name="grid_compare_drivers">ドライバー比較</string>
+    <string name="grid_loading_drivers">ドライバーを読み込み中…</string>
+    <string name="grid_loading_teams">チームを読み込み中…</string>
+    <string name="grid_no_drivers_found">ドライバーが見つかりません</string>
+    <string name="grid_no_teams_found">チームが見つかりません</string>
+
+    <!-- Calendar Screen & Race Cards -->
+    <string name="race_card_circuit_explorer">サーキット情報</string>
+    <string name="race_card_weekend_schedule">週末スケジュール</string>
+    <string name="race_card_full_race">決勝レース</string>
+    <string name="session_fp1">FP1</string>
+    <string name="session_fp2">FP2</string>
+    <string name="session_fp3">FP3</string>
+    <string name="session_sprint_qualy">スプリント予選</string>
+    <string name="session_sprint_race">スプリント</string>
+    <string name="session_qualy">予選</string>
+    <string name="session_results">リザルト</string>
+
+    <!-- Circuit Data Screen -->
+    <string name="circuit_loading">サーキットデータを読み込み中…</string>
+    <string name="circuit_not_found">サーキット情報が見つかりません</string>
+    <string name="circuit_race_winner">優勝者</string>
+    <string name="circuit_round_header">第%1$s戦 • %2$s</string>
+    <string name="circuit_data_title">サーキットデータ</string>
+    <string name="circuit_spec_corners">コーナー数</string>
+    <string name="circuit_spec_length">全長</string>
+    <string name="circuit_spec_lap_record">ラップレコード</string>
+    <string name="circuit_spec_first_gp">初開催</string>
+    <string name="circuit_spec_laps">周回数</string>
+    <string name="circuit_weekend_schedule">週末スケジュール</string>
+    <string name="session_type_practice">フリー走行</string>
+    <string name="session_type_grid_setup">予選</string>
+    <string name="session_type_sprint">スプリント</string>
+    <string name="session_type_grand_prix">決勝</string>
+
+    <!-- F1 Results Screen -->
+    <string name="results_share_button">リザルトを共有</string>
+    <string name="results_share_sheet_title">リザルトを共有</string>
+    <string name="results_share_sheet_subtitle">共有またはコピー可能な要約テキスト</string>
+    <string name="results_summary_format">表示形式</string>
+    <string name="results_limit_podium">表彰台 (Top 3)</string>
+    <string name="results_limit_top10">Top 10</string>
+    <string name="results_limit_all">全車 (%1$d)</string>
+    <string name="results_preview">プレビュー</string>
+    <string name="results_copy_text">テキストをコピー</string>
+    <string name="results_share_text">テキストを共有</string>
+    <string name="results_share_graphic_card">画像カードとして共有</string>
+    <string name="results_col_time">タイム</string>
+    <string name="results_col_gap">差</string>
+    <string name="results_col_laps">周回</string>
+    <string name="results_session_not_started">セッションはまだ始まっていません</string>
+    <string name="results_scheduled_for">開始予定: %1$s</string>
+    <string name="results_no_data">このセッションのデータはありません。</string>
+    <string name="results_loading_fp">フリー走行結果を読み込み中…</string>
+    <string name="results_loading_sprint_qualy">スプリント予選結果を読み込み中…</string>
+    <string name="results_loading_sprint_race">スプリント結果を読み込み中…</string>
+    <string name="results_loading_qualy">予選結果を読み込み中…</string>
+    <string name="results_loading_race">決勝結果を読み込み中…</string>
+
+    <!-- Driver & Team Profile Screens -->
+    <string name="driver_not_found">ドライバーが見つかりません</string>
+    <string name="team_not_found">チームが見つかりません</string>
+    <string name="add_to_favorites">お気に入りに追加</string>
+    <string name="remove_from_favorites">お気に入りから削除</string>
+    <string name="stat_rank">順位</string>
+    <string name="stat_code">略称</string>
+    <string name="stat_points">ポイント</string>
+    <string name="stat_first_entry">初参戦</string>
+    <string name="teammate_title">チームメイト</string>
+    <string name="team_drivers_title">所属ドライバー</string>
+    <string name="compare_teammates">チームメイトを比較</string>
+    <string name="teammate_battle_title">チームメイト対決</string>
+    <string name="h2h_qualifying">予選 H2H</string>
+    <string name="h2h_race">決勝 H2H</string>
+    <string name="h2h_points_split">ポイント比較</string>
+    <string name="performance_2026">2026年 成績</string>
+    <string name="career_stats_title">通算成績</string>
+    <string name="team_history_title">チーム沿革</string>
+    <string name="management_technical_title">チーム首脳 &amp; 技術陣</string>
+    <string name="team_chief">チーム代表</string>
+    <string name="technical_chief">テクニカルディレクター</string>
+    <string name="chassis">シャシー</string>
+    <string name="power_unit">パワーユニット</string>
+    <string name="reserve_driver">リザーブドライバー</string>
+    <string name="stat_world_championships">世界タイトル</string>
+    <string name="stat_grand_prix_wins">GP通算勝利</string>
+    <string name="stat_podium_finishes">表彰台回数</string>
+    <string name="stat_gp_entered">参戦グランプリ数</string>
+    <string name="stat_pole">ポール</string>
+    <string name="stat_pole_positions">ポールポジション</string>
+    <string name="stat_career_points">通算ポイント</string>
+    <string name="stat_dnfs">リタイア (DNF)</string>
+    <string name="stat_gp_races">GP出走数</string>
+    <string name="stat_wins">勝利数</string>
+    <string name="stat_poles">ポール数</string>
+    <string name="stat_podiums">表彰台数</string>
+    <string name="stat_fastest_laps">ファステストラップ</string>
+    <string name="stat_top_10s">Top 10</string>
+    <string name="stat_sprint_races">スプリント出走数</string>
+    <string name="stat_sprint_wins">スプリント勝利</string>
+    <string name="stat_sprint_podiums">スプリント表彰台</string>
+    <string name="stat_sprint_poles">スプリントポール</string>
+    <string name="recent_form_title">最近の成績</string>
+    <string name="points_progression_title">ポイント推移</string>
+    <string name="points_progression_placeholder">シーズン開幕後にポイント推移が表示されます。</string>
+    <string name="biography_title">プロフィール</string>
+    <string name="bio_born">生年月日</string>
+    <string name="bio_birthplace">出身地</string>
+
+    <!-- Comparison Screen -->
+    <string name="comparison_tab_drivers">ドライバー</string>
+    <string name="comparison_tab_teams">チーム &amp; マシン</string>
+    <string name="comparison_err_drivers">ドライバーを読み込めませんでした: %1$s</string>
+    <string name="comparison_err_teams">チームを読み込めませんでした: %1$s</string>
+    <string name="comparison_empty_drivers">ドライバーデータが不足しています</string>
+    <string name="comparison_empty_teams">チームデータが不足しています</string>
+    <string name="comparison_teammate_battles">チームメイト対決</string>
+    <string name="comparison_quick_select">クイック選択</string>
+    <string name="comparison_select_driver_1">ドライバー1を選択</string>
+    <string name="comparison_select_driver_2">ドライバー2を選択</string>
+    <string name="comparison_select_team_1">チーム1を選択</string>
+    <string name="comparison_select_team_2">チーム2を選択</string>
+    <string name="comparison_head_to_head">直接対決</string>
+    <string name="comparison_points_rank">ポイント &amp; 順位</string>
+    <string name="comparison_qualifying_race">予選 &amp; 決勝リザルト</string>
+    <string name="comparison_season_stats">今季成績</string>
+    <string name="comparison_career_stats">通算成績</string>
+    <string name="comparison_swap">入れ替え</string>
+    <string name="comparison_search_driver">ドライバーを検索…</string>
+    <string name="comparison_search_team">チームを検索…</string>
+
+    <!-- Onboarding Screen -->
+    <string name="onboarding_step_indicator">ステップ %1$d / %2$d</string>
+    <string name="onboarding_skip">スキップ</string>
+    <string name="onboarding_step1_title">グリッドへようこそ</string>
+    <string name="onboarding_step1_desc">F1のライブカウントダウン、テレメトリ、ランキング、最新パドックニュースをお届けします。</string>
+    <string name="onboarding_step1_name_prompt">お名前を教えてください</string>
+    <string name="onboarding_step1_name_desc">フィードやウィジェットでの挨拶に表示されます。</string>
+    <string name="onboarding_step1_name_placeholder">例: マックス, ルイス, レーサー</string>
+    <string name="onboarding_step1_greeting">ようこそ、%1$sさん！ 🏎️</string>
+    <string name="onboarding_step2_title">推しを選ぼう</string>
+    <string name="onboarding_step2_desc">お気に入りのドライバーとチームを選択してください。グリッドでハイライトされ、ウィジェットにも固定されます。</string>
+    <string name="onboarding_step2_fav_driver">お気に入りドライバー</string>
+    <string name="onboarding_step2_fav_constructor">お気に入りコンストラクター</string>
+    <string name="onboarding_step3_title">Tarasのカスタマイズ</string>
+    <string name="onboarding_step3_desc">テーマを選択し、レース通知を受け取るかどうかを設定します。</string>
+    <string name="onboarding_step3_theme">テーマ設定</string>
+    <string name="onboarding_theme_light_sub">デイライト</string>
+    <string name="onboarding_theme_dark_sub">カーボン</string>
+    <string name="onboarding_theme_system_sub">システム連動</string>
+    <string name="onboarding_step3_alerts">レース速報・通知</string>
+    <string name="onboarding_step3_reminders">セッション前リマインダー</string>
+    <string name="onboarding_step3_reminders_desc">予選、スプリント、決勝の開始前にお知らせします。</string>
+    <string name="onboarding_back">戻る</string>
+    <string name="onboarding_enter_paddock">パドックに入る</string>
+    <string name="onboarding_continue">次へ</string>
+
+    <!-- News Cards -->
+    <string name="news_empty_title">現在、この記事ソースからのニュースはありません。</string>
+    <string name="news_empty_desc">「すべてのソース」を選択するか、別のメディアに切り替えてください。</string>
+    <string name="news_open_error">記事のリンクを開けませんでした</string>
+    <string name="news_by_author">執筆: %1$s</string>
+    <string name="news_no_title">タイトルなし</string>
+</resources>

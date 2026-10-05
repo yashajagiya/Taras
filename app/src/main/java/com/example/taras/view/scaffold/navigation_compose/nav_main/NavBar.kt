@@ -6,6 +6,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.taras.core.navigation.MainNavRoutes
 import com.example.taras.core.navigation.NAV_BAR_PARAMETER
@@ -18,18 +19,19 @@ fun MainNavBar(
 ) {
     NavigationBar(modifier = modifier) {
         NAV_BAR_PARAMETER.forEach { (routeKey, itemData) ->
+            val labelText = if (itemData.titleRes != 0) stringResource(itemData.titleRes) else itemData.title
             NavigationBarItem(
                 selected = routeKey == selectedItem,
                 onClick = { onSelectedItem(routeKey) },
                 icon = {
                     Icon(
                         imageVector = itemData.icon,
-                        contentDescription = itemData.title
+                        contentDescription = labelText
                     )
                 },
                 label = {
                     Text(
-                        text = itemData.title,
+                        text = labelText,
                         fontWeight = FontWeight.Bold
                     )
                 }

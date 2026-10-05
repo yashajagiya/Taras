@@ -77,11 +77,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.example.taras.R
 import com.example.taras.core.common.UiState
 import com.example.taras.core.db.AppDatabase
 import com.example.taras.core.helpercore.toComposeColor
@@ -107,7 +109,10 @@ fun ComparisonScreen(
     val teamsState by teamsViewModel.combinedDetailedTeams.collectAsStateWithLifecycle()
 
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
-    val tabs = listOf("Drivers", "Teams & Cars")
+    val tabs = listOf(
+        stringResource(R.string.comparison_tab_drivers),
+        stringResource(R.string.comparison_tab_teams)
+    )
 
     Column(
         modifier = modifier
@@ -124,7 +129,7 @@ fun ComparisonScreen(
             IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.action_back),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -157,7 +162,7 @@ fun ComparisonScreen(
             if (selectedTabIndex == 0) {
                 when (val state = driversState) {
                     is UiState.Loading -> LoadingView()
-                    is UiState.Error -> ErrorView("Could not load drivers: ${state.message}")
+                    is UiState.Error -> ErrorView(stringResource(R.string.comparison_err_drivers, state.message.orEmpty()))
                     is UiState.Success -> {
                         val drivers = state.data
                         if (drivers.size >= 2) {
@@ -167,20 +172,20 @@ fun ComparisonScreen(
                                 initialDriver2 = initialDriver2
                             )
                         } else {
-                            EmptyComparisonView("Not enough driver data available")
+                            EmptyComparisonView(stringResource(R.string.comparison_empty_drivers))
                         }
                     }
                 }
             } else {
                 when (val state = teamsState) {
                     is UiState.Loading -> LoadingView()
-                    is UiState.Error -> ErrorView("Could not load teams: ${state.message}")
+                    is UiState.Error -> ErrorView(stringResource(R.string.comparison_err_teams, state.message.orEmpty()))
                     is UiState.Success -> {
                         val teams = state.data
                         if (teams.size >= 2) {
                             TeamComparisonView(teams = teams)
                         } else {
-                            EmptyComparisonView("Not enough team data available")
+                            EmptyComparisonView(stringResource(R.string.comparison_empty_teams))
                         }
                     }
                 }
@@ -286,7 +291,7 @@ private fun DriverComparisonView(
 
     if (showPicker1) {
         DriverSelectionSheet(
-            title = "Select Driver 1",
+            title = stringResource(R.string.comparison_select_driver_1),
             drivers = sortedDrivers,
             currentSelected = selectedDriver1,
             excludedDriverNumber = selectedDriver2.driverNumber,
@@ -300,7 +305,7 @@ private fun DriverComparisonView(
 
     if (showPicker2) {
         DriverSelectionSheet(
-            title = "Select Driver 2",
+            title = stringResource(R.string.comparison_select_driver_2),
             drivers = sortedDrivers,
             currentSelected = selectedDriver2,
             excludedDriverNumber = selectedDriver1.driverNumber,
@@ -337,7 +342,7 @@ private fun DriverComparisonView(
                             )
                             Spacer(Modifier.width(6.dp))
                             Text(
-                                text = "TEAMMATE BATTLES",
+                                text = stringResource(R.string.comparison_teammate_battles),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.Black,
                                 letterSpacing = 0.5.sp,
@@ -345,7 +350,7 @@ private fun DriverComparisonView(
                             )
                         }
                         Text(
-                            text = "Quick Select",
+                            text = stringResource(R.string.comparison_quick_select),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -824,7 +829,7 @@ private fun TeamComparisonView(teams: List<DetailedTeamUiModel>) {
 
     if (showPicker1) {
         TeamSelectionSheet(
-            title = "Select Team 1",
+            title = stringResource(R.string.comparison_select_team_1),
             teams = sortedTeams,
             currentSelected = selectedTeam1,
             excludedTeamName = selectedTeam2.teamName,
@@ -838,7 +843,7 @@ private fun TeamComparisonView(teams: List<DetailedTeamUiModel>) {
 
     if (showPicker2) {
         TeamSelectionSheet(
-            title = "Select Team 2",
+            title = stringResource(R.string.comparison_select_team_2),
             teams = sortedTeams,
             currentSelected = selectedTeam2,
             excludedTeamName = selectedTeam1.teamName,
@@ -1231,7 +1236,7 @@ private fun DriverVersusHero(
                 ) {
                     Icon(
                         imageVector = Icons.Default.SwapHoriz,
-                        contentDescription = "Swap",
+                        contentDescription = stringResource(R.string.comparison_swap),
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -1379,7 +1384,7 @@ private fun TeamVersusHero(
             ) {
                 Icon(
                     imageVector = Icons.Default.SwapHoriz,
-                    contentDescription = "Swap",
+                    contentDescription = stringResource(R.string.comparison_swap),
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -1923,12 +1928,12 @@ private fun DriverSelectionSheet(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search driver or team...") },
+                placeholder = { Text(stringResource(R.string.comparison_search_driver)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = { searchQuery = "" }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear")
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear))
                         }
                     }
                 },
@@ -2127,12 +2132,12 @@ private fun TeamSelectionSheet(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search team or constructor...") },
+                placeholder = { Text(stringResource(R.string.comparison_search_team)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = { searchQuery = "" }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear")
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.clear))
                         }
                     }
                 },
@@ -2292,7 +2297,7 @@ private fun EmptyComparisonView(message: String) {
  * Prevents assigning rival teams' signature primary colors (such as Ferrari red to a Red Bull driver).
  * Uses official team accent palettes (such as Red Bull Navy + Sun Yellow, Ferrari Rosso + Modena Yellow).
  */
-private fun getTeammateColors(teamName: String, baseColor: Color): Pair<Color, Color> {
+internal fun getTeammateColors(teamName: String, baseColor: Color): Pair<Color, Color> {
     val lower = teamName.lowercase()
     return when {
         lower.contains("ferrari") -> {

@@ -2,6 +2,7 @@ package com.example.taras.network_calls
 
 object ApiConstants {
     const val BASE_URL_TARAS_GITHUB = "https://yashajagiya.github.io/tarasF1Data/"
+    const val PRIVACY_POLICY_URL = "https://yashajagiya.github.io/tarasF1Data/privacy-policy.html"
 
     const val ENDPOINT_DRIVER_CHAMPIONSHIP = "driversperrace.json"
     const val ENDPOINT_TEAM_CHAMPIONSHIP = "carperrace.json"

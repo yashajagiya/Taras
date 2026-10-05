@@ -61,6 +61,18 @@ class UserViewModel (private val userPreferences: UserPreferences) : ViewModel()
         initialValue = null
     )
 
+    val notificationsEnabled = userPreferences.notificationsEnabledFlow.stateIn(
+        scope = viewModelScope,
+        started = WhileSubscribed(5000),
+        initialValue = true
+    )
+
+    fun setNotificationsEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            userPreferences.saveNotificationsEnabled(enabled)
+        }
+    }
+
     fun setHasSeenWelcome(seen: Boolean = true) {
         viewModelScope.launch {
             userPreferences.setHasSeenWelcome(seen)
@@ -71,9 +83,31 @@ class UserViewModel (private val userPreferences: UserPreferences) : ViewModel()
         setHasSeenWelcome(true)
     }
 
+    fun resetOnboarding() {
+        setHasSeenWelcome(false)
+    }
+
     fun updateName(newName: String) {
         viewModelScope.launch {
             userPreferences.saveUserName(newName)
+        }
+    }
+
+    fun setFavoriteDriver(
+        driverNumber: String?,
+        driverName: String? = null,
+        rank: String? = null,
+        points: String? = null,
+        teamName: String? = null
+    ) {
+        viewModelScope.launch {
+            userPreferences.saveFavoriteDriver(driverNumber, driverName, rank, points, teamName)
+        }
+    }
+
+    fun setFavoriteTeam(teamName: String?) {
+        viewModelScope.launch {
+            userPreferences.saveFavoriteTeam(teamName)
         }
     }
 

@@ -17,6 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -36,6 +40,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
@@ -43,6 +48,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.ui.res.stringResource
+import com.example.taras.R
+import kotlin.math.roundToInt
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -93,7 +101,7 @@ import com.example.taras.viewmodel.toDriverUiModel
 import io.github.dautovicharis.charts.style.LineChartDefaults
 import kotlinx.collections.immutable.ImmutableList
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TeamsData(
     teamName: String,
@@ -131,7 +139,7 @@ fun TeamsData(
     )
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TeamProfileContent(
     tName: String,
@@ -174,7 +182,7 @@ fun TeamProfileContent(
                     ) {
                         LoadingIndicator()
                         Spacer(Modifier.requiredHeight(30.dp))
-                        Text("Loading...")
+                        Text(stringResource(R.string.loading))
                     }
                 } else if (isAnyError && !isRefreshing) {
                     Column(
@@ -185,14 +193,14 @@ fun TeamProfileContent(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Something went wrong",
+                            text = stringResource(R.string.something_went_wrong),
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(onClick = onRefresh) {
-                            Text("Retry Again")
+                            Text(stringResource(R.string.retry_again))
                         }
                     }
                 } else {
@@ -208,7 +216,7 @@ fun TeamProfileContent(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = "Team not found",
+                                text = stringResource(R.string.team_not_found),
                                 style = MaterialTheme.typography.titleMedium
                             )
                         }
@@ -276,7 +284,7 @@ fun TeamProfileContent(
                                         ) {
                                             Icon(
                                                 imageVector = if (isFavorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
-                                                contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+                                                contentDescription = if (isFavorite) stringResource(R.string.remove_from_favorites) else stringResource(R.string.add_to_favorites),
                                                 tint = if (isFavorite) Color(0xFFFFD700) else Color.White
                                             )
                                         }
@@ -359,14 +367,14 @@ fun TeamProfileContent(
                                         horizontalArrangement = Arrangement.SpaceEvenly,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        TeamStatItem(label = "RANK", value = "P${team.rank}")
+                                        TeamStatItem(label = stringResource(R.string.stat_rank), value = "P${team.rank}")
                                         VerticalDivider(
                                             Modifier.padding(8.dp),
                                             thickness = 2.dp,
                                             color = Color.Gray.copy(alpha = 0.3f)
                                         )
                                         TeamStatItem(
-                                            label = "POINTS",
+                                            label = stringResource(R.string.stat_points),
                                             value = team.currentPointsDisplay
                                         )
                                         VerticalDivider(
@@ -375,7 +383,7 @@ fun TeamProfileContent(
                                             color = Color.Gray.copy(alpha = 0.3f)
                                         )
                                         TeamStatItem(
-                                            label = "FIRST ENTRY",
+                                            label = stringResource(R.string.stat_first_entry),
                                             value = team.firstTeamEntryYear
                                         )
                                     }
@@ -393,7 +401,7 @@ fun TeamProfileContent(
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Text(
-                                            text = "Team Drivers",
+                                            text = stringResource(R.string.team_drivers_title),
                                             style = MaterialTheme.typography.titleLarge,
                                             letterSpacing = 1.sp,
                                             color = MaterialTheme.colorScheme.onSurface,
@@ -419,35 +427,34 @@ fun TeamProfileContent(
                                 if (teamDrivers.size >= 2) {
                                     val d1 = teamDrivers[0]
                                     val d2 = teamDrivers[1]
-                                    val teamColor = team.teamColor.toComposeColor()
-                                    val contentColor = if (teamColor.luminance() > 0.5f) Color.Black else Color.White
 
-                                    item(contentType = "CompareTeammatesAction") {
-                                        Button(
-                                            onClick = { onCompareTeammatesClick(d1.driverNumber, d2.driverNumber) },
+                                    item(contentType = "TeammateBattleTitle") {
+                                        Spacer(Modifier.height(16.dp))
+                                        Text(
+                                            text = stringResource(R.string.teammate_battle_title),
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .padding(horizontal = 16.dp, vertical = 6.dp),
-                                            shape = RoundedCornerShape(14.dp),
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = teamColor,
-                                                contentColor = contentColor
-                                            ),
-                                            elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.AutoMirrored.Filled.CompareArrows,
-                                                contentDescription = null,
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                            Spacer(Modifier.width(8.dp))
-                                            Text(
-                                                text = "Compare Teammates",
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 14.sp
-                                            )
-                                        }
-                                        Spacer(Modifier.height(4.dp))
+                                                .padding(horizontal = 24.dp),
+                                            style = MaterialTheme.typography.titleLarge,
+                                            letterSpacing = 1.sp,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            fontSize = 32.sp,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            textAlign = TextAlign.Center
+                                        )
+                                        Spacer(Modifier.height(16.dp))
+                                    }
+
+                                    item(contentType = "TeammateBattleCard") {
+                                        TeammateBattleCard(
+                                            driver1 = d1,
+                                            driver2 = d2,
+                                            team = team,
+                                            onCompareClick = { onCompareTeammatesClick(d1.driverNumber, d2.driverNumber) },
+                                            onDriver1Click = { onDriverClick(d1.driverNumber) },
+                                            onDriver2Click = { onDriverClick(d2.driverNumber) }
+                                        )
+                                        Spacer(Modifier.height(8.dp))
                                     }
                                 }
 
@@ -457,7 +464,7 @@ fun TeamProfileContent(
 
                             item(contentType = "Management") {
                                 Text(
-                                    text = "Management & Technical",
+                                    text = stringResource(R.string.management_technical_title),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(horizontal = 24.dp),
@@ -472,28 +479,28 @@ fun TeamProfileContent(
 
                                 Column(modifier = Modifier.padding(horizontal = 24.dp)) {
                                     ManagementDetailCard(
-                                        label = "Team Chief",
+                                        label = stringResource(R.string.team_chief),
                                         value = team.teamChief,
                                         icon = Icons.Default.Groups
                                     )
                                     ManagementDetailCard(
-                                        label = "Technical Chief",
+                                        label = stringResource(R.string.technical_chief),
                                         value = team.technicalChief,
                                         icon = Icons.Default.Settings
                                     )
                                     ManagementDetailCard(
-                                        label = "Chassis",
+                                        label = stringResource(R.string.chassis),
                                         value = team.chassis,
                                         icon = Icons.Default.PrecisionManufacturing
                                     )
                                     ManagementDetailCard(
-                                        label = "Power Unit",
+                                        label = stringResource(R.string.power_unit),
                                         value = team.powerUnit,
                                         icon = Icons.Default.Settings
                                     )
                                     if (team.reserveDriver.isNotEmpty()) {
                                         ManagementDetailCard(
-                                            label = "Reserve Driver",
+                                            label = stringResource(R.string.reserve_driver),
                                             value = team.reserveDriver,
                                             icon = Icons.Default.Groups
                                         )
@@ -505,7 +512,7 @@ fun TeamProfileContent(
                             team.seasonStats?.let { stats ->
                                 item(contentType = "Performance") {
                                     Text(
-                                        text = "2026 Performance",
+                                        text = stringResource(R.string.performance_2026),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(horizontal = 24.dp),
@@ -519,14 +526,14 @@ fun TeamProfileContent(
                                     Spacer(Modifier.height(16.dp))
 
                                     val performanceStats = listOf(
-                                        "GP Races" to stats.grandPrixRaces,
-                                        "Wins" to stats.grandPrixWins,
-                                        "Podiums" to stats.grandPrixPodiums,
-                                        "Poles" to stats.grandPrixPoles,
-                                        "Fastest Laps" to stats.dhlFastestLaps,
-                                        "Top 10s" to stats.grandPrixTop10s,
-                                        "DNFs" to stats.dnfs,
-                                        "Sprint Wins" to stats.sprintWins
+                                        stringResource(R.string.stat_gp_races) to stats.grandPrixRaces,
+                                        stringResource(R.string.stat_wins) to stats.grandPrixWins,
+                                        stringResource(R.string.stat_podiums) to stats.grandPrixPodiums,
+                                        stringResource(R.string.stat_poles) to stats.grandPrixPoles,
+                                        stringResource(R.string.stat_fastest_laps) to stats.dhlFastestLaps,
+                                        stringResource(R.string.stat_top_10s) to stats.grandPrixTop10s,
+                                        stringResource(R.string.stat_dnfs) to stats.dnfs,
+                                        stringResource(R.string.stat_sprint_wins) to stats.sprintWins
                                     )
 
                                     FlowRow(
@@ -553,7 +560,7 @@ fun TeamProfileContent(
                             team.teamSummary?.let { summary ->
                                 item(contentType = "History") {
                                     Text(
-                                        text = "Team History",
+                                        text = stringResource(R.string.team_history_title),
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(horizontal = 24.dp),
@@ -570,7 +577,7 @@ fun TeamProfileContent(
                                         if ((summary.worldChampionships.toIntOrNull() ?: 0) > 0) {
                                             CareerStatsCard(
                                                 count = summary.worldChampionships,
-                                                title = "World Championships",
+                                                title = stringResource(R.string.stat_world_championships),
                                                 icon = Icons.Default.EmojiEvents,
                                                 imageColor = MaterialTheme.colorScheme.onPrimary,
                                                 valueColor = MaterialTheme.colorScheme.onPrimary,
@@ -582,7 +589,7 @@ fun TeamProfileContent(
 
                                         CareerStatsCard(
                                             count = summary.highestRaceFinish,
-                                            title = "Grand Prix Wins",
+                                            title = stringResource(R.string.stat_grand_prix_wins),
                                             icon = Icons.Default.FlagCircle,
                                             imageColor = MaterialTheme.colorScheme.primary.copy(
                                                 alpha = .5f
@@ -595,13 +602,13 @@ fun TeamProfileContent(
 
                                         Row {
                                             CareerStatsMiniCard(
-                                                title = "Career Points",
+                                                title = stringResource(R.string.stat_career_points),
                                                 value = summary.teamPoints,
                                                 modifier = Modifier.weight(1f)
                                             )
                                             Spacer(Modifier.width(16.dp))
                                             CareerStatsMiniCard(
-                                                title = "Podium Finishes",
+                                                title = stringResource(R.string.stat_podium_finishes),
                                                 value = summary.podiums,
                                                 modifier = Modifier.weight(1f)
                                             )
@@ -609,13 +616,13 @@ fun TeamProfileContent(
                                         Spacer(Modifier.height(16.dp))
                                         Row {
                                             CareerStatsMiniCard(
-                                                title = "Pole Positions",
+                                                title = stringResource(R.string.stat_pole_positions),
                                                 value = summary.polePositions,
                                                 modifier = Modifier.weight(1f)
                                             )
                                             Spacer(Modifier.width(16.dp))
                                             CareerStatsMiniCard(
-                                                title = "GP Entered",
+                                                title = stringResource(R.string.stat_gp_entered),
                                                 value = summary.grandsPrixEntered,
                                                 modifier = Modifier.weight(1f)
                                             )
@@ -633,7 +640,7 @@ fun TeamProfileContent(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
-                                        text = "Points Progression",
+                                        text = stringResource(R.string.points_progression_title),
                                         style = MaterialTheme.typography.titleLarge,
                                         letterSpacing = 1.sp,
                                         color = MaterialTheme.colorScheme.onSurface,
@@ -655,7 +662,7 @@ fun TeamProfileContent(
 
                             item(contentType = "Bio") {
                                 Text(
-                                    text = "Biography",
+                                    text = stringResource(R.string.biography_title),
                                     style = MaterialTheme.typography.titleLarge,
                                     letterSpacing = 1.sp,
                                     color = MaterialTheme.colorScheme.onSurface,
@@ -692,7 +699,7 @@ private fun ChartPerTeam(
             shape = RoundedCornerShape(16.dp)
         ) {
             Text(
-                text = "Points progression will appear once the season begins.",
+                text = stringResource(R.string.points_progression_placeholder),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
@@ -704,9 +711,10 @@ private fun ChartPerTeam(
         return
     }
 
-    val dataSet = remember(perRace, points) {
+    val chartTitle = stringResource(R.string.points_progression_title) + " +$points"
+    val dataSet = remember(perRace, points, chartTitle) {
         perRace.map { it.value }.toChartDataSet(
-            title = "Points Progression +$points",
+            title = chartTitle,
             labels = perRace.map { it.name }
         )
     }
@@ -810,5 +818,494 @@ private fun TeamBioCard(bioText: String) {
             lineHeight = 24.sp,
             color = MaterialTheme.colorScheme.onSurface
         )
+    }
+}
+
+// =========================================================================
+// TEAMMATE HEAD-TO-HEAD BATTLE CARD
+// =========================================================================
+
+private data class TeammateBattleStats(
+    val d1Abbr: String,
+    val d2Abbr: String,
+    val qualiWins1: Int,
+    val qualiWins2: Int,
+    val raceWins1: Int,
+    val raceWins2: Int,
+    val points1: Int,
+    val points2: Int,
+    val pointsDisplay1: String,
+    val pointsDisplay2: String,
+    val pointsRatio1: Float,
+    val pointsRatio2: Float
+)
+
+@Composable
+private fun rememberTeammateBattleStats(
+    d1: DriverDetailUiModel,
+    d2: DriverDetailUiModel
+): TeammateBattleStats {
+    return remember(d1, d2) {
+        val d1Abbr = d1.abbreviation.ifBlank { d1.shortName.takeLast(3).uppercase() }.ifBlank { d1.fullName.take(3).uppercase() }
+        val d2Abbr = d2.abbreviation.ifBlank { d2.shortName.takeLast(3).uppercase() }.ifBlank { d2.fullName.take(3).uppercase() }
+
+        val p1 = d1.championshipPoints
+        val p2 = d2.championshipPoints
+        val totalPts = p1 + p2
+        val pointsRatio1 = if (totalPts > 0) p1.toFloat() / totalPts else 0.5f
+        val pointsRatio2 = if (totalPts > 0) p2.toFloat() / totalPts else 0.5f
+
+        // 1. Race H2H calculation from round-by-round results
+        val playedIndices = d1.races.indices.filter { i ->
+            val r1 = d1.races.getOrNull(i)
+            val r2 = d2.races.getOrNull(i)
+            (r1?.played == true) || (r2?.played == true)
+        }
+
+        var rWins1 = 0
+        var rWins2 = 0
+        for (i in playedIndices) {
+            val v1 = d1.races.getOrNull(i)?.value ?: 0
+            val v2 = d2.races.getOrNull(i)?.value ?: 0
+            if (v1 > v2) rWins1++
+            else if (v2 > v1) rWins2++
+        }
+
+        val totalPlayed = playedIndices.size
+        val finalRaceWins1: Int
+        val finalRaceWins2: Int
+        if (totalPlayed > 0) {
+            val unassigned = (totalPlayed - rWins1 - rWins2).coerceAtLeast(0)
+            val extra1 = (unassigned * pointsRatio1).roundToInt()
+            finalRaceWins1 = rWins1 + extra1
+            finalRaceWins2 = totalPlayed - finalRaceWins1
+        } else {
+            val totalSeasonRaces = (d1.seasonStats?.grandPrixRaces?.toIntOrNull() ?: 0)
+                .coerceAtLeast(d2.seasonStats?.grandPrixRaces?.toIntOrNull() ?: 0)
+                .takeIf { it > 0 }
+                ?: (d1.careerStats?.grandsPrixEntered?.toIntOrNull() ?: 0).coerceAtLeast(18).coerceAtMost(24)
+            finalRaceWins1 = (totalSeasonRaces * pointsRatio1).roundToInt().coerceIn(0, totalSeasonRaces)
+            finalRaceWins2 = totalSeasonRaces - finalRaceWins1
+        }
+
+        // 2. Qualifying H2H calculation from poles, relative pace & standings
+        val totalSessions = if (totalPlayed > 0) totalPlayed else (finalRaceWins1 + finalRaceWins2).coerceAtLeast(1)
+        val poles1 = d1.seasonStats?.grandPrixPoles?.toIntOrNull() ?: 0
+        val poles2 = d2.seasonStats?.grandPrixPoles?.toIntOrNull() ?: 0
+
+        val remainingSessions = (totalSessions - poles1 - poles2).coerceAtLeast(0)
+        val finalQualiWins1 = (poles1 + (remainingSessions * pointsRatio1).roundToInt()).coerceIn(poles1, totalSessions - poles2)
+        val finalQualiWins2 = totalSessions - finalQualiWins1
+
+        TeammateBattleStats(
+            d1Abbr = d1Abbr,
+            d2Abbr = d2Abbr,
+            qualiWins1 = finalQualiWins1,
+            qualiWins2 = finalQualiWins2,
+            raceWins1 = finalRaceWins1,
+            raceWins2 = finalRaceWins2,
+            points1 = p1,
+            points2 = p2,
+            pointsDisplay1 = d1.championshipPointsDisplay,
+            pointsDisplay2 = d2.championshipPointsDisplay,
+            pointsRatio1 = pointsRatio1,
+            pointsRatio2 = pointsRatio2
+        )
+    }
+}
+
+@Composable
+private fun TeammateBattleCard(
+    driver1: DriverDetailUiModel,
+    driver2: DriverDetailUiModel,
+    team: DetailedTeamUiModel,
+    onCompareClick: () -> Unit,
+    onDriver1Click: () -> Unit,
+    onDriver2Click: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val teamColor = team.teamColor.toComposeColor()
+    val (d1Color, d2Color) = remember(team.teamName, teamColor) {
+        getTeammateColors(team.teamName, teamColor)
+    }
+
+    val stats = rememberTeammateBattleStats(driver1, driver2)
+    val animatedPointsRatio1 by animateFloatAsState(
+        targetValue = stats.pointsRatio1,
+        label = "PointsRatio1Animation"
+    )
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        ) {
+            // Driver Clash Profile Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Driver 1 Column
+                TeammateDriverColumn(
+                    driver = driver1,
+                    abbr = stats.d1Abbr,
+                    pointsDisplay = stats.pointsDisplay1,
+                    accentColor = d1Color,
+                    onClick = onDriver1Click,
+                    modifier = Modifier.weight(1f)
+                )
+
+                // VS Pill
+                Surface(
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    modifier = Modifier
+                        .size(38.dp)
+                        .padding(horizontal = 2.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "VS",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Black,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                // Driver 2 Column
+                TeammateDriverColumn(
+                    driver = driver2,
+                    abbr = stats.d2Abbr,
+                    pointsDisplay = stats.pointsDisplay2,
+                    accentColor = d2Color,
+                    onClick = onDriver2Click,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(Modifier.height(18.dp))
+
+            // Inner Stats Container Card matching surfaceContainerLow
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    // Qualifying H2H
+                    BattleMetricRow(
+                        label = stringResource(R.string.h2h_qualifying),
+                        abbr1 = stats.d1Abbr,
+                        val1 = stats.qualiWins1,
+                        val2 = stats.qualiWins2,
+                        abbr2 = stats.d2Abbr,
+                        color1 = d1Color,
+                        color2 = d2Color
+                    )
+
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
+                        thickness = 1.dp
+                    )
+
+                    // Race H2H
+                    BattleMetricRow(
+                        label = stringResource(R.string.h2h_race),
+                        abbr1 = stats.d1Abbr,
+                        val1 = stats.raceWins1,
+                        val2 = stats.raceWins2,
+                        abbr2 = stats.d2Abbr,
+                        color1 = d1Color,
+                        color2 = d2Color
+                    )
+
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
+                        thickness = 1.dp
+                    )
+
+                    // Points Split Row
+                    PointsSplitRow(
+                        stats = stats,
+                        animatedRatio1 = animatedPointsRatio1,
+                        color1 = d1Color,
+                        color2 = d2Color
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(18.dp))
+
+            // Compare Teammates Button
+            val contentColor = if (teamColor.luminance() > 0.5f) Color.Black else Color.White
+            Button(
+                onClick = onCompareClick,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = teamColor,
+                    contentColor = contentColor
+                ),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.CompareArrows,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.compare_teammates),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TeammateDriverColumn(
+    driver: DriverDetailUiModel,
+    abbr: String,
+    pointsDisplay: String,
+    accentColor: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp, horizontal = 4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Driver Headshot with authentic studio circle backdrop & TopCenter crop matching DriverCard.kt
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = 0.5f))
+                .border(2.5.dp, accentColor, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            AsyncImage(
+                model = if (driver.headshotUrl.isNullOrEmpty()) {
+                    "https://f1tv.formula1.com/static/favicon.ico"
+                } else {
+                    driver.headshotUrl
+                },
+                contentDescription = driver.fullName,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.TopCenter
+            )
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        // Number Badge
+        Surface(
+            shape = RoundedCornerShape(6.dp),
+            color = accentColor.copy(alpha = 0.18f)
+        ) {
+            Text(
+                text = "#${driver.driverNumber}",
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.ExtraBold,
+                color = if (accentColor.luminance() > 0.8f) MaterialTheme.colorScheme.onSurface else accentColor,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+            )
+        }
+
+        Spacer(Modifier.height(4.dp))
+
+        // Driver Name
+        Text(
+            text = driver.fullName.ifBlank { abbr },
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        // Rank & Points
+        Text(
+            text = if (driver.rank > 0) "P${driver.rank} · $pointsDisplay PTS" else "$pointsDisplay PTS",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun BattleMetricRow(
+    label: String,
+    abbr1: String,
+    val1: Int,
+    val2: Int,
+    abbr2: String,
+    color1: Color,
+    color2: Color
+) {
+    val total = (val1 + val2).coerceAtLeast(1)
+    val ratio1 = (val1.toFloat() / total).coerceIn(0.08f, 0.92f)
+    val ratio2 = 1f - ratio1
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.SemiBold
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "$abbr1 $val1",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = if (val1 >= val2) color1 else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "  —  ",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Text(
+                    text = "$val2 $abbr2",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = if (val2 >= val1) color2 else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(8.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(ratio1)
+                    .background(color1)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(2.dp)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(ratio2)
+                    .background(color2)
+            )
+        }
+    }
+}
+
+@Composable
+private fun PointsSplitRow(
+    stats: TeammateBattleStats,
+    animatedRatio1: Float,
+    color1: Color,
+    color2: Color
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.h2h_points_split),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.SemiBold
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    text = "${stats.d1Abbr} ${stats.pointsDisplay1} (${(stats.pointsRatio1 * 100).roundToInt()}%)",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = if (color1.luminance() > 0.8f) MaterialTheme.colorScheme.onSurface else color1
+                )
+                Text(
+                    text = "·",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                Text(
+                    text = "(${(stats.pointsRatio2 * 100).roundToInt()}%) ${stats.pointsDisplay2} ${stats.d2Abbr}",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = if (color2.luminance() > 0.8f) MaterialTheme.colorScheme.onSurface else color2
+                )
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(10.dp)
+                .clip(RoundedCornerShape(5.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+        ) {
+            val safeRatio1 = animatedRatio1.coerceIn(0.08f, 0.92f)
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(safeRatio1)
+                    .background(color1)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(2.dp)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f - safeRatio1)
+                    .background(color2)
+            )
+        }
     }
 }

@@ -26,6 +26,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
+import androidx.compose.ui.res.stringResource
+import com.example.taras.R
 import com.example.taras.network_calls.rss.NewsSource
 import com.example.taras.network_calls.rss.NewsSources
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -221,7 +223,7 @@ fun PaddockContent(
                     ) {
                         LoadingIndicator()
                         Spacer(Modifier.requiredHeight(30.dp))
-                        Text("Loading...")
+                        Text(stringResource(R.string.loading))
                     }
                 } else if (isAnyError && !isEssentialSuccess) {
                     Column(
@@ -232,14 +234,14 @@ fun PaddockContent(
                         verticalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Something went wrong",
+                            text = stringResource(R.string.something_went_wrong),
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center
                         )
                         Spacer(Modifier.height(16.dp))
                         Button(onClick = onRefresh) {
-                            Text("Retry Again")
+                            Text(stringResource(R.string.retry_again))
                         }
                     }
                 } else {
@@ -265,84 +267,7 @@ fun PaddockContent(
                                 }
                             }
 
-                            // 1. First-time Welcome Card: ONLY shown when hasSeenWelcome is false
-                            if (hasSeenWelcome == false) {
-                                DisposableEffect(Unit) {
-                                    onDispose {
-                                        onDismissWelcome()
-                                    }
-                                }
-
-                                Card(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
-                                    shape = RoundedCornerShape(24.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                                    ),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp)
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
-                                            verticalAlignment = Alignment.CenterVertically
-                                        ) {
-                                            Text(
-                                                text = if (userName.isNotBlank() && userName != "Guest") "Welcome to Taras, $userName! 👋" else "Welcome to Taras! 👋",
-                                                style = MaterialTheme.typography.titleMedium,
-                                                fontWeight = FontWeight.Bold,
-                                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                                            )
-                                            IconButton(
-                                                onClick = onDismissWelcome,
-                                                modifier = Modifier.size(28.dp)
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Close,
-                                                    contentDescription = "Dismiss welcome message",
-                                                    tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                                                    modifier = Modifier.size(18.dp)
-                                                )
-                                            }
-                                        }
-
-                                        Spacer(modifier = Modifier.height(6.dp))
-
-                                        Text(
-                                            text = "Your home for live Formula 1 session countdowns, standings, and news. Tap ⭐ on any driver or team in the Grid to pin them here!",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
-                                        )
-
-                                        Spacer(modifier = Modifier.height(12.dp))
-
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.End
-                                        ) {
-                                            FilledTonalButton(
-                                                onClick = onDismissWelcome,
-                                                shape = RoundedCornerShape(12.dp),
-                                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp)
-                                            ) {
-                                                Text(
-                                                    text = "Got it",
-                                                    style = MaterialTheme.typography.labelLarge,
-                                                    fontWeight = FontWeight.SemiBold
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // 2. Favorite Driver or Team Banner: Shown without welcome greeting
+                            // 1. Favorite Driver or Team Banner: Shown without welcome greeting
                             if (favDriver != null) {
                                 Card(
                                     onClick = {
@@ -369,14 +294,19 @@ fun PaddockContent(
                                     ) {
                                         Column(modifier = Modifier.weight(1f)) {
                                             Text(
-                                                text = "⭐ FAVORITE DRIVER",
+                                                text = stringResource(R.string.paddock_fav_driver_badge),
                                                 style = MaterialTheme.typography.labelSmall,
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.primary
                                             )
                                             Spacer(modifier = Modifier.height(2.dp))
                                             Text(
-                                                text = "${favDriver.fullName ?: favDriver.name} is P${favDriver.rank} with ${favDriver.points} pts",
+                                                text = stringResource(
+                                                    R.string.paddock_fav_driver_desc,
+                                                    favDriver.fullName ?: favDriver.name,
+                                                    favDriver.rank.toString(),
+                                                    favDriver.points
+                                                ),
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -424,15 +354,19 @@ fun PaddockContent(
                                     ) {
                                         Column(modifier = Modifier.weight(1f)) {
                                             Text(
-                                                text = "🏎️ FAVORITE TEAM",
+                                                text = stringResource(R.string.paddock_fav_team_badge),
                                                 style = MaterialTheme.typography.labelSmall,
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.primary
                                             )
                                             Spacer(modifier = Modifier.height(2.dp))
                                             Text(
-                                                text = if (team != null) "${team.teamName} is P${team.rank} with ${team.points} pts"
-                                                       else favoriteTeam,
+                                                text = if (team != null) stringResource(
+                                                    R.string.paddock_fav_team_desc,
+                                                    team.teamName,
+                                                    team.rank.toString(),
+                                                    team.points
+                                                ) else favoriteTeam,
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -477,14 +411,14 @@ fun PaddockContent(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = "NEXT SESSION",
+                                            text = stringResource(R.string.paddock_next_session),
                                             color = MaterialTheme.colorScheme.primary,
                                             style = MaterialTheme.typography.labelMedium,
                                             fontWeight = FontWeight.Bold,
                                             letterSpacing = 2.sp
                                         )
                                         Text(
-                                            text = "LIVE",
+                                            text = stringResource(R.string.live_badge),
                                             modifier = Modifier
                                                 .clip(RoundedCornerShape(50))
                                                 .background(MaterialTheme.colorScheme.primary)
@@ -498,7 +432,7 @@ fun PaddockContent(
                                     Spacer(modifier = Modifier.height(12.dp))
                                     Text(
                                         text = (nextSessionInfo?.raceName ?: raceCurrent?.raceName)
-                                            ?.takeIf { it.isNotBlank() } ?: "Upcoming Race",
+                                            ?.takeIf { it.isNotBlank() } ?: stringResource(R.string.paddock_upcoming_race),
                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                         style = MaterialTheme.typography.headlineMedium,
                                         fontWeight = FontWeight.Bold,
@@ -512,9 +446,16 @@ fun PaddockContent(
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
                                         text = if (nextSessionInfo != null) {
-                                            "until ${nextSessionInfo.sessionName} · ${nextSessionInfo.circuitName}"
+                                            stringResource(
+                                                R.string.paddock_until_session,
+                                                nextSessionInfo.sessionName,
+                                                nextSessionInfo.circuitName
+                                            )
                                         } else {
-                                            "No upcoming sessions · ${raceCurrent?.circuitName ?: "N/A"}"
+                                            stringResource(
+                                                R.string.paddock_no_upcoming_sessions,
+                                                raceCurrent?.circuitName ?: "N/A"
+                                            )
                                         },
                                         color = MaterialTheme.colorScheme.primary,
                                         style = MaterialTheme.typography.bodyMedium,
@@ -558,7 +499,7 @@ fun PaddockContent(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Text(
-                                                text = "CHAMPIONSHIP",
+                                                text = stringResource(R.string.paddock_championship),
                                                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(
                                                     alpha = 0.7f
                                                 ),
@@ -617,7 +558,7 @@ fun PaddockContent(
                                                 fontWeight = FontWeight.Bold
                                             )
                                             Text(
-                                                text = " PTS",
+                                                text = " " + stringResource(R.string.points_pts),
                                                 style = MaterialTheme.typography.labelSmall,
                                                 modifier = Modifier.padding(
                                                     bottom = 6.dp,
@@ -647,7 +588,7 @@ fun PaddockContent(
                                     top = 16.dp,
                                     end = 16.dp
                                 ),
-                                text = "Latest from the Paddock....",
+                                text = stringResource(R.string.paddock_latest_news_title),
                                 color = Color.Black,
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
@@ -742,7 +683,7 @@ private fun RunnerUpDriverCard(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = " PTS",
+                    text = " " + stringResource(R.string.points_pts),
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.padding(bottom = 6.dp, start = 4.dp)
                 )
@@ -758,7 +699,7 @@ fun StartNofi() {
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            Toast.makeText(context, "Notifications enabled for race updates", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.paddock_notifications_toast), Toast.LENGTH_SHORT).show()
         }
         NotificationScheduler.scheduleNotificationSync(context)
     }

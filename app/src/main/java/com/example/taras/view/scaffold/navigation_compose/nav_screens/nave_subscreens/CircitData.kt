@@ -34,6 +34,8 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import com.example.taras.R
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -135,7 +137,7 @@ fun CircuitProfileContent(
                         ) {
                             LoadingIndicator()
                             Spacer(Modifier.requiredHeight(30.dp))
-                            Text("Loading Circuit Data...")
+                            Text(stringResource(R.string.circuit_loading))
                         }
                     }
 
@@ -155,7 +157,7 @@ fun CircuitProfileContent(
                             )
                             Spacer(Modifier.height(16.dp))
                             Button(onClick = onRefresh) {
-                                Text("Retry")
+                                Text(stringResource(R.string.retry))
                             }
                         }
                     }
@@ -172,7 +174,7 @@ fun CircuitProfileContent(
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 Text(
-                                    text = "Circuit information not found",
+                                    text = stringResource(R.string.circuit_not_found),
                                     style = MaterialTheme.typography.titleMedium
                                 )
                             }
@@ -247,7 +249,7 @@ fun WinnerCard(race: RaceClearData, modifier: Modifier = Modifier) {
 
             Column {
                 Text(
-                    text = "RACE WINNER",
+                    text = stringResource(R.string.circuit_race_winner),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                     fontWeight = FontWeight.ExtraBold,
@@ -311,7 +313,7 @@ fun CircuitHeader(
                     shape = CircleShape
                 ) {
                     Text(
-                        text = "ROUND ${race.roundNumber} • ${race.gpName.uppercase()}",
+                        text = stringResource(R.string.circuit_round_header, race.roundNumber, race.gpName.uppercase()),
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimary,
@@ -370,7 +372,7 @@ fun TechnicalSpecsCard(race: RaceClearData, modifier: Modifier = Modifier) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Circuit Data",
+                    text = stringResource(R.string.circuit_data_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -378,12 +380,12 @@ fun TechnicalSpecsCard(race: RaceClearData, modifier: Modifier = Modifier) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            SpecRow(label = "CORNERS", value = race.corners?.toString() ?: "N/A")
+            SpecRow(label = stringResource(R.string.circuit_spec_corners), value = race.corners?.toString() ?: "N/A")
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 12.dp),
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
             )
-            SpecRow(label = "LENGTH", value = race.circuitLength)
+            SpecRow(label = stringResource(R.string.circuit_spec_length), value = race.circuitLength)
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 12.dp),
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
@@ -394,7 +396,7 @@ fun TechnicalSpecsCard(race: RaceClearData, modifier: Modifier = Modifier) {
                 verticalAlignment = Alignment.Top
             ) {
                 Text(
-                    text = "LAP RECORD",
+                    text = stringResource(R.string.circuit_spec_lap_record),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold
@@ -420,13 +422,13 @@ fun TechnicalSpecsCard(race: RaceClearData, modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(vertical = 12.dp),
                 color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
             )
-            SpecRow(label = "FIRST GP", value = race.firstParticipationYear?.toString() ?: "N/A")
+            SpecRow(label = stringResource(R.string.circuit_spec_first_gp), value = race.firstParticipationYear?.toString() ?: "N/A")
             if (race.laps != null) {
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 12.dp),
                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
                 )
-                SpecRow(label = "LAPS", value = race.laps.toString())
+                SpecRow(label = stringResource(R.string.circuit_spec_laps), value = race.laps.toString())
             }
         }
     }
@@ -476,7 +478,7 @@ fun WeekendScheduleSection(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Weekend Schedule",
+                text = stringResource(R.string.circuit_weekend_schedule),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -496,44 +498,48 @@ fun WeekendScheduleSection(
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
-                SessionTimelineItem(name = "FP1", type = "Practice", time = race.fp1)
+                SessionTimelineItem(
+                    name = stringResource(R.string.session_fp1),
+                    type = stringResource(R.string.session_type_practice),
+                    time = race.fp1
+                )
                 race.fp2.date?.let {
                     SessionTimelineItem(
-                        name = "FP2",
-                        type = "Practice",
+                        name = stringResource(R.string.session_fp2),
+                        type = stringResource(R.string.session_type_practice),
                         time = race.fp2
                     )
                 }
                 race.fp3.date?.let {
                     SessionTimelineItem(
-                        name = "FP3",
-                        type = "Practice",
+                        name = stringResource(R.string.session_fp3),
+                        type = stringResource(R.string.session_type_practice),
                         time = race.fp3
                     )
                 }
                 race.sprintQualy.date?.let {
                     SessionTimelineItem(
-                        name = "Sprint Qualy",
-                        type = "Grid Setup",
+                        name = stringResource(R.string.session_sprint_qualy),
+                        type = stringResource(R.string.session_type_grid_setup),
                         time = race.sprintQualy
                     )
                 }
                 race.sprintRace.date?.let {
                     SessionTimelineItem(
-                        name = "Sprint Race",
-                        type = "Sprint",
+                        name = stringResource(R.string.session_sprint_race),
+                        type = stringResource(R.string.session_type_sprint),
                         time = race.sprintRace
                     )
                 }
                 SessionTimelineItem(
-                    name = "Qualifying",
-                    type = "Grid Setup",
+                    name = stringResource(R.string.session_qualy),
+                    type = stringResource(R.string.session_type_grid_setup),
                     time = race.qualy,
                     isHighlight = true
                 )
                 SessionTimelineItem(
-                    name = "Race",
-                    type = "Grand Prix",
+                    name = stringResource(R.string.race_card_full_race),
+                    type = stringResource(R.string.session_type_grand_prix),
                     time = race.race,
                     isHighlight = true,
                     isRace = true

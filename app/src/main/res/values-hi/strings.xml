@@ -1,0 +1,279 @@
+<resources>
+    <string name="app_name">Taras</string>
+    <string name="widget_next_race_label">अगला सत्र</string>
+    <string name="widget_next_race_desc">आगामी रेस सत्र और काउंटडाउन</string>
+    <string name="widget_standings_label">चैंपियनशिप स्टैंडिंग</string>
+    <string name="widget_standings_desc">चैंपियनशिप स्टैंडिंग में शीर्ष 3 ड्राइवर्स</string>
+    <string name="widget_favorite_driver_label">पसंदीदा ड्राइवर</string>
+    <string name="widget_favorite_driver_desc">अपने पसंदीदा ड्राइवर की स्थिति, अंक और पिछले परिणाम ट्रैक करें</string>
+    <string name="widget_race_result_label">पिछली रेस के परिणाम</string>
+    <string name="widget_race_result_desc">नवीनतम ग्रां प्री के पोडियम फिनिशर</string>
+
+    <!-- Navigation -->
+    <string name="nav_paddock">पैडॉक</string>
+    <string name="nav_grid">ग्रिड</string>
+    <string name="nav_calendar">कैलेंडर</string>
+    <string name="nav_results">परिणाम</string>
+    <string name="topbar_user_profile">उपयोगकर्ता प्रोफ़ाइल</string>
+    <string name="action_back">पीछे जाएं</string>
+
+    <!-- Common Actions & Statuses -->
+    <string name="loading">लोड हो रहा है…</string>
+    <string name="retry_again">पुनः प्रयास करें</string>
+    <string name="retry">पुनः प्रयास</string>
+    <string name="something_went_wrong">कुछ गलत हो गया</string>
+    <string name="no_internet_connection">इंटरनेट कनेक्शन नहीं है</string>
+    <string name="share">साझा करें</string>
+    <string name="close">बंद करें</string>
+    <string name="copy">कॉपी करें</string>
+    <string name="done">हो गया</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="continue_text">जारी रखें</string>
+    <string name="dismiss">खारिज करें</string>
+    <string name="skip">छोड़ें</string>
+    <string name="clear">हटाएं</string>
+    <string name="pos_prefix">स्थान: %1$s</string>
+    <string name="pts_prefix">अंक: %1$s</string>
+    <string name="points_pts">अंक</string>
+    <string name="live_badge">लाइव</string>
+    <string name="upcoming_badge">आगामी</string>
+    <string name="first_place">प्रथम स्थान</string>
+
+    <!-- Drawer / Settings -->
+    <string name="drawer_title">TARAS</string>
+    <string name="drawer_hello_user">नमस्ते %1$s</string>
+    <string name="drawer_user_name_dialog_title">अपना नाम दर्ज करें</string>
+    <string name="drawer_name_label">नाम</string>
+    <string name="drawer_github">GitHub</string>
+    <string name="drawer_theme">थीम: %1$s</string>
+    <string name="drawer_widget_theme">विजेट थीम: %1$s</string>
+    <string name="drawer_language">भाषा: %1$s</string>
+    <string name="drawer_notification_permission">सूचना अनुमति</string>
+    <string name="drawer_welcome_guide">स्वागत गाइड और सेटअप</string>
+    <string name="drawer_about_privacy">के बारे में और गोपनीयता नीति</string>
+
+    <!-- In-App Privacy Policy -->
+    <string name="privacy_policy_title">गोपनीयता नीति</string>
+    <string name="privacy_badge_no_data">100% निजी · कोई डेटा एकत्र नहीं</string>
+    <string name="privacy_core_commitment">मूल प्रतिबद्धता</string>
+    <string name="privacy_core_commitment_desc">हम कोई व्यक्तिगत डेटा एकत्र नहीं करते हैं। आपका नाम और पसंदीदा ड्राइवर प्राथमिकताएं डेटास्टोर के माध्यम से आपके डिवाइस पर स्थानीय रूप से संग्रहीत की जाती हैं। कोई भी डेटा किसी सर्वर पर नहीं भेजा जाता है। समाचार सार्वजनिक आरएसएस फ़ीड से प्राप्त किए जाते हैं।</string>
+    <string name="privacy_sec_no_data_title">कोई व्यक्तिगत डेटा एकत्र नहीं</string>
+    <string name="privacy_sec_no_data_p1">तरास एक ओपन-सोर्स, गैर-व्यावसायिक F1 साथी ऐप है। हम पूर्ण पारदर्शिता और अधिकतम गोपनीयता में विश्वास करते हैं:</string>
+    <string name="privacy_sec_no_data_item1">कोई नाम, ईमेल, फोन नंबर या खाता लॉगिन नहीं</string>
+    <string name="privacy_sec_no_data_item2">कोई सटीक या अनुमानित स्थान ट्रैकिंग नहीं</string>
+    <string name="privacy_sec_no_data_item3">कोई विज्ञापन आईडी (GAID), डिवाइस आईडी या आईपी लॉगिंग नहीं</string>
+    <string name="privacy_sec_no_data_item4">कोई व्यावसायिक विज्ञापन SDK, मार्केटिंग ट्रैकर या एनालिटिक्स नहीं</string>
+    <string name="privacy_sec_storage_title">पूरी तरह से ऑन-डिवाइस स्टोरेज</string>
+    <string name="privacy_sec_storage_desc">आपका उपनाम, पसंदीदा ड्राइवर, पसंदीदा टीम और थीम प्राथमिकताएं Android Jetpack DataStore और Room का उपयोग करके विशेष रूप से आपके डिवाइस पर संग्रहीत की जाती हैं। कोई भी डेटा कभी भी बाहरी सर्वर पर प्रेषित नहीं होता है। आप ऐप स्टोरेज साफ़ करके या अनइंस्टॉल करके कभी भी सभी डेटा मिटा सकते हैं।</string>
+    <string name="privacy_sec_network_title">सार्वजनिक फ़ीड और एन्क्रिप्शन</string>
+    <string name="privacy_sec_network_desc">रेस शेड्यूल और स्टैंडिंग गिटहब पर सार्वजनिक स्थिर फ़ाइलों से प्राप्त किए जाते हैं। समाचार लेख सार्वजनिक आरएसएस फ़ीड से सीधे आपके डिवाइस पर पार्स किए जाते हैं। सभी नेटवर्क कनेक्शन सुरक्षित HTTPS का उपयोग करते हैं।</string>
+    <string name="privacy_sec_notifications_title">डिवाइस अनुमतियाँ</string>
+    <string name="privacy_sec_notifications_desc">अधिसूचना अनुमति (POST_NOTIFICATIONS) का उपयोग केवल Android WorkManager द्वारा आपके फ़ोन पर निर्धारित स्थानीय रेस काउंटडाउन अनुस्मारक देने के लिए किया जाता है। कोई दूरस्थ पुश टोकन एकत्र नहीं किया जाता है।</string>
+    <string name="privacy_sec_opensource_title">ओपन सोर्स पारदर्शिता</string>
+    <string name="privacy_sec_opensource_desc">तरास अपाचे 2.0 लाइसेंस के तहत पूरी तरह से ओपन-सोर्स है। हमारी गोपनीयता प्रतिबद्धताओं को सत्यापित करने के लिए कोई भी गिटहब पर कोड का निरीक्षण कर सकता है।</string>
+    <string name="privacy_btn_view_online">ऑनलाइन नीति देखें</string>
+    <string name="privacy_btn_got_it">समझ गया</string>
+    <string name="drawer_notifications_already_granted">अनुमति पहले से दी जा चुकी है</string>
+    <string name="drawer_could_not_open_settings">सेटिंग्स नहीं खोली जा सकी</string>
+    <string name="theme_light">लाइट</string>
+    <string name="theme_dark">डार्क</string>
+    <string name="theme_system">सिस्टम</string>
+    <string name="theme_system_default">सिस्टम डिफ़ॉल्ट</string>
+
+    <!-- Language Names -->
+    <string name="lang_system_default">सिस्टम डिफ़ॉल्ट</string>
+    <string name="lang_en">English (अंग्रेजी)</string>
+    <string name="lang_hi">हिन्दी (Hindi)</string>
+    <string name="lang_es">Español (स्पैनिश)</string>
+    <string name="lang_de">Deutsch (जर्मन)</string>
+    <string name="lang_fr">Français (फ्रेंच)</string>
+    <string name="lang_ja">日本語 (जापानी)</string>
+    <string name="lang_pt">Português (पुर्तगाली)</string>
+
+    <!-- Notification Dialogs -->
+    <string name="dialog_enable_notifications_title">सूचनाएं सक्षम करें</string>
+    <string name="dialog_enable_notifications_desc">रेस शेड्यूल, परिणाम और ताज़ा F1 समाचारों से अपडेट रहें। कृपया अगली स्क्रीन पर अनुमति दें।</string>
+    <string name="dialog_permissions_required_title">अनुमति आवश्यक है</string>
+    <string name="dialog_permissions_required_desc">सूचना अनुमतियां बंद हैं। अपडेट प्राप्त करने के लिए कृपया ऐप सेटिंग्स में जाकर उन्हें सक्षम करें।</string>
+    <string name="dialog_open_settings">सेटिंग्स खोलें</string>
+
+    <!-- Paddock Screen -->
+    <string name="paddock_fav_driver_badge">⭐ पसंदीदा ड्राइवर</string>
+    <string name="paddock_fav_driver_desc">%1$s %3$s अंकों के साथ P%2$s पर हैं</string>
+    <string name="paddock_fav_team_badge">🏎️ पसंदीदा टीम</string>
+    <string name="paddock_fav_team_desc">%1$s %3$s अंकों के साथ P%2$s पर हैं</string>
+    <string name="paddock_next_session">अगला सत्र</string>
+    <string name="paddock_upcoming_race">आगामी रेस</string>
+    <string name="paddock_until_session">%1$s · %2$s तक</string>
+    <string name="paddock_no_upcoming_sessions">कोई आगामी सत्र नहीं · %1$s</string>
+    <string name="paddock_championship">चैंपियनशिप</string>
+    <string name="paddock_latest_news_title">पैडॉक से ताज़ा समाचार....</string>
+    <string name="paddock_notifications_toast">रेस अपडेट के लिए सूचनाएं सक्षम की गईं</string>
+
+    <!-- Grid Screen -->
+    <string name="grid_tab_drivers">ड्राइवर्स</string>
+    <string name="grid_tab_teams">टीमें</string>
+    <string name="grid_compare_drivers">ड्राइवर्स की तुलना करें</string>
+    <string name="grid_loading_drivers">ड्राइवर्स लोड हो रहे हैं…</string>
+    <string name="grid_loading_teams">टीमें लोड हो रही हैं…</string>
+    <string name="grid_no_drivers_found">कोई ड्राइवर नहीं मिला</string>
+    <string name="grid_no_teams_found">कोई टीम नहीं मिली</string>
+
+    <!-- Calendar Screen & Race Cards -->
+    <string name="race_card_circuit_explorer">सर्किट एक्सप्लोरर</string>
+    <string name="race_card_weekend_schedule">सप्ताहांत शेड्यूल</string>
+    <string name="race_card_full_race">मुख्य रेस</string>
+    <string name="session_fp1">FP1</string>
+    <string name="session_fp2">FP2</string>
+    <string name="session_fp3">FP3</string>
+    <string name="session_sprint_qualy">स्प्रिंट क्वालिफाइंग</string>
+    <string name="session_sprint_race">स्प्रिंट रेस</string>
+    <string name="session_qualy">क्वालिफाइंग</string>
+    <string name="session_results">परिणाम</string>
+
+    <!-- Circuit Data Screen -->
+    <string name="circuit_loading">सर्किट डेटा लोड हो रहा है…</string>
+    <string name="circuit_not_found">सर्किट की जानकारी नहीं मिली</string>
+    <string name="circuit_race_winner">रेस विजेता</string>
+    <string name="circuit_round_header">राउंड %1$s • %2$s</string>
+    <string name="circuit_data_title">सर्किट डेटा</string>
+    <string name="circuit_spec_corners">मोड़ (कॉर्नर)</string>
+    <string name="circuit_spec_length">लंबाई</string>
+    <string name="circuit_spec_lap_record">लैप रिकॉर्ड</string>
+    <string name="circuit_spec_first_gp">पहला ग्रां प्री</string>
+    <string name="circuit_spec_laps">लैप्स</string>
+    <string name="circuit_weekend_schedule">सप्ताहांत शेड्यूल</string>
+    <string name="session_type_practice">अभ्यास</string>
+    <string name="session_type_grid_setup">ग्रिड सेटअप</string>
+    <string name="session_type_sprint">स्प्रिंट</string>
+    <string name="session_type_grand_prix">ग्रां प्री</string>
+
+    <!-- F1 Results Screen -->
+    <string name="results_share_button">परिणाम साझा करें</string>
+    <string name="results_share_sheet_title">परिणाम साझा करें</string>
+    <string name="results_share_sheet_subtitle">साझा करने या कॉपी करने के लिए तैयार सारांश</string>
+    <string name="results_summary_format">सारांश प्रारूप</string>
+    <string name="results_limit_podium">पोडियम (शीर्ष 3)</string>
+    <string name="results_limit_top10">शीर्ष 10</string>
+    <string name="results_limit_all">सभी (%1$d)</string>
+    <string name="results_preview">पूर्वावलोकन</string>
+    <string name="results_copy_text">टेक्स्ट कॉपी करें</string>
+    <string name="results_share_text">टेक्स्ट साझा करें</string>
+    <string name="results_share_graphic_card">ग्राफिक कार्ड (छवि) साझा करें</string>
+    <string name="results_col_time">समय</string>
+    <string name="results_col_gap">अंतर (गैप)</string>
+    <string name="results_col_laps">लैप्स</string>
+    <string name="results_session_not_started">सत्र अभी शुरू नहीं हुआ है</string>
+    <string name="results_scheduled_for">शेड्यूल किया गया: %1$s</string>
+    <string name="results_no_data">इस सत्र के लिए कोई डेटा नहीं मिला।</string>
+    <string name="results_loading_fp">अभ्यास परिणाम लोड हो रहे हैं…</string>
+    <string name="results_loading_sprint_qualy">स्प्रिंट क्वालिफाइंग परिणाम लोड हो रहे हैं…</string>
+    <string name="results_loading_sprint_race">स्प्रिंट रेस परिणाम लोड हो रहे हैं…</string>
+    <string name="results_loading_qualy">क्वालिफाइंग परिणाम लोड हो रहे हैं…</string>
+    <string name="results_loading_race">रेस परिणाम लोड हो रहे हैं…</string>
+
+    <!-- Driver & Team Profile Screens -->
+    <string name="driver_not_found">ड्राइवर नहीं मिला</string>
+    <string name="team_not_found">टीम नहीं मिली</string>
+    <string name="add_to_favorites">पसंदीदा में जोड़ें</string>
+    <string name="remove_from_favorites">पसंदीदा से हटाएं</string>
+    <string name="stat_rank">रैंक</string>
+    <string name="stat_code">कोड</string>
+    <string name="stat_points">अंक</string>
+    <string name="stat_first_entry">प्रथम प्रवेश</string>
+    <string name="teammate_title">टीम के साथी</string>
+    <string name="team_drivers_title">टीम ड्राइवर्स</string>
+    <string name="compare_teammates">साथियों की तुलना करें</string>
+    <string name="teammate_battle_title">टीममेट मुकाबला</string>
+    <string name="h2h_qualifying">क्वालिफाइंग H2H</string>
+    <string name="h2h_race">रेस H2H</string>
+    <string name="h2h_points_split">अंक तुलना</string>
+    <string name="performance_2026">2026 प्रदर्शन</string>
+    <string name="career_stats_title">करियर आंकड़े</string>
+    <string name="team_history_title">टीम का इतिहास</string>
+    <string name="management_technical_title">प्रबंधन और तकनीकी</string>
+    <string name="team_chief">टीम प्रमुख</string>
+    <string name="technical_chief">तकनीकी प्रमुख</string>
+    <string name="chassis">चेसिस</string>
+    <string name="power_unit">पावर यूनिट</string>
+    <string name="reserve_driver">रिज़र्व ड्राइवर</string>
+    <string name="stat_world_championships">विश्व चैंपियनशिप</string>
+    <string name="stat_grand_prix_wins">ग्रां प्री जीत</string>
+    <string name="stat_podium_finishes">पोडियम फिनिश</string>
+    <string name="stat_gp_entered">प्रविष्ट ग्रां प्री</string>
+    <string name="stat_pole">पोल</string>
+    <string name="stat_pole_positions">पोल पोजीशन</string>
+    <string name="stat_career_points">करियर अंक</string>
+    <string name="stat_dnfs">डीएनएफ</string>
+    <string name="stat_gp_races">ग्रां प्री रेस</string>
+    <string name="stat_wins">जीत</string>
+    <string name="stat_poles">पोल</string>
+    <string name="stat_podiums">पोडियम</string>
+    <string name="stat_fastest_laps">सबसे तेज़ लैप</string>
+    <string name="stat_top_10s">शीर्ष 10</string>
+    <string name="stat_sprint_races">स्प्रिंट रेस</string>
+    <string name="stat_sprint_wins">स्प्रिंट जीत</string>
+    <string name="stat_sprint_podiums">स्प्रिंट पोडियम</string>
+    <string name="stat_sprint_poles">स्प्रिंट पोल</string>
+    <string name="recent_form_title">हालिया फॉर्म</string>
+    <string name="points_progression_title">अंकों की प्रगति</string>
+    <string name="points_progression_placeholder">सीज़न शुरू होने पर अंकों की प्रगति दिखाई देगी।</string>
+    <string name="biography_title">जीवनी</string>
+    <string name="bio_born">जन्म</string>
+    <string name="bio_birthplace">जन्मस्थान</string>
+
+    <!-- Comparison Screen -->
+    <string name="comparison_tab_drivers">ड्राइवर्स</string>
+    <string name="comparison_tab_teams">टीमें और कारें</string>
+    <string name="comparison_err_drivers">ड्राइवर्स लोड नहीं किए जा सके: %1$s</string>
+    <string name="comparison_err_teams">टीमें लोड नहीं की जा सकीं: %1$s</string>
+    <string name="comparison_empty_drivers">पर्याप्त ड्राइवर डेटा उपलब्ध नहीं है</string>
+    <string name="comparison_empty_teams">पर्याप्त टीम डेटा उपलब्ध नहीं है</string>
+    <string name="comparison_teammate_battles">टीम के साथियों का मुकाबला</string>
+    <string name="comparison_quick_select">त्वरित चयन</string>
+    <string name="comparison_select_driver_1">ड्राइवर 1 चुनें</string>
+    <string name="comparison_select_driver_2">ड्राइवर 2 चुनें</string>
+    <string name="comparison_select_team_1">टीम 1 चुनें</string>
+    <string name="comparison_select_team_2">टीम 2 चुनें</string>
+    <string name="comparison_head_to_head">आमने-सामने</string>
+    <string name="comparison_points_rank">अंक और रैंक</string>
+    <string name="comparison_qualifying_race">क्वालिफाइंग और रेस परिणाम</string>
+    <string name="comparison_season_stats">सीज़न आंकड़े</string>
+    <string name="comparison_career_stats">करियर आंकड़े</string>
+    <string name="comparison_swap">बदलें</string>
+    <string name="comparison_search_driver">ड्राइवर खोजें…</string>
+    <string name="comparison_search_team">टीम खोजें…</string>
+
+    <!-- Onboarding Screen -->
+    <string name="onboarding_step_indicator">चरण %1$d / %2$d</string>
+    <string name="onboarding_skip">छोड़ें</string>
+    <string name="onboarding_step1_title">ग्रिड में आपका स्वागत है</string>
+    <string name="onboarding_step1_desc">लाइव फॉर्मूला 1 सत्र काउंटडाउन, टेलीमेट्री, स्टैंडिंग और पैडॉक समाचारों के लिए आपका ऐप।</string>
+    <string name="onboarding_step1_name_prompt">हम आपको क्या कहकर बुलाएं?</string>
+    <string name="onboarding_step1_name_desc">आपके पैडॉक फीड, विजेट और कार्ड में अभिवादन को वैयक्तिकृत करता है।</string>
+    <string name="onboarding_step1_name_placeholder">उदा. मैक्स, लुईस, रेसर</string>
+    <string name="onboarding_step1_greeting">आपसे मिलकर खुशी हुई, %1$s! 🏎️</string>
+    <string name="onboarding_step2_title">अपनी पसंद चुनें</string>
+    <string name="onboarding_step2_desc">अपना पसंदीदा ड्राइवर और निर्माता चुनें। हम उन्हें ग्रिड पर हाइलाइट करेंगे और आपके होम विजेट पर पिन करेंगे।</string>
+    <string name="onboarding_step2_fav_driver">पसंदीदा ड्राइवर</string>
+    <string name="onboarding_step2_fav_constructor">पसंदीदा निर्माता</string>
+    <string name="onboarding_step3_title">Taras को सेट करें</string>
+    <string name="onboarding_step3_desc">अपनी विज़ुअल थीम चुनें और तय करें कि क्या आप रेस अलर्ट प्राप्त करना चाहते हैं।</string>
+    <string name="onboarding_step3_theme">थीम चयन</string>
+    <string name="onboarding_theme_light_sub">दिन का उजाला</string>
+    <string name="onboarding_theme_dark_sub">कार्बन</string>
+    <string name="onboarding_theme_system_sub">सिस्टम अनुसार</string>
+    <string name="onboarding_step3_alerts">रेस अलर्ट</string>
+    <string name="onboarding_step3_reminders">सत्र अनुस्मारक</string>
+    <string name="onboarding_step3_reminders_desc">क्वालिफाइंग, स्प्रिंट और रेस शुरू होने से पहले सूचना प्राप्त करें।</string>
+    <string name="onboarding_back">पीछे</string>
+    <string name="onboarding_enter_paddock">पैडॉक में प्रवेश करें</string>
+    <string name="onboarding_continue">जारी रखें</string>
+
+    <!-- News Cards -->
+    <string name="news_empty_title">वर्तमान में इस स्रोत से कोई लेख नहीं मिला।</string>
+    <string name="news_empty_desc">\'सभी स्रोत\' चुनें या किसी अन्य स्रोत पर स्विच करें।</string>
+    <string name="news_open_error">लेख का लिंक नहीं खोला जा सका</string>
+    <string name="news_by_author">द्वारा: %1$s</string>
+    <string name="news_no_title">कोई शीर्षक नहीं</string>
+</resources>

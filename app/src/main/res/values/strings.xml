@@ -8,4 +8,272 @@
     <string name="widget_favorite_driver_desc">Track your favorite driver\'s position, points, and last race result</string>
     <string name="widget_race_result_label">Last Race Results</string>
     <string name="widget_race_result_desc">Podium finishers of the latest Grand Prix</string>
+
+    <!-- Navigation -->
+    <string name="nav_paddock">Paddock</string>
+    <string name="nav_grid">Grid</string>
+    <string name="nav_calendar">Calendar</string>
+    <string name="nav_results">Results</string>
+    <string name="topbar_user_profile">User Profile</string>
+    <string name="action_back">Back</string>
+
+    <!-- Common Actions & Statuses -->
+    <string name="loading">Loading…</string>
+    <string name="retry_again">Retry Again</string>
+    <string name="retry">Retry</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="share">Share</string>
+    <string name="close">Close</string>
+    <string name="copy">Copy</string>
+    <string name="done">Done</string>
+    <string name="cancel">Cancel</string>
+    <string name="continue_text">Continue</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="skip">Skip</string>
+    <string name="clear">Clear</string>
+    <string name="pos_prefix">Pos: %1$s</string>
+    <string name="pts_prefix">Pts: %1$s</string>
+    <string name="points_pts">PTS</string>
+    <string name="live_badge">LIVE</string>
+    <string name="upcoming_badge">Upcoming</string>
+    <string name="first_place">First Place</string>
+
+    <!-- Drawer / Settings -->
+    <string name="drawer_title">TARAS</string>
+    <string name="drawer_hello_user">Hello %1$s</string>
+    <string name="drawer_user_name_dialog_title">Enter your name</string>
+    <string name="drawer_name_label">Name</string>
+    <string name="drawer_github">GitHub</string>
+    <string name="drawer_theme">Theme: %1$s</string>
+    <string name="drawer_widget_theme">Widget Theme: %1$s</string>
+    <string name="drawer_language">Language: %1$s</string>
+    <string name="drawer_notification_permission">Notification Permission</string>
+    <string name="drawer_welcome_guide">Welcome Guide &amp; Setup</string>
+    <string name="drawer_about_privacy">About &amp; Privacy Policy</string>
+
+    <!-- In-App Privacy Policy -->
+    <string name="privacy_policy_title">Privacy Policy</string>
+    <string name="privacy_badge_no_data">100% Private · No Data Collected</string>
+    <string name="privacy_core_commitment">Core Commitment</string>
+    <string name="privacy_core_commitment_desc">We collect no personal data. Your name and favorite driver preferences are stored locally on your device via DataStore. No data is sent to any server. News is fetched from public RSS feeds.</string>
+    <string name="privacy_sec_no_data_title">No Personal Data Collected</string>
+    <string name="privacy_sec_no_data_p1">Taras is an open-source, non-commercial F1 companion app. We believe in complete transparency and maximum privacy:</string>
+    <string name="privacy_sec_no_data_item1">No names, emails, phone numbers, or account logins</string>
+    <string name="privacy_sec_no_data_item2">No precise or coarse location tracking</string>
+    <string name="privacy_sec_no_data_item3">No advertising IDs (GAID), device IDs, or IP logging</string>
+    <string name="privacy_sec_no_data_item4">No commercial advertising SDKs, marketing trackers, or analytics</string>
+    <string name="privacy_sec_storage_title">Strictly On-Device Storage</string>
+    <string name="privacy_sec_storage_desc">Your nickname, favorite driver, favorite team, and theme preferences are stored exclusively on your device using Android Jetpack DataStore and Room. No data is ever transmitted to an external server. You can wipe all data anytime by clearing app storage or uninstalling.</string>
+    <string name="privacy_sec_network_title">Public Feeds &amp; Encryption</string>
+    <string name="privacy_sec_network_desc">Race schedules and standings are retrieved from public static files on GitHub. News articles are parsed directly on your device from public RSS feeds. All network connections use secure HTTPS.</string>
+    <string name="privacy_sec_notifications_title">Device Permissions</string>
+    <string name="privacy_sec_notifications_desc">Notification permission (POST_NOTIFICATIONS) is used solely to deliver local race countdown reminders scheduled on your phone by Android WorkManager. No remote push tokens are collected.</string>
+    <string name="privacy_sec_opensource_title">Open Source Transparency</string>
+    <string name="privacy_sec_opensource_desc">Taras is completely open-source under the Apache 2.0 license. Anyone can inspect the code on GitHub to verify our privacy commitments.</string>
+    <string name="privacy_btn_view_online">View Online Policy</string>
+    <string name="privacy_btn_got_it">Got It</string>
+    <string name="drawer_notifications_already_granted">Permission already granted</string>
+    <string name="drawer_could_not_open_settings">Could not open settings</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System</string>
+    <string name="theme_system_default">System Default</string>
+
+    <!-- Language Names -->
+    <string name="lang_system_default">System Default</string>
+    <string name="lang_en">English</string>
+    <string name="lang_hi">हिन्दी (Hindi)</string>
+    <string name="lang_es">Español (Spanish)</string>
+    <string name="lang_de">Deutsch (German)</string>
+    <string name="lang_fr">Français (French)</string>
+    <string name="lang_ja">日本語 (Japanese)</string>
+    <string name="lang_pt">Português (Portuguese)</string>
+
+    <!-- Notification Dialogs -->
+    <string name="dialog_enable_notifications_title">Enable Notifications</string>
+    <string name="dialog_enable_notifications_desc">Stay updated with race schedules, results, and the latest F1 news. Please grant permission in the next screen.</string>
+    <string name="dialog_permissions_required_title">Permissions Required</string>
+    <string name="dialog_permissions_required_desc">It seems notification permissions are disabled or permanently denied. Please enable them in the App Settings to receive updates.</string>
+    <string name="dialog_open_settings">Open Settings</string>
+
+    <!-- Paddock Screen -->
+    <string name="paddock_fav_driver_badge">⭐ FAVORITE DRIVER</string>
+    <string name="paddock_fav_driver_desc">%1$s is P%2$s with %3$s pts</string>
+    <string name="paddock_fav_team_badge">🏎️ FAVORITE TEAM</string>
+    <string name="paddock_fav_team_desc">%1$s is P%2$s with %3$s pts</string>
+    <string name="paddock_next_session">NEXT SESSION</string>
+    <string name="paddock_upcoming_race">Upcoming Race</string>
+    <string name="paddock_until_session">until %1$s · %2$s</string>
+    <string name="paddock_no_upcoming_sessions">No upcoming sessions · %1$s</string>
+    <string name="paddock_championship">CHAMPIONSHIP</string>
+    <string name="paddock_latest_news_title">Latest from the Paddock....</string>
+    <string name="paddock_notifications_toast">Notifications enabled for race updates</string>
+
+    <!-- Grid Screen -->
+    <string name="grid_tab_drivers">Drivers</string>
+    <string name="grid_tab_teams">Teams</string>
+    <string name="grid_compare_drivers">Compare Drivers</string>
+    <string name="grid_loading_drivers">Loading drivers…</string>
+    <string name="grid_loading_teams">Loading teams…</string>
+    <string name="grid_no_drivers_found">No Drivers Found</string>
+    <string name="grid_no_teams_found">No Teams Found</string>
+
+    <!-- Calendar Screen & Race Cards -->
+    <string name="race_card_circuit_explorer">CIRCUIT EXPLORER</string>
+    <string name="race_card_weekend_schedule">WEEKEND SCHEDULE</string>
+    <string name="race_card_full_race">FULL RACE</string>
+    <string name="session_fp1">FP1</string>
+    <string name="session_fp2">FP2</string>
+    <string name="session_fp3">FP3</string>
+    <string name="session_sprint_qualy">Sprint Q</string>
+    <string name="session_sprint_race">Sprint Race</string>
+    <string name="session_qualy">Qualifying</string>
+    <string name="session_results">Results</string>
+
+    <!-- Circuit Data Screen -->
+    <string name="circuit_loading">Loading Circuit Data…</string>
+    <string name="circuit_not_found">Circuit information not found</string>
+    <string name="circuit_race_winner">RACE WINNER</string>
+    <string name="circuit_round_header">ROUND %1$s • %2$s</string>
+    <string name="circuit_data_title">Circuit Data</string>
+    <string name="circuit_spec_corners">CORNERS</string>
+    <string name="circuit_spec_length">LENGTH</string>
+    <string name="circuit_spec_lap_record">LAP RECORD</string>
+    <string name="circuit_spec_first_gp">FIRST GP</string>
+    <string name="circuit_spec_laps">LAPS</string>
+    <string name="circuit_weekend_schedule">Weekend Schedule</string>
+    <string name="session_type_practice">Practice</string>
+    <string name="session_type_grid_setup">Grid Setup</string>
+    <string name="session_type_sprint">Sprint</string>
+    <string name="session_type_grand_prix">Grand Prix</string>
+
+    <!-- F1 Results Screen -->
+    <string name="results_share_button">Share Results</string>
+    <string name="results_share_sheet_title">Share Results</string>
+    <string name="results_share_sheet_subtitle">Formatted summary ready to share or copy</string>
+    <string name="results_summary_format">SUMMARY FORMAT</string>
+    <string name="results_limit_podium">Podium (Top 3)</string>
+    <string name="results_limit_top10">Top 10</string>
+    <string name="results_limit_all">All (%1$d)</string>
+    <string name="results_preview">PREVIEW</string>
+    <string name="results_copy_text">Copy Text</string>
+    <string name="results_share_text">Share Text</string>
+    <string name="results_share_graphic_card">Share as Graphic Card (Image)</string>
+    <string name="results_col_time">TIME</string>
+    <string name="results_col_gap">GAP</string>
+    <string name="results_col_laps">LAPS</string>
+    <string name="results_session_not_started">Session hasn\'t started yet</string>
+    <string name="results_scheduled_for">Scheduled for: %1$s</string>
+    <string name="results_no_data">No data found for this session.</string>
+    <string name="results_loading_fp">Loading practice results…</string>
+    <string name="results_loading_sprint_qualy">Loading sprint qualifying results…</string>
+    <string name="results_loading_sprint_race">Loading sprint race results…</string>
+    <string name="results_loading_qualy">Loading qualifying results…</string>
+    <string name="results_loading_race">Loading race results…</string>
+
+    <!-- Driver & Team Profile Screens -->
+    <string name="driver_not_found">Driver not found</string>
+    <string name="team_not_found">Team not found</string>
+    <string name="add_to_favorites">Add to favorites</string>
+    <string name="remove_from_favorites">Remove from favorites</string>
+    <string name="stat_rank">RANK</string>
+    <string name="stat_code">CODE</string>
+    <string name="stat_points">POINTS</string>
+    <string name="stat_first_entry">FIRST ENTRY</string>
+    <string name="teammate_title">Teammate</string>
+    <string name="team_drivers_title">Team Drivers</string>
+    <string name="compare_teammates">Compare Teammates</string>
+    <string name="teammate_battle_title">Teammate Battle</string>
+    <string name="h2h_qualifying">Qualifying H2H</string>
+    <string name="h2h_race">Race H2H</string>
+    <string name="h2h_points_split">Points Comparison</string>
+    <string name="performance_2026">2026 Performance</string>
+    <string name="career_stats_title">Career Stats</string>
+    <string name="team_history_title">Team History</string>
+    <string name="management_technical_title">Management &amp; Technical</string>
+    <string name="team_chief">Team Chief</string>
+    <string name="technical_chief">Technical Chief</string>
+    <string name="chassis">Chassis</string>
+    <string name="power_unit">Power Unit</string>
+    <string name="reserve_driver">Reserve Driver</string>
+    <string name="stat_world_championships">World Championships</string>
+    <string name="stat_grand_prix_wins">Grand Prix Wins</string>
+    <string name="stat_podium_finishes">Podium Finishes</string>
+    <string name="stat_gp_entered">GP Entered</string>
+    <string name="stat_pole">Pole</string>
+    <string name="stat_pole_positions">Pole Positions</string>
+    <string name="stat_career_points">Career Points</string>
+    <string name="stat_dnfs">DNFs</string>
+    <string name="stat_gp_races">Grand Prix Races</string>
+    <string name="stat_wins">Wins</string>
+    <string name="stat_poles">Poles</string>
+    <string name="stat_podiums">Podiums</string>
+    <string name="stat_fastest_laps">Fastest Laps</string>
+    <string name="stat_top_10s">Top 10s</string>
+    <string name="stat_sprint_races">Sprint Races</string>
+    <string name="stat_sprint_wins">Sprint Wins</string>
+    <string name="stat_sprint_podiums">Sprint Podiums</string>
+    <string name="stat_sprint_poles">Sprint Poles</string>
+    <string name="recent_form_title">Recent Form</string>
+    <string name="points_progression_title">Points Progression</string>
+    <string name="points_progression_placeholder">Points progression will appear once the season begins.</string>
+    <string name="biography_title">Biography</string>
+    <string name="bio_born">Born</string>
+    <string name="bio_birthplace">Birthplace</string>
+
+    <!-- Comparison Screen -->
+    <string name="comparison_tab_drivers">Drivers</string>
+    <string name="comparison_tab_teams">Teams &amp; Cars</string>
+    <string name="comparison_err_drivers">Could not load drivers: %1$s</string>
+    <string name="comparison_err_teams">Could not load teams: %1$s</string>
+    <string name="comparison_empty_drivers">Not enough driver data available</string>
+    <string name="comparison_empty_teams">Not enough team data available</string>
+    <string name="comparison_teammate_battles">TEAMMATE BATTLES</string>
+    <string name="comparison_quick_select">Quick Select</string>
+    <string name="comparison_select_driver_1">Select Driver 1</string>
+    <string name="comparison_select_driver_2">Select Driver 2</string>
+    <string name="comparison_select_team_1">Select Team 1</string>
+    <string name="comparison_select_team_2">Select Team 2</string>
+    <string name="comparison_head_to_head">HEAD TO HEAD</string>
+    <string name="comparison_points_rank">POINTS &amp; RANK</string>
+    <string name="comparison_qualifying_race">QUALIFYING &amp; RACE RESULTS</string>
+    <string name="comparison_season_stats">SEASON STATS</string>
+    <string name="comparison_career_stats">CAREER STATS</string>
+    <string name="comparison_swap">Swap</string>
+    <string name="comparison_search_driver">Search driver…</string>
+    <string name="comparison_search_team">Search team…</string>
+
+    <!-- Onboarding Screen -->
+    <string name="onboarding_step_indicator">Step %1$d of %2$d</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_step1_title">Welcome to the Grid</string>
+    <string name="onboarding_step1_desc">Your home for live Formula 1 session countdowns, telemetry, standings, and breaking paddock news.</string>
+    <string name="onboarding_step1_name_prompt">What should we call you?</string>
+    <string name="onboarding_step1_name_desc">Personalizes greetings in your paddock feed, widgets, and cards.</string>
+    <string name="onboarding_step1_name_placeholder">e.g. Max, Lewis, Racer</string>
+    <string name="onboarding_step1_greeting">Nice to meet you, %1$s! 🏎️</string>
+    <string name="onboarding_step2_title">Pick Your Allegiance</string>
+    <string name="onboarding_step2_desc">Select your favorite driver and constructor. We\'ll highlight them on the grid and pin them to your home widget.</string>
+    <string name="onboarding_step2_fav_driver">Favorite Driver</string>
+    <string name="onboarding_step2_fav_constructor">Favorite Constructor</string>
+    <string name="onboarding_step3_title">Fine-Tune Taras</string>
+    <string name="onboarding_step3_desc">Personalize your visual theme and choose whether to receive race alerts.</string>
+    <string name="onboarding_step3_theme">Theme Choice</string>
+    <string name="onboarding_theme_light_sub">Daylight</string>
+    <string name="onboarding_theme_dark_sub">Carbon</string>
+    <string name="onboarding_theme_system_sub">Match OS</string>
+    <string name="onboarding_step3_alerts">Race Alerts</string>
+    <string name="onboarding_step3_reminders">Session Reminders</string>
+    <string name="onboarding_step3_reminders_desc">Get notified before qualifying, sprints, and races kick off.</string>
+    <string name="onboarding_back">Back</string>
+    <string name="onboarding_enter_paddock">Enter Paddock</string>
+    <string name="onboarding_continue">Continue</string>
+
+    <!-- News Cards -->
+    <string name="news_empty_title">No articles found from this outlet right now.</string>
+    <string name="news_empty_desc">Select \'All Sources\' or switch to another outlet.</string>
+    <string name="news_open_error">Unable to open article link</string>
+    <string name="news_by_author">by %1$s</string>
+    <string name="news_no_title">No Title</string>
 </resources>

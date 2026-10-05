@@ -23,6 +23,7 @@ class UserPreferences(private val context: Context) {
         val FAVORITE_DRIVER_TEAM_KEY = stringPreferencesKey("favorite_driver_team")
         val FAVORITE_TEAM_KEY = stringPreferencesKey("favorite_team")
         val HAS_SEEN_WELCOME_KEY = booleanPreferencesKey("has_seen_welcome")
+        val NOTIFICATIONS_ENABLED_KEY = booleanPreferencesKey("notifications_enabled")
     }
 
     val userNameFlow: Flow<String> = context.userNameDataStore.data
@@ -33,6 +34,11 @@ class UserPreferences(private val context: Context) {
     val hasSeenWelcomeFlow: Flow<Boolean> = context.userNameDataStore.data
         .map {
             it[HAS_SEEN_WELCOME_KEY] ?: false
+        }
+
+    val notificationsEnabledFlow: Flow<Boolean> = context.userNameDataStore.data
+        .map {
+            it[NOTIFICATIONS_ENABLED_KEY] ?: true
         }
 
     val favoriteDriverNumberFlow: Flow<String?> = context.userNameDataStore.data
@@ -52,6 +58,12 @@ class UserPreferences(private val context: Context) {
 
     val favoriteTeamFlow: Flow<String?> = context.userNameDataStore.data
         .map { it[FAVORITE_TEAM_KEY] }
+
+    suspend fun saveNotificationsEnabled(enabled: Boolean) {
+        context.userNameDataStore.edit { prefs ->
+            prefs[NOTIFICATIONS_ENABLED_KEY] = enabled
+        }
+    }
 
     suspend fun saveUserName(name: String) {
         context.userNameDataStore.edit {

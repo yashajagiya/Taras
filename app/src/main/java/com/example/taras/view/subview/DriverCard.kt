@@ -22,8 +22,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.example.taras.R
 import com.example.taras.core.helpercore.toComposeColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -88,7 +90,7 @@ fun DriverCard(
                     if (isFavorite) {
                         Icon(
                             imageVector = Icons.Filled.Star,
-                            contentDescription = "Favorite Driver",
+                            contentDescription = stringResource(R.string.widget_favorite_driver_label),
                             tint = Color(0xFFFFD700),
                             modifier = Modifier.size(18.dp)
                         )
@@ -105,11 +107,11 @@ fun DriverCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Pos: ${driver.rank}",
+                        text = stringResource(R.string.pos_prefix, driver.rank.toString()),
                         style = typography.labelLarge
                     )
                     Text(
-                        text = "Pts: ${driver.points}",
+                        text = stringResource(R.string.pts_prefix, driver.points),
                         style = typography.labelLarge
                     )
                 }

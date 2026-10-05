@@ -31,7 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.example.taras.R
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -346,7 +348,7 @@ fun CurrentRaceExtended(
                             )
                         }
                         Text(
-                            text = "CIRCUIT EXPLORER",
+                            text = stringResource(R.string.race_card_circuit_explorer),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -370,7 +372,7 @@ fun CurrentRaceExtended(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "Upcoming",
+                                text = stringResource(R.string.upcoming_badge),
                                 color = MaterialTheme.colorScheme.onTertiaryContainer,
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Black
@@ -435,7 +437,7 @@ fun CurrentRaceExtended(
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Text(
-                            text = "WEEKEND SCHEDULE",
+                            text = stringResource(R.string.race_card_weekend_schedule),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
@@ -446,20 +448,27 @@ fun CurrentRaceExtended(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
+                        val fp1Label = stringResource(R.string.session_fp1)
+                        val sqLabel = stringResource(R.string.session_sprint_qualy)
+                        val srLabel = stringResource(R.string.session_sprint_race)
+                        val fp2Label = stringResource(R.string.session_fp2)
+                        val fp3Label = stringResource(R.string.session_fp3)
+                        val qualyLabel = stringResource(R.string.session_qualy)
+
                         val isSprint = race.fp2.date == null && race.fp3.date == null
                         val sessions = if (isSprint) {
                             listOf(
-                                "FP1" to race.fp1,
-                                "SPRINT QUALY" to race.sprintQualy,
-                                "SPRINT RACE" to race.sprintRace,
-                                "QUALI" to race.qualy
+                                fp1Label to race.fp1,
+                                sqLabel to race.sprintQualy,
+                                srLabel to race.sprintRace,
+                                qualyLabel to race.qualy
                             )
                         } else {
                             listOf(
-                                "FP1" to race.fp1,
-                                "FP2" to race.fp2,
-                                "FP3" to race.fp3,
-                                "QUALI" to race.qualy
+                                fp1Label to race.fp1,
+                                fp2Label to race.fp2,
+                                fp3Label to race.fp3,
+                                qualyLabel to race.qualy
                             )
                         }
 
@@ -514,7 +523,7 @@ fun CurrentRaceExtended(
                             ) {
                                 Column(horizontalAlignment = Alignment.Start) {
                                     Text(
-                                        text = "FULL RACE",
+                                        text = stringResource(R.string.race_card_full_race),
                                         style = MaterialTheme.typography.labelSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)

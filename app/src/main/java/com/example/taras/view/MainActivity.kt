@@ -35,6 +35,8 @@ import com.example.taras.core.common.OfflineDataStoreAppearance
 import com.example.taras.core.common.UserPreferences
 import com.example.taras.viewmodel.AppearanceViewModel
 import com.example.taras.viewmodel.UserViewModel
+import androidx.compose.animation.Crossfade
+import com.example.taras.view.onboarding.OnboardingScreen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -68,8 +70,8 @@ class MainActivity : ComponentActivity() {
             val appearance by appearanceViewModel.appearanceData.collectAsStateWithLifecycle()
             val darkTheme = when (appearance) {
                 "Dark" -> true
-                "Light" -> false
-                else -> isSystemInDarkTheme()
+                "System Default" -> isSystemInDarkTheme()
+                else -> false // Light is the default main theme
             }
 
             val startRoute = when (navTarget) {
@@ -85,58 +87,79 @@ class MainActivity : ComponentActivity() {
             )
             val navigator = remember { Navigator(navigationState) }
 
+            val hasSeenWelcome by userViewModel.hasSeenWelcome.collectAsStateWithLifecycle()
+            var showManualOnboarding by remember {
+                mutableStateOf(intent?.getBooleanExtra("reset_onboarding", false) ?: false)
+            }
+
             androidx.compose.runtime.LaunchedEffect(navTarget) {
                 when (navTarget) {
                     "grid" -> navigator.navigate(MainNavRoutes.Grid)
                     "results" -> navigator.navigate(MainNavRoutes.F1Results)
                     "paddock" -> navigator.navigate(MainNavRoutes.Paddock)
+                    "onboarding" -> showManualOnboarding = true
                 }
             }
 
             TarasTheme(darkTheme = darkTheme) {
-                val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-                val scope = rememberCoroutineScope()
-                var appearanceExpanded by remember { mutableStateOf(false) }
+                Crossfade(
+                    targetState = (hasSeenWelcome == false || showManualOnboarding),
+                    label = "OnboardingCrossfade"
+                ) { shouldShowOnboarding ->
+                    if (shouldShowOnboarding) {
+                        OnboardingScreen(
+                            userViewModel = userViewModel,
+                            appearanceViewModel = appearanceViewModel,
+                            onFinish = {
+                                showManualOnboarding = false
+                            }
+                        )
+                    } else if (hasSeenWelcome != null) {
+                        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+                        val scope = rememberCoroutineScope()
+                        var appearanceExpanded by remember { mutableStateOf(false) }
 
-                SettingDrawer(
-                    drawerState = drawerState,
-                    appearanceViewModel = appearanceViewModel,
-                    userViewModel = userViewModel,
-                    appearanceExpanded = appearanceExpanded,
-                    onAppearanceExpandChange = { appearanceExpanded = it }
-                ) {
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize(),
-                        topBar = {
-                            TarasTopBar(
-                                onProfileClick = {
-                                    scope.launch { drawerState.open() }
-                                }
-                            )
-                        },
-
-                        bottomBar = {
-                            MainNavBar(
-                                selectedItem = navigationState.topLevelRoute,
-                                onSelectedItem = { navigator.navigate(it) }
-                            )
-
-                        }
-
-                    ) { innerPadding ->
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding)
+                        SettingDrawer(
+                            drawerState = drawerState,
+                            appearanceViewModel = appearanceViewModel,
+                            userViewModel = userViewModel,
+                            appearanceExpanded = appearanceExpanded,
+                            onAppearanceExpandChange = { appearanceExpanded = it },
+                            onOpenOnboarding = { showManualOnboarding = true }
                         ) {
-                            MainNavHost(
-                                navigationState = navigationState,
-                                navigator = navigator,
-                                appearanceViewModel = appearanceViewModel,
-                                userViewModel = userViewModel
-                            )
+                            Scaffold(
+                                modifier = Modifier.fillMaxSize(),
+                                topBar = {
+                                    TarasTopBar(
+                                        onProfileClick = {
+                                            scope.launch { drawerState.open() }
+                                        }
+                                    )
+                                },
+                                bottomBar = {
+                                    MainNavBar(
+                                        selectedItem = navigationState.topLevelRoute,
+                                        onSelectedItem = { navigator.navigate(it) }
+                                    )
+                                }
+                            ) { innerPadding ->
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(innerPadding)
+                                ) {
+                                    MainNavHost(
+                                        navigationState = navigationState,
+                                        navigator = navigator,
+                                        appearanceViewModel = appearanceViewModel,
+                                        userViewModel = userViewModel
+                                    )
+                                }
+                            }
                         }
+                    } else {
+                        // Cold start buffer while DataStore loads initial state
+                        Box(modifier = Modifier.fillMaxSize())
                     }
                 }
             }

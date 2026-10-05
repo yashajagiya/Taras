@@ -56,7 +56,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import com.example.taras.R
 import com.example.taras.core.helpercore.RaceResultShareHelper
 import com.example.taras.core.helpercore.RefreshHapticEffect
 import androidx.compose.runtime.Composable
@@ -153,9 +155,21 @@ private fun ResultContent(
     val isConnected by networkObserver.isConnected.collectAsStateWithLifecycle(initialValue = true)
 
     val tabs = if (isSprintWeekend) {
-        listOf("FP1", "Sprint Q", "Sprint Race", "Qualifying", "Results")
+        listOf(
+            stringResource(R.string.session_fp1),
+            stringResource(R.string.session_sprint_qualy),
+            stringResource(R.string.session_sprint_race),
+            stringResource(R.string.session_qualy),
+            stringResource(R.string.session_results)
+        )
     } else {
-        listOf("FP1", "FP2", "FP3", "Qualifying", "Results")
+        listOf(
+            stringResource(R.string.session_fp1),
+            stringResource(R.string.session_fp2),
+            stringResource(R.string.session_fp3),
+            stringResource(R.string.session_qualy),
+            stringResource(R.string.session_results)
+        )
     }
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     var shareSessionData by remember { mutableStateOf<Pair<String, SessionResultUiState>?>(null) }
@@ -170,6 +184,12 @@ private fun ResultContent(
     }
     val currentResults = (currentSessionState as? UiState.Success)?.data
     val canShare = currentResults != null && currentResults.results.isNotEmpty()
+
+    val loadingFp = stringResource(R.string.results_loading_fp)
+    val loadingSprintQ = stringResource(R.string.results_loading_sprint_qualy)
+    val loadingSprintRace = stringResource(R.string.results_loading_sprint_race)
+    val loadingQualy = stringResource(R.string.results_loading_qualy)
+    val loadingRace = stringResource(R.string.results_loading_race)
 
     RefreshHapticEffect(isRefreshing = isRefreshing, state = pullToRefreshState)
 
@@ -232,7 +252,7 @@ private fun ResultContent(
                             0 -> SessionTabs(
                                 state = fp1State,
                                 isRefreshing = isRefreshing,
-                                loadingMessage = "Loading practice results...",
+                                loadingMessage = loadingFp,
                                 isConnected = isConnected,
                                 onShareClick = { shareSessionData = tabs[0] to it }
                             )
@@ -240,7 +260,7 @@ private fun ResultContent(
                             1 -> SessionTabs(
                                 state = fp2State,
                                 isRefreshing = isRefreshing,
-                                loadingMessage = if (isSprintWeekend) "Loading sprint qualifying results..." else "Loading practice results...",
+                                loadingMessage = if (isSprintWeekend) loadingSprintQ else loadingFp,
                                 isConnected = isConnected,
                                 onShareClick = { shareSessionData = tabs[1] to it }
                             )
@@ -248,7 +268,7 @@ private fun ResultContent(
                             2 -> SessionTabs(
                                 state = fp3State,
                                 isRefreshing = isRefreshing,
-                                loadingMessage = if (isSprintWeekend) "Loading sprint race results..." else "Loading practice results...",
+                                loadingMessage = if (isSprintWeekend) loadingSprintRace else loadingFp,
                                 isConnected = isConnected,
                                 onShareClick = { shareSessionData = tabs[2] to it }
                             )
@@ -256,7 +276,7 @@ private fun ResultContent(
                             3 -> SessionTabs(
                                 state = qualifyState,
                                 isRefreshing = isRefreshing,
-                                loadingMessage = "Loading qualifying results...",
+                                loadingMessage = loadingQualy,
                                 isConnected = isConnected,
                                 onShareClick = { shareSessionData = tabs[3] to it }
                             )
@@ -264,7 +284,7 @@ private fun ResultContent(
                             4 -> SessionTabs(
                                 state = resultState,
                                 isRefreshing = isRefreshing,
-                                loadingMessage = "Loading race results...",
+                                loadingMessage = loadingRace,
                                 isConnected = isConnected,
                                 onShareClick = { shareSessionData = tabs[4] to it }
                             )
@@ -281,13 +301,13 @@ private fun ResultContent(
                     icon = {
                         Icon(
                             imageVector = Icons.Rounded.Share,
-                            contentDescription = "Share",
+                            contentDescription = stringResource(R.string.share),
                             modifier = Modifier.size(20.dp)
                         )
                     },
                     text = {
                         Text(
-                            text = "Share",
+                            text = stringResource(R.string.share),
                             fontWeight = FontWeight.Bold
                         )
                     },
@@ -338,12 +358,12 @@ private fun SessionTabs(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.SignalWifiStatusbarConnectedNoInternet4,
-                                contentDescription = "No internet connection",
+                                contentDescription = stringResource(R.string.no_internet_connection),
                                 tint = MaterialTheme.colorScheme.error
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                "No internet connection",
+                                stringResource(R.string.no_internet_connection),
                                 color = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.padding(16.dp)
                             )
@@ -352,7 +372,7 @@ private fun SessionTabs(
                 } else {
                     item {
                         Text(
-                            text = "Something went wrong",
+                            text = stringResource(R.string.something_went_wrong),
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(16.dp)
                         )
@@ -435,12 +455,12 @@ private fun SessionHeader(
         ) {
             Icon(
                 imageVector = Icons.Rounded.Share,
-                contentDescription = "Share",
+                contentDescription = stringResource(R.string.share),
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-                text = "Share Results",
+                text = stringResource(R.string.results_share_button),
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -495,13 +515,13 @@ fun ShareResultBottomSheet(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Share Results",
+                        text = stringResource(R.string.results_share_sheet_title),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Formatted summary ready to share or copy",
+                        text = stringResource(R.string.results_share_sheet_subtitle),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -510,7 +530,7 @@ fun ShareResultBottomSheet(
                 IconButton(onClick = onDismiss) {
                     Icon(
                         imageVector = Icons.Rounded.Close,
-                        contentDescription = "Close",
+                        contentDescription = stringResource(R.string.close),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -520,7 +540,7 @@ fun ShareResultBottomSheet(
 
             // Limit Selector Chips
             Text(
-                text = "SUMMARY FORMAT",
+                text = stringResource(R.string.results_summary_format),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -535,7 +555,7 @@ fun ShareResultBottomSheet(
                 FilterChip(
                     selected = selectedLimit == 3,
                     onClick = { selectedLimit = 3 },
-                    label = { Text("Podium (Top 3)") },
+                    label = { Text(stringResource(R.string.results_limit_podium)) },
                     shape = RoundedCornerShape(999.dp)
                 )
 
@@ -543,7 +563,7 @@ fun ShareResultBottomSheet(
                     FilterChip(
                         selected = selectedLimit == 10,
                         onClick = { selectedLimit = 10 },
-                        label = { Text("Top 10") },
+                        label = { Text(stringResource(R.string.results_limit_top10)) },
                         shape = RoundedCornerShape(999.dp)
                     )
                 }
@@ -551,7 +571,7 @@ fun ShareResultBottomSheet(
                 FilterChip(
                     selected = selectedLimit == -1,
                     onClick = { selectedLimit = -1 },
-                    label = { Text("All (${results.size})") },
+                    label = { Text(stringResource(R.string.results_limit_all, results.size)) },
                     shape = RoundedCornerShape(999.dp)
                 )
             }
@@ -560,7 +580,7 @@ fun ShareResultBottomSheet(
 
             // Formatted Text Preview Card
             Text(
-                text = "PREVIEW",
+                text = stringResource(R.string.results_preview),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -602,12 +622,12 @@ fun ShareResultBottomSheet(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.ContentCopy,
-                        contentDescription = "Copy",
+                        contentDescription = stringResource(R.string.copy),
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Copy Text",
+                        text = stringResource(R.string.results_copy_text),
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -631,12 +651,12 @@ fun ShareResultBottomSheet(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Share,
-                        contentDescription = "Share",
+                        contentDescription = stringResource(R.string.share),
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Share Text",
+                        text = stringResource(R.string.results_share_text),
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -665,12 +685,12 @@ fun ShareResultBottomSheet(
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Image,
-                    contentDescription = "Graphic Card",
+                    contentDescription = null,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Share as Graphic Card (Image)",
+                    text = stringResource(R.string.results_share_graphic_card),
                     fontWeight = FontWeight.Bold
                 )
             }

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — Taras (F1 Companion)</title>
+    <meta name="description" content="Privacy Policy for Taras, the open-source Formula 1 companion Android application.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0e14;
+            --card-bg: #151a23;
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-red: #e10600;
+            --accent-red-glow: rgba(225, 6, 0, 0.25);
+            --text-primary: #f0f3f8;
+            --text-secondary: #9aa5b8;
+            --text-muted: #64748b;
+            --highlight-bg: rgba(225, 6, 0, 0.1);
+            --badge-bg: rgba(255, 255, 255, 0.06);
+            --pill-green: #10b981;
+            --pill-green-bg: rgba(16, 185, 129, 0.12);
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-color: #f8fafc;
+                --card-bg: #ffffff;
+                --card-border: rgba(0, 0, 0, 0.08);
+                --text-primary: #0f172a;
+                --text-secondary: #475569;
+                --text-muted: #94a3b8;
+                --highlight-bg: rgba(225, 6, 0, 0.06);
+                --badge-bg: rgba(0, 0, 0, 0.04);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.7;
+            padding: 2rem 1.25rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 820px;
+            width: 100%;
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--highlight-bg);
+            color: var(--accent-red);
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: var(--pill-green-bg);
+            color: var(--pill-green);
+            padding: 0.25rem 0.65rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
+        }
+
+        .effective-date {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-left: 4px solid var(--accent-red);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-card h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--accent-red);
+        }
+
+        .summary-card p {
+            color: var(--text-primary);
+            font-size: 1.05rem;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        section h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            color: var(--text-primary);
+        }
+
+        section p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        section p:last-child {
+            margin-bottom: 0;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 1rem;
+        }
+
+        ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        ul li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--pill-green);
+            font-weight: bold;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        th {
+            background: var(--badge-bg);
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        .badge-none {
+            display: inline-block;
+            background: var(--pill-green-bg);
+            color: var(--pill-green);
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        a {
+            color: var(--accent-red);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--card-border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="brand-badge">
+                🏎️ Taras F1 Companion
+                <span class="status-pill">No Data Collected</span>
+            </div>
+            <h1>Privacy Policy</h1>
+            <p class="effective-date">Effective Date: October 5, 2026 &bull; Version 1.0</p>
+        </header>
+
+        <div class="summary-card">
+            <h2>Core Commitment</h2>
+            <p>
+                We collect no personal data. Your name and favorite driver preferences are stored locally on your device via Android Jetpack DataStore. No personal data is sent to any server. News is fetched directly from public RSS feeds.
+            </p>
+        </div>
+
+        <section>
+            <h2>1. Information We Do Not Collect</h2>
+            <p>
+                <strong>Taras</strong> is an open-source, non-commercial Formula 1 companion application built by Yash Ajagiya. We believe in complete transparency and maximum privacy.
+            </p>
+            <ul>
+                <li>We do <strong>not</strong> collect your real identity, email address, phone number, or contacts.</li>
+                <li>We do <strong>not</strong> track your precise or coarse geographic location.</li>
+                <li>We do <strong>not</strong> collect advertising identifiers (GAID), unique device hardware IDs, or IP addresses.</li>
+                <li>We do <strong>not</strong> record your browsing history, race search queries, or reading activity.</li>
+                <li>We do <strong>not</strong> include any commercial advertising SDKs, marketing trackers, or third-party telemetry libraries.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>2. On-Device Storage (Local Only)</h2>
+            <p>
+                To provide a personalized experience with home-screen widgets and custom dashboards, the app stores a few configuration preferences <strong>strictly locally on your device</strong> using Android Jetpack DataStore and Room SQLite database:
+            </p>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Purpose</th>
+                            <th>Storage Location</th>
+                            <th>Transmitted?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Nickname / Name</td>
+                            <td>Greeting on the dashboard &amp; widgets</td>
+                            <td>Local DataStore</td>
+                            <td><span class="badge-none">Never</span></td>
+                        </tr>
+                        <tr>
+                            <td>Favorite Driver &amp; Team</td>
+                            <td>Highlighting favorite driver widgets</td>
+                            <td>Local DataStore</td>
+                            <td><span class="badge-none">Never</span></td>
+                        </tr>
+                        <tr>
+                            <td>Theme / Language Preference</td>
+                            <td>App display appearance (Light/Dark/Language)</td>
+                            <td>Local DataStore</td>
+                            <td><span class="badge-none">Never</span></td>
+                        </tr>
+                        <tr>
+                            <td>Race Standings &amp; Schedule Cache</td>
+                            <td>Offline viewing &amp; fast app loading</td>
+                            <td>Local Room DB</td>
+                            <td><span class="badge-none">Never</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="margin-top: 1rem;">
+                All local preferences can be wiped at any time by clearing the application storage via <em>Android Settings &rarr; Apps &rarr; Taras &rarr; Storage &rarr; Clear Data</em> or simply by uninstalling the application.
+            </p>
+        </section>
+
+        <section>
+            <h2>3. Network Communications &amp; Public Feeds</h2>
+            <p>
+                Taras interacts with the internet strictly to retrieve public Formula 1 sports information:
+            </p>
+            <ul>
+                <li><strong>Public Sports Data (TarasF1Data)</strong>: Race schedules, driver standings, constructor standings, and circuit information are fetched from the public static GitHub repository (<a href="https://github.com/yashajagiya/tarasF1Data" target="_blank" rel="noopener">tarasF1Data</a>). No client credentials, user identifiers, or personal payload are transmitted.</li>
+                <li><strong>News Aggregator</strong>: News headlines and thumbnails are parsed on-device directly from public RSS feeds published by prominent motorsport journalism outlets (such as Motorsport.com, Autosport, RaceFans, and PlanetF1).</li>
+                <li><strong>All Connections over HTTPS</strong>: All network interactions are encrypted in transit via standard Transport Layer Security (TLS/HTTPS).</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>4. Device Permissions</h2>
+            <p>Taras requests minimal Android permissions only when necessary for user-facing features:</p>
+            <ul>
+                <li><strong>Notifications (POST_NOTIFICATIONS)</strong>: On Android 13 and above, you may optionally enable notification permissions to receive race weekend countdown reminders and schedule notifications scheduled locally by Android WorkManager. No remote push notification tokens or device IDs are collected or stored.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>5. Google Play Data Safety Summary</h2>
+            <p>
+                In accordance with Google Play Developer Policies and the Google Play Data Safety Declaration:
+            </p>
+            <ul>
+                <li><strong>Data Collection</strong>: No user data is collected by the developer.</li>
+                <li><strong>Data Sharing</strong>: No user data is shared with third parties or advertisers.</li>
+                <li><strong>Data Transfer Security</strong>: All public API network requests are performed over secure HTTPS (encrypted in transit).</li>
+                <li><strong>Data Deletion</strong>: Users have 100% control over their data; uninstalling the app or clearing app cache permanently removes all stored data.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>6. Children's Privacy (COPPA Compliance)</h2>
+            <p>
+                Taras does not knowingly collect or solicit personal information from children under the age of 13. Since the application does not collect any personal data whatsoever, it is safe for Formula 1 fans of all ages.
+            </p>
+        </section>
+
+        <section>
+            <h2>7. Open Source Transparency &amp; Contact</h2>
+            <p>
+                Taras is completely open-source. You are invited to review the full source code on GitHub to verify our privacy commitments:
+            </p>
+            <p>
+                <a href="https://github.com/yashajagiya/Taras" target="_blank" rel="noopener">👉 GitHub Repository: yashajagiya/Taras</a>
+            </p>
+            <p style="margin-top: 1rem;">
+                If you have any questions or feedback regarding this Privacy Policy, please contact the developer via GitHub Issues or at:
+            </p>
+            <p>
+                <strong>Developer:</strong> Yash Ajagiya<br>
+                <strong>GitHub:</strong> <a href="https://github.com/yashajagiya" target="_blank" rel="noopener">https://github.com/yashajagiya</a>
+            </p>
+        </section>
+
+        <footer>
+            <p>&copy; 2026 Taras &bull; Developed by Yash Ajagiya &bull; Unofficial Formula 1 Companion</p>
+        </footer>
+    </div>
+</body>
+</html>

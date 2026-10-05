@@ -6,50 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Immutable
 @Serializable
-data class F1DriversInfoResponse(
-    val slug: String,
-    val url: String,
-    val hero: DriverHero,
-    val biography: Biography,
-    @SerialName("season_2026")
-    val seasonStats: DriverSeasonStats? = null,
-    @SerialName("career_stats")
-    val careerStats: CareerStats? = null,
-)
-
-@Immutable
-@Serializable
-data class DriverHero(
-    @SerialName("first_name") val firstName: String,
-    @SerialName("last_name") val lastName: String,
-    val country: String,
-    val team: String,
-    val number: String,
-    @SerialName("team_color") val teamColor: String,
-    @SerialName("accessible_color") val accessibleColor: String,
-    @SerialName("driver_image") val driverImage: String? = null,
-    @SerialName("driver_number_logo") val driverNumberLogo: String? = null,
-)
-
-@Immutable
-@Serializable
-data class Biography(
-    @SerialName("Date of Birth") val dateOfBirth: String,
-    @SerialName("Place of Birth") val placeOfBirth: String,
-    val text: List<String>,
-    val quote: Quote? = null,
-)
-
-@Immutable
-@Serializable
-data class Quote(
-    val text: String = "",
-    val author: String = "",
-)
-
-@Immutable
-@Serializable
-data class DriverSeasonStats(
+data class SeasonStats(
     @SerialName("Season Position") val seasonPosition: String = "",
     @SerialName("Season Points") val seasonPoints: String = "",
     @SerialName("Grand Prix Races") val grandPrixRaces: String = "",
@@ -70,13 +27,25 @@ data class DriverSeasonStats(
 
 @Immutable
 @Serializable
-data class CareerStats(
+data class TeamSummary(
     @SerialName("Grands Prix Entered") val grandsPrixEntered: String = "",
-    @SerialName("Career Points") val careerPoints: String = "",
+    @SerialName("Team Points") val teamPoints: String = "",
     @SerialName("Highest Race Finish") val highestRaceFinish: String = "",
     @SerialName("Podiums") val podiums: String = "",
     @SerialName("Highest Grid Position") val highestGridPosition: String = "",
     @SerialName("Pole Positions") val polePositions: String = "",
     @SerialName("World Championships") val worldChampionships: String = "",
-    @SerialName("DNFs") val dnfs: String = "",
+)
+
+@Immutable
+@Serializable
+data class TeamProfile(
+    @SerialName("Full Team Name") val fullTeamName: String = "",
+    @SerialName("Base") val base: String = "",
+    @SerialName("Team Chief") val teamChief: String = "",
+    @SerialName("Technical Chief") val technicalChief: String = "",
+    @SerialName("Chassis") val chassis: String = "",
+    @SerialName("Power Unit") val powerUnit: String = "",
+    @SerialName("Reserve Driver") val reserveDriver: String = "",
+    @SerialName("First Team Entry") val firstTeamEntry: String = "",
 )

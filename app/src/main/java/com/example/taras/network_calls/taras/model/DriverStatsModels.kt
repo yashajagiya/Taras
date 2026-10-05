@@ -1,37 +1,19 @@
 package com.example.taras.network_calls.taras.model
 
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Immutable
 @Serializable
-data class F1TeamsInfoResponse(
-    val slug: String,
-    val url: String,
-    val hero: Hero,
-    val biography: String = "",
-    @SerialName("season_2026")
-    val seasonStats: SeasonStats? = null,
-    @SerialName("team_summary")
-    val teamSummary: TeamSummary? = null,
-    @SerialName("team_profile")
-    val teamProfile: TeamProfile? = null,
+data class Quote(
+    val text: String = "",
+    val author: String = "",
 )
 
+@Immutable
 @Serializable
-data class Hero(
-    val name: String,
-    @SerialName("team_color")
-    val teamColor: String,
-    @SerialName("accessible_color")
-    val accessibleColor: String,
-    @SerialName("team_car")
-    val teamCar: String,
-    @SerialName("team_logo")
-    val teamLogo: String
-)
-
-@Serializable
-data class SeasonStats(
+data class DriverSeasonStats(
     @SerialName("Season Position") val seasonPosition: String = "",
     @SerialName("Season Points") val seasonPoints: String = "",
     @SerialName("Grand Prix Races") val grandPrixRaces: String = "",
@@ -50,25 +32,15 @@ data class SeasonStats(
     @SerialName("Sprint Top 10s") val sprintTop10s: String = "",
 )
 
+@Immutable
 @Serializable
-data class TeamSummary(
+data class CareerStats(
     @SerialName("Grands Prix Entered") val grandsPrixEntered: String = "",
-    @SerialName("Team Points") val teamPoints: String = "",
+    @SerialName("Career Points") val careerPoints: String = "",
     @SerialName("Highest Race Finish") val highestRaceFinish: String = "",
     @SerialName("Podiums") val podiums: String = "",
     @SerialName("Highest Grid Position") val highestGridPosition: String = "",
     @SerialName("Pole Positions") val polePositions: String = "",
     @SerialName("World Championships") val worldChampionships: String = "",
-)
-
-@Serializable
-data class TeamProfile(
-    @SerialName("Full Team Name") val fullTeamName: String = "",
-    @SerialName("Base") val base: String = "",
-    @SerialName("Team Chief") val teamChief: String = "",
-    @SerialName("Technical Chief") val technicalChief: String = "",
-    @SerialName("Chassis") val chassis: String = "",
-    @SerialName("Power Unit") val powerUnit: String = "",
-    @SerialName("Reserve Driver") val reserveDriver: String = "",
-    @SerialName("First Team Entry") val firstTeamEntry: String = "",
+    @SerialName("DNFs") val dnfs: String = "",
 )

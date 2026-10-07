@@ -29,7 +29,7 @@ data class BinderUiState(
     val selectedTier: RarityTier? = null,
     val selectedTeamId: String? = null,
     val totalCollected: Int = 0,
-    val totalCards: Int = 23,
+    val totalCards: Int = 34,
     val unrevealedCard: TcgCardEntity? = null
 )
 
@@ -83,7 +83,7 @@ class TcgViewModel(
             selectedTier = selectedTier,
             selectedTeamId = selectedTeamId,
             totalCollected = collectedCount,
-            totalCards = allCards.size.coerceAtLeast(23),
+            totalCards = allCards.size.coerceAtLeast(34),
             unrevealedCard = pendingPackCard
         )
     }.stateIn(

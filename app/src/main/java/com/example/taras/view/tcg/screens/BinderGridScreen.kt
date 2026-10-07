@@ -49,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -387,20 +388,43 @@ private fun BinderCardCell(
             )
     ) {
         if (item.isUnlocked) {
-            // Giant Watermark Number behind cutout
-            Text(
-                text = watermarkNumber,
-                fontSize = if (watermarkNumber.length <= 2) 56.sp else 34.sp,
-                fontWeight = FontWeight.Black,
-                fontStyle = FontStyle.Italic,
-                color = Color.White.copy(alpha = 0.24f),
-                letterSpacing = (-3).sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.Center)
-                    .padding(bottom = 6.dp)
-            )
+            if (card.role == CardRole.CHASSIS) {
+                val teamLogoUrl = remember(card.teamId) {
+                    com.example.taras.view.tcg.components.getTeamLogoWatermarkUrl(card.teamId)
+                }
+                val logoRequest = remember(teamLogoUrl) {
+                    ImageRequest.Builder(context)
+                        .data(teamLogoUrl)
+                        .crossfade(true)
+                        .build()
+                }
+                // Giant Watermark Team Logo behind car cutout
+                AsyncImage(
+                    model = logoRequest,
+                    contentDescription = "${card.teamName} Logo Watermark",
+                    contentScale = ContentScale.Fit,
+                    alignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 10.dp, vertical = 20.dp)
+                        .alpha(0.25f)
+                )
+            } else {
+                // Giant Watermark Number behind driver cutout
+                Text(
+                    text = watermarkNumber,
+                    fontSize = if (watermarkNumber.length <= 2) 56.sp else 34.sp,
+                    fontWeight = FontWeight.Black,
+                    fontStyle = FontStyle.Italic,
+                    color = Color.White.copy(alpha = 0.24f),
+                    letterSpacing = (-3).sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Center)
+                        .padding(bottom = 6.dp)
+                )
+            }
 
             // Unlocked Card Thumbnail Content
             Column(
@@ -479,7 +503,7 @@ private fun BinderCardCell(
                     model = imageRequest,
                     contentDescription = card.name,
                     contentScale = ContentScale.Fit,
-                    alignment = Alignment.BottomCenter,
+                    alignment = if (card.role == CardRole.CHASSIS) Alignment.Center else Alignment.BottomCenter,
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)

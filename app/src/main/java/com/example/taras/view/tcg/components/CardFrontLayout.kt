@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Size
@@ -57,12 +58,40 @@ import com.example.taras.core.tcg.model.RarityTier
  */
 fun getOptimizedAvatarUrl(rawUrl: String): String {
     return if (rawUrl.contains("media.formula1.com/image/upload/")) {
-        rawUrl.replace(
-            Regex("image/upload/(?:c_[^/]+/)?(?:q_[^/]+/)?(?:d_[^/]+/)?"),
-            "image/upload/c_crop,g_north,w_1080,h_1350/q_auto:best/"
-        )
+        if (rawUrl.contains("carright")) {
+            rawUrl.replace(
+                Regex("image/upload/(?:c_[^/]+/)?(?:q_[^/]+/)?(?:d_[^/]+/)?"),
+                "image/upload/c_fit,w_1600/q_auto:best/"
+            )
+        } else {
+            rawUrl.replace(
+                Regex("image/upload/(?:c_[^/]+/)?(?:q_[^/]+/)?(?:d_[^/]+/)?"),
+                "image/upload/c_crop,g_north,w_1080,h_1350/q_auto:best/"
+            )
+        }
     } else {
         rawUrl
+    }
+}
+
+/**
+ * High-resolution official vector/transparent team logo watermark for constructor chassis cards.
+ */
+fun getTeamLogoWatermarkUrl(teamId: String): String {
+    val cleanId = teamId.lowercase().replace("-", "").replace("_", "").replace(" ", "")
+    return when (cleanId) {
+        "ferrari" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/ferrari/2025ferrarilogolight.webp"
+        "redbull", "redbullracing" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/redbullracing/2025redbullracinglogowhite.webp"
+        "mclaren" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/mclaren/2025mclarenlogowhite.webp"
+        "mercedes" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/mercedes/2025mercedeslogowhite.webp"
+        "astonmartin" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/astonmartin/2025astonmartinlogowhite.webp"
+        "williams" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/williams/2025williamslogowhite.webp"
+        "audi" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2026/audi/2026audilogowhite.webp"
+        "alpine" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/alpine/2025alpinelogowhite.webp"
+        "cadillac" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2026/cadillac/2026cadillaclogowhite.webp"
+        "racingbulls", "vcarb" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/racingbulls/2025racingbullslogowhite.webp"
+        "haas" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/haas/2025haaslogowhite.webp"
+        else -> ""
     }
 }
 
@@ -250,7 +279,13 @@ private fun TopHeaderBar(
             )
         }
 
-        // Center: Driver Name & Team Name in middle top of the card
+        // Center: Driver Name or Chassis Name in middle top of the card
+        val titleText = if (card.role == CardRole.CHASSIS) {
+            card.name.uppercase()
+        } else {
+            "${card.name.uppercase()} ${card.driverNumber}".trim()
+        }
+
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -258,7 +293,7 @@ private fun TopHeaderBar(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "${card.name.uppercase()} ${card.driverNumber}".trim(),
+                text = titleText,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 0.3.sp,
@@ -339,30 +374,51 @@ private fun ArtworkWindow(
             )
             .border(1.2.dp, tierColor.copy(alpha = 0.85f), windowShape)
     ) {
-        // GIANT WATERMARK DRIVER NUMBER - In the back of the driver
-        Text(
-            text = watermarkNumber,
-            fontSize = if (watermarkNumber.length <= 2) 160.sp else 100.sp,
-            fontWeight = FontWeight.Black,
-            fontStyle = FontStyle.Italic,
-            color = Color.White.copy(alpha = 0.28f),
-            letterSpacing = (-4).sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Center)
-                .padding(bottom = 4.dp)
-        )
+        if (card.role == CardRole.CHASSIS) {
+            val teamLogoUrl = remember(card.teamId) { getTeamLogoWatermarkUrl(card.teamId) }
+            val logoRequest = remember(teamLogoUrl) {
+                ImageRequest.Builder(context)
+                    .data(teamLogoUrl)
+                    .crossfade(true)
+                    .build()
+            }
+            // GIANT WATERMARK TEAM / CAR LOGO - In the back of the chassis
+            AsyncImage(
+                model = logoRequest,
+                contentDescription = "${card.teamName} Logo Watermark",
+                contentScale = ContentScale.Fit,
+                alignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp, vertical = 20.dp)
+                    .alpha(0.28f)
+            )
+        } else {
+            // GIANT WATERMARK DRIVER NUMBER - In the back of the driver
+            Text(
+                text = watermarkNumber,
+                fontSize = if (watermarkNumber.length <= 2) 160.sp else 100.sp,
+                fontWeight = FontWeight.Black,
+                fontStyle = FontStyle.Italic,
+                color = Color.White.copy(alpha = 0.28f),
+                letterSpacing = (-4).sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
+                    .padding(bottom = 4.dp)
+            )
+        }
 
-        // Driver Portrait - Head down to waist (top 50% high-res 1080x1350 crop)
+        // Driver Portrait or Chassis Car Cutout
         AsyncImage(
             model = imageRequest,
             contentDescription = card.name,
             contentScale = ContentScale.Fit,
-            alignment = Alignment.BottomCenter,
+            alignment = if (card.role == CardRole.CHASSIS) Alignment.Center else Alignment.BottomCenter,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 2.dp)
+                .padding(if (card.role == CardRole.CHASSIS) 6.dp else 2.dp)
                 .clip(windowShape)
         )
     }
@@ -542,7 +598,7 @@ private fun CollectorFooter(card: TcgCardEntity) {
             color = Color(0xFF888888)
         )
         Text(
-            text = "$cardNumberFormatted/023 $rarityName",
+            text = "$cardNumberFormatted/034 $rarityName",
             fontSize = 6.5.sp,
             fontWeight = FontWeight.Bold,
             color = card.tier.borderColor

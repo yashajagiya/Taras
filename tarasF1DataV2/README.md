@@ -105,7 +105,7 @@ interface F1ApiService {
 tarasF1DataV2/
 ├── data/
 │   ├── drivers_registry.json    ← Master registry of all 23 drivers (IDs, numbers, colors, images)
-│   ├── teams_registry.json      ← Master registry of all 11 teams (specs, engines, leadership)
+│   ├── teams_registry.json      ← Master registry of all 11 teams (specs, assets, engines, leadership)
 │   ├── calendar_master.json     ← Master 2026 calendar (23 rounds, circuit records, track maps)
 │   └── sessions/                ← Master archives for all rounds (round_1.json ... round_16.json)
 ├── collectors/
@@ -125,6 +125,8 @@ tarasF1DataV2/
 │       ├── round_1.json ... round_16.json
 └── README.md                    ← This developer guide
 ```
+
+The v2 builder uses the canonical 2026 team colors and car/logo URLs in `team_assets.py` on every build. The generated team JSON therefore always uses these assets without scraping the Formula 1 site or relying on image URLs in the registry.
 
 ---
 

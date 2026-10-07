@@ -14,6 +14,7 @@ def load_driver_encyclopedia(path=None):
         base_dir = os.path.dirname(os.path.abspath(__file__))
         candidates = [
             os.path.abspath(os.path.join(base_dir, "..", "..", "f1Info", "drivers_data.json")),
+            os.path.abspath(os.path.join(base_dir, "..", "..", "v1", "f1Info", "drivers_data.json")),
             os.path.abspath(os.path.join(base_dir, "..", "f1Info", "drivers_data.json")),
             os.path.abspath(os.path.join(base_dir, "..", "..", "tarasF1Data", "f1Info", "drivers_data.json")),
             os.path.abspath(os.path.join(base_dir, "..", "data", "drivers_registry.json")),

@@ -9,6 +9,9 @@ import sys
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+sys.path.insert(0, BASE_DIR)
+
+from team_assets import get_team_assets
 
 if sys.platform == "win32":
     try:
@@ -60,6 +63,10 @@ def run_integrity_tests():
         assert t["images"]["logo"], f"Missing logo for {t['name']}"
         assert t["power_unit"], f"Missing power unit for {t['name']}"
         assert t["team_chief"], f"Missing team chief for {t['name']}"
+        assets = get_team_assets(t["id"])
+        assert t["colors"]["color_argb"] == assets["team_color"], f"Team color mismatch for {t['name']}"
+        assert t["images"]["car"] == assets["team_car"], f"Car image mismatch for {t['name']}"
+        assert t["images"]["logo"] == assets["team_logo"], f"Logo image mismatch for {t['name']}"
     print("  [PASS] 3. teams.json integrity verified (All 11 constructors, car renders, logos, specs)")
 
     # 4. Test Standings

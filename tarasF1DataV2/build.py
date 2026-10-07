@@ -22,6 +22,7 @@ if sys.platform == "win32":
 from collectors.espn_standings import fetch_espn_raw_data, parse_standings, load_drivers_lookup
 from collectors.f1_encyclopedia import load_driver_encyclopedia, load_team_encyclopedia
 from collectors.f1_sessions import load_all_known_sessions, get_latest_weekend_event
+from team_assets import get_team_assets
 
 
 
@@ -173,7 +174,8 @@ def build_v2_api():
         # Find drivers in this team
         team_driver_ids = [d["id"] for d in unified_drivers if d["team"]["name"].lower() == team_name.lower()]
 
-        color_raw = hero.get("team_color", "")
+        team_assets = get_team_assets(slug)
+        color_raw = team_assets["team_color"]
         hex_color = ('#' + color_raw[4:]) if color_raw.startswith('0xFF') else color_raw
 
         team_obj = {
@@ -193,8 +195,8 @@ def build_v2_api():
                 "accessible_color": hero.get("accessible_color")
             },
             "images": {
-                "car": hero.get("team_car"),
-                "logo": hero.get("team_logo")
+                "car": team_assets["team_car"],
+                "logo": team_assets["team_logo"]
             },
             "drivers": team_driver_ids,
             "standings": {
@@ -464,4 +466,3 @@ if __name__ == "__main__":
             run_session_scraper(sess)
 
     build_v2_api()
-

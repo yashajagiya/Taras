@@ -37,6 +37,7 @@ import com.example.taras.viewmodel.AppearanceViewModel
 import com.example.taras.viewmodel.UserViewModel
 import androidx.compose.animation.Crossfade
 import com.example.taras.view.onboarding.OnboardingScreen
+import com.example.taras.core.tcg.worker.WeeklyPackWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -48,6 +49,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        WeeklyPackWorker.scheduleWeeklyPack(this)
         navTargetState.value = intent?.getStringExtra("nav_target")
 
         setContent {
@@ -77,6 +79,8 @@ class MainActivity : ComponentActivity() {
             val startRoute = when (navTarget) {
                 "grid" -> MainNavRoutes.Grid
                 "results" -> MainNavRoutes.F1Results
+                "tcg_pack" -> MainNavRoutes.TcgScratchPack()
+                "tcg_binder" -> MainNavRoutes.TcgBinder
                 else -> MainNavRoutes.Paddock
             }
 
@@ -98,6 +102,8 @@ class MainActivity : ComponentActivity() {
                     "results" -> navigator.navigate(MainNavRoutes.F1Results)
                     "paddock" -> navigator.navigate(MainNavRoutes.Paddock)
                     "onboarding" -> showManualOnboarding = true
+                    "tcg_pack" -> navigator.navigate(MainNavRoutes.TcgScratchPack())
+                    "tcg_binder" -> navigator.navigate(MainNavRoutes.TcgBinder)
                 }
             }
 
@@ -125,7 +131,8 @@ class MainActivity : ComponentActivity() {
                             userViewModel = userViewModel,
                             appearanceExpanded = appearanceExpanded,
                             onAppearanceExpandChange = { appearanceExpanded = it },
-                            onOpenOnboarding = { showManualOnboarding = true }
+                            onOpenOnboarding = { showManualOnboarding = true },
+                            onNavigateToTcgBinder = { navigator.navigate(MainNavRoutes.TcgBinder) }
                         ) {
                             Scaffold(
                                 modifier = Modifier.fillMaxSize(),

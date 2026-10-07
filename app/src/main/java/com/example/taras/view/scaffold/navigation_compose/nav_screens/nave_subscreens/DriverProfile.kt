@@ -22,11 +22,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.FlagCircle
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Style
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -108,7 +110,8 @@ fun DriverProfile(
         factory = DriversViewModelFactory(AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao())
     ),
     onCompareTeammatesClick: (String, String) -> Unit = { _, _ -> },
-    onDriverClick: (String) -> Unit = {}
+    onDriverClick: (String) -> Unit = {},
+    onNavigateToTcgBinder: () -> Unit = {}
 ) {
     val driverDetailsState by driversViewModel.combinedDetailedDrivers.collectAsStateWithLifecycle()
     val isRefreshing by driversViewModel.isRefreshing.collectAsStateWithLifecycle()
@@ -133,6 +136,7 @@ fun DriverProfile(
         onRefresh = { driversViewModel.fetchDriverData(isRefresh = true) },
         onCompareTeammatesClick = onCompareTeammatesClick,
         onDriverClick = onDriverClick,
+        onNavigateToTcgBinder = onNavigateToTcgBinder,
         modifier = modifier
     )
 }
@@ -151,6 +155,7 @@ fun DriverProfileContent(
     onToggleFavorite: () -> Unit = {},
     onCompareTeammatesClick: (String, String) -> Unit = { _, _ -> },
     onDriverClick: (String) -> Unit = {},
+    onNavigateToTcgBinder: () -> Unit = {},
     isRefreshing: Boolean = false
 ) {
     Box(modifier = modifier.fillMaxSize()) {
@@ -396,6 +401,59 @@ fun DriverProfileContent(
                                         DriverStatItem(
                                             label = stringResource(R.string.stat_points),
                                             value = driver.championshipPoints.toString()
+                                        )
+                                    }
+                                }
+                            }
+
+                            item {
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Card(
+                                    onClick = onNavigateToTcgBinder,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp),
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                                    ),
+                                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 14.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(
+                                                imageVector = Icons.Filled.Style,
+                                                contentDescription = null,
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.size(24.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(12.dp))
+                                            Column {
+                                                Text(
+                                                    text = "F1 GRID TCG 2026",
+                                                    fontWeight = FontWeight.Black,
+                                                    fontSize = 13.sp,
+                                                    letterSpacing = 0.5.sp,
+                                                    color = MaterialTheme.colorScheme.onSurface
+                                                )
+                                                Text(
+                                                    text = "View Collectible Cards & Stats",
+                                                    fontSize = 11.sp,
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                )
+                                            }
+                                        }
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                            contentDescription = "Open Binder",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(18.dp)
                                         )
                                     }
                                 }
@@ -692,7 +750,11 @@ fun ChartPerRace(
     perRace: ImmutableList<com.example.taras.network_calls.taras.model.DriverPerRace>,
     points: String
 ) {
-    if (perRace.isEmpty()) {
+    val playedRaces = remember(perRace) {
+        perRace.filter { it.played }
+    }
+
+    if (playedRaces.isEmpty()) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -713,11 +775,19 @@ fun ChartPerRace(
         return
     }
 
+    val cumulativePoints = remember(playedRaces) {
+        var runningTotal = 0
+        playedRaces.map { race ->
+            runningTotal += race.value
+            runningTotal
+        }
+    }
+
     val chartTitle = stringResource(R.string.points_progression_title) + " +$points"
-    val dataSet = remember(perRace, points, chartTitle) {
-        perRace.map { it.value }.toChartDataSet(
+    val dataSet = remember(cumulativePoints, playedRaces, chartTitle) {
+        cumulativePoints.toChartDataSet(
             title = chartTitle,
-            labels = perRace.map { it.name }
+            labels = playedRaces.map { it.displayName.ifBlank { it.name.take(3).uppercase() } }
         )
     }
     LineChart(
@@ -728,7 +798,7 @@ fun ChartPerRace(
             pointSize = 8f,
             xAxisLabelsVisible = true,
             yAxisLabelsVisible = true,
-            xAxisLabelMaxCount = perRace.size.coerceAtLeast(1)
+            xAxisLabelMaxCount = playedRaces.size.coerceAtLeast(1)
         )
     )
 }

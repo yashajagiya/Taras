@@ -692,7 +692,11 @@ private fun ChartPerTeam(
     perRace: ImmutableList<com.example.taras.network_calls.taras.model.Racedata>,
     points: String
 ) {
-    if (perRace.isEmpty()) {
+    val playedRaces = remember(perRace) {
+        perRace.filter { it.played }
+    }
+
+    if (playedRaces.isEmpty()) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -713,11 +717,19 @@ private fun ChartPerTeam(
         return
     }
 
+    val cumulativePoints = remember(playedRaces) {
+        var runningTotal = 0
+        playedRaces.map { race ->
+            runningTotal += race.value
+            runningTotal
+        }
+    }
+
     val chartTitle = stringResource(R.string.points_progression_title) + " +$points"
-    val dataSet = remember(perRace, points, chartTitle) {
-        perRace.map { it.value }.toChartDataSet(
+    val dataSet = remember(cumulativePoints, playedRaces, chartTitle) {
+        cumulativePoints.toChartDataSet(
             title = chartTitle,
-            labels = perRace.map { it.name }
+            labels = playedRaces.map { it.displayName.ifBlank { it.name.take(3).uppercase() } }
         )
     }
     LineChart(
@@ -728,7 +740,7 @@ private fun ChartPerTeam(
             pointSize = 8f,
             xAxisLabelsVisible = true,
             yAxisLabelsVisible = true,
-            xAxisLabelMaxCount = perRace.size.coerceAtLeast(1)
+            xAxisLabelMaxCount = playedRaces.size.coerceAtLeast(1)
         )
     )
 }

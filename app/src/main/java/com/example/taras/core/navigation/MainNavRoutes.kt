@@ -33,4 +33,13 @@ sealed class MainNavRoutes : NavKey {
 
     @Serializable
     data class Comparison(val initialDriver1: String = "", val initialDriver2: String = "") : MainNavRoutes()
+
+    @Serializable
+    data object TcgBinder : MainNavRoutes()
+
+    @Serializable
+    data class TcgScratchPack(val cardId: String = "") : MainNavRoutes()
+
+    @Serializable
+    data class TcgArena(val card1Id: String = "card_fer_44", val card2Id: String = "card_rbr_03") : MainNavRoutes()
 }

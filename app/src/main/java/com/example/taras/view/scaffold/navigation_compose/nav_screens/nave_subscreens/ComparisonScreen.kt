@@ -94,6 +94,9 @@ import com.example.taras.viewmodel.DriverDetailUiModel
 import com.example.taras.viewmodel.DriversViewModel
 import com.example.taras.viewmodel.DriversViewModelFactory
 import com.example.taras.viewmodel.TeamsViewModel
+import io.github.dautovicharis.charts.LineChart
+import io.github.dautovicharis.charts.model.toMultiChartDataSet
+import io.github.dautovicharis.charts.style.LineChartDefaults
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -101,6 +104,7 @@ fun ComparisonScreen(
     initialDriver1: String = "",
     initialDriver2: String = "",
     onBackClick: () -> Unit = {},
+    onBattleArenaClick: (String, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
     driversViewModel: DriversViewModel = viewModel(
         factory = DriversViewModelFactory(AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao())
@@ -171,7 +175,8 @@ fun ComparisonScreen(
                             DriverComparisonView(
                                 drivers = drivers,
                                 initialDriver1 = initialDriver1,
-                                initialDriver2 = initialDriver2
+                                initialDriver2 = initialDriver2,
+                                onBattleArenaClick = onBattleArenaClick
                             )
                         } else {
                             EmptyComparisonView(stringResource(R.string.comparison_empty_drivers))
@@ -211,7 +216,8 @@ private data class TeammatePair(
 private fun DriverComparisonView(
     drivers: List<DriverDetailUiModel>,
     initialDriver1: String,
-    initialDriver2: String
+    initialDriver2: String,
+    onBattleArenaClick: (String, String) -> Unit = { _, _ -> }
 ) {
     // Sort drivers by championship rank: P1 is index 0 (#1 in list), P2 is index 1 (#2 in list)
     val sortedDrivers = remember(drivers) {
@@ -321,9 +327,68 @@ private fun DriverComparisonView(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp),
+        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 28.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
+        // TCG Battle Arena Banner
+        item(contentType = "TcgBattleArenaBanner") {
+            Card(
+                onClick = {
+                    onBattleArenaClick(selectedDriver1.driverNumber, selectedDriver2.driverNumber)
+                },
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 2.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                ),
+                shape = RoundedCornerShape(12.dp),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                )
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.CompareArrows,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                text = "F1 2026 TCG BATTLE ARENA",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 0.5.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                text = "${selectedDriver1.lastName} VS ${selectedDriver2.lastName} • Head-to-Head Clash",
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.primary
+                    ) {
+                        Text(
+                            text = "CHALLENGE",
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
+            }
+        }
         // Teammates Auto-Suggestions
         if (teammatePairs.isNotEmpty()) {
             item(contentType = "TeammateShortcuts") {
@@ -526,6 +591,15 @@ private fun DriverComparisonView(
         // Section: 2026 Season Performance
         item(contentType = "SectionHeader") {
             SectionHeader(title = "SEASON PERFORMANCE", subtitle = "2026 World Championship")
+        }
+
+        item(contentType = "HeadToHeadChart") {
+            HeadToHeadDriverChart(
+                driver1 = selectedDriver1,
+                driver2 = selectedDriver2,
+                color1 = d1Color,
+                color2 = d2Color
+            )
         }
 
         val d1Stats = selectedDriver1.seasonStats
@@ -882,6 +956,15 @@ private fun TeamComparisonView(teams: List<DetailedTeamUiModel>) {
         // Section: 2026 Constructors Championship
         item(contentType = "SectionHeader") {
             SectionHeader(title = "CONSTRUCTORS CHAMPIONSHIP", subtitle = "2026 Season Performance")
+        }
+
+        item(contentType = "HeadToHeadChart") {
+            HeadToHeadTeamChart(
+                team1 = selectedTeam1,
+                team2 = selectedTeam2,
+                color1 = t1Color,
+                color2 = t2Color
+            )
         }
 
         val s1 = selectedTeam1.seasonStats
@@ -2012,7 +2095,7 @@ private fun DriverSelectionSheet(
                             color = MaterialTheme.colorScheme.primary
                         ) {
                             Text(
-                                text = "Select ⚔️",
+                                text = "Select",
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
@@ -2377,3 +2460,192 @@ private fun formatBirthDateAndAge(dob: String): String {
         dob
     }
 }
+
+@Composable
+private fun HeadToHeadDriverChart(
+    driver1: DriverDetailUiModel,
+    driver2: DriverDetailUiModel,
+    color1: Color,
+    color2: Color,
+    modifier: Modifier = Modifier
+) {
+    val maxPlayedRound = maxOf(
+        driver1.races.indexOfLast { it.played } + 1,
+        driver2.races.indexOfLast { it.played } + 1
+    )
+
+    if (maxPlayedRound <= 0) return
+
+    var cum1 = 0
+    val d1Points = (0 until maxPlayedRound).map { i ->
+        cum1 += driver1.races.getOrNull(i)?.value ?: 0
+        cum1
+    }
+
+    var cum2 = 0
+    val d2Points = (0 until maxPlayedRound).map { i ->
+        cum2 += driver2.races.getOrNull(i)?.value ?: 0
+        cum2
+    }
+
+    val categories = (0 until maxPlayedRound).map { i ->
+        val code1 = driver1.races.getOrNull(i)?.displayName.orEmpty()
+        val code2 = driver2.races.getOrNull(i)?.displayName.orEmpty()
+        code1.ifBlank { code2.ifBlank { "R${i + 1}" } }
+    }
+
+    val items = listOf(
+        driver1.shortName.ifBlank { driver1.fullName } to d1Points,
+        driver2.shortName.ifBlank { driver2.fullName } to d2Points
+    )
+
+    val chartTitle = stringResource(R.string.points_progression_title)
+    val dataSet = remember(items, categories, chartTitle) {
+        items.toMultiChartDataSet(
+            title = chartTitle,
+            categories = categories
+        )
+    }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "HEAD-TO-HEAD PROGRESSION",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    letterSpacing = 1.sp
+                )
+                Text(
+                    text = "${driver1.abbreviation} (${driver1.championshipPoints}) vs ${driver2.abbreviation} (${driver2.championshipPoints})",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            LineChart(
+                dataSet = dataSet,
+                style = LineChartDefaults.style(
+                    lineColors = listOf(color1, color2),
+                    pointVisible = true,
+                    xAxisLabelsVisible = true,
+                    yAxisLabelsVisible = true,
+                    xAxisLabelMaxCount = categories.size.coerceAtLeast(1)
+                )
+            )
+        }
+    }
+}
+
+@Composable
+private fun HeadToHeadTeamChart(
+    team1: DetailedTeamUiModel,
+    team2: DetailedTeamUiModel,
+    color1: Color,
+    color2: Color,
+    modifier: Modifier = Modifier
+) {
+    val maxPlayedRound = maxOf(
+        team1.races.indexOfLast { it.played } + 1,
+        team2.races.indexOfLast { it.played } + 1
+    )
+
+    if (maxPlayedRound <= 0) return
+
+    var cum1 = 0
+    val t1Points = (0 until maxPlayedRound).map { i ->
+        cum1 += team1.races.getOrNull(i)?.value ?: 0
+        cum1
+    }
+
+    var cum2 = 0
+    val t2Points = (0 until maxPlayedRound).map { i ->
+        cum2 += team2.races.getOrNull(i)?.value ?: 0
+        cum2
+    }
+
+    val categories = (0 until maxPlayedRound).map { i ->
+        val code1 = team1.races.getOrNull(i)?.displayName.orEmpty()
+        val code2 = team2.races.getOrNull(i)?.displayName.orEmpty()
+        code1.ifBlank { code2.ifBlank { "R${i + 1}" } }
+    }
+
+    val items = listOf(
+        team1.teamName.split(" ").first() to t1Points,
+        team2.teamName.split(" ").first() to t2Points
+    )
+
+    val chartTitle = stringResource(R.string.points_progression_title)
+    val dataSet = remember(items, categories, chartTitle) {
+        items.toMultiChartDataSet(
+            title = chartTitle,
+            categories = categories
+        )
+    }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "HEAD-TO-HEAD PROGRESSION",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    letterSpacing = 1.sp
+                )
+                Text(
+                    text = "${team1.teamName} (${team1.currentPoints}) vs ${team2.teamName} (${team2.currentPoints})",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            LineChart(
+                dataSet = dataSet,
+                style = LineChartDefaults.style(
+                    lineColors = listOf(color1, color2),
+                    pointVisible = true,
+                    xAxisLabelsVisible = true,
+                    yAxisLabelsVisible = true,
+                    xAxisLabelMaxCount = categories.size.coerceAtLeast(1)
+                )
+            )
+        }
+    }
+}
+

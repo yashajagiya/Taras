@@ -18,6 +18,8 @@ import com.example.taras.view.scaffold.navigation_compose.nav_screens.nave_subsc
 
 import com.example.taras.viewmodel.AppearanceViewModel
 import com.example.taras.viewmodel.UserViewModel
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun MainNavHost(
@@ -89,6 +91,9 @@ fun MainNavHost(
                         },
                         onDriverClick = { teammateNum ->
                             navigator.navigate(MainNavRoutes.DriverProfile(teammateNum))
+                        },
+                        onNavigateToTcgBinder = {
+                            navigator.navigate(MainNavRoutes.TcgBinder)
                         }
                     )
                 }
@@ -111,6 +116,70 @@ fun MainNavHost(
                     com.example.taras.view.scaffold.navigation_compose.nav_screens.nave_subscreens.ComparisonScreen(
                         initialDriver1 = route.initialDriver1,
                         initialDriver2 = route.initialDriver2,
+                        onBackClick = { navigator.goBack() },
+                        onBattleArenaClick = { d1, d2 ->
+                            val c1 = com.example.taras.core.tcg.seed.RosterSeedData.allCards.find { it.code.equals(d1, true) || it.name.contains(d1, true) }?.id ?: "card_fer_44"
+                            val c2 = com.example.taras.core.tcg.seed.RosterSeedData.allCards.find { it.code.equals(d2, true) || it.name.contains(d2, true) }?.id ?: "card_rbr_03"
+                            navigator.navigate(MainNavRoutes.TcgArena(card1Id = c1, card2Id = c2))
+                        }
+                    )
+                }
+                entry<MainNavRoutes.TcgBinder> {
+                    val tcgViewModel: com.example.taras.viewmodel.TcgViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+                        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+                            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                                val db = com.example.taras.core.db.AppDatabase.getDatabase(context)
+                                val repo = com.example.taras.core.tcg.repository.TcgRepository(db.tcgCardDao())
+                                @Suppress("UNCHECKED_CAST")
+                                return com.example.taras.viewmodel.TcgViewModel(repo) as T
+                            }
+                        }
+                    )
+                    com.example.taras.view.tcg.screens.BinderGridScreen(
+                        viewModel = tcgViewModel,
+                        onBackClick = { navigator.goBack() },
+                        onOpenPackClick = {
+                            tcgViewModel.openMysteryPack { drawnCard ->
+                                navigator.navigate(MainNavRoutes.TcgScratchPack(cardId = drawnCard.id))
+                            }
+                        },
+                        onBattleClick = { card1, card2 ->
+                            navigator.navigate(MainNavRoutes.TcgArena(card1Id = card1, card2Id = card2))
+                        }
+                    )
+                }
+                entry<MainNavRoutes.TcgScratchPack> { route ->
+                    val tcgViewModel: com.example.taras.viewmodel.TcgViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
+                        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+                            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                                val db = com.example.taras.core.db.AppDatabase.getDatabase(context)
+                                val repo = com.example.taras.core.tcg.repository.TcgRepository(db.tcgCardDao())
+                                @Suppress("UNCHECKED_CAST")
+                                return com.example.taras.viewmodel.TcgViewModel(repo) as T
+                            }
+                        }
+                    )
+                    val uiState by tcgViewModel.uiState.collectAsStateWithLifecycle()
+                    val cardToScratch = uiState.allBinderItems.find { it.card.id == route.cardId }?.card
+                        ?: uiState.unrevealedCard
+                        ?: com.example.taras.core.tcg.seed.RosterSeedData.allCards.first()
+
+                    com.example.taras.view.tcg.screens.PackOpeningScreen(
+                        card = cardToScratch,
+                        onScratchFinished = { cardId ->
+                            tcgViewModel.completeScratch(cardId)
+                        },
+                        onBackClick = { navigator.goBack() },
+                        onBattleClick = { cardId ->
+                            val opponent = if (cardId == "card_fer_44") "card_rbr_03" else "card_fer_44"
+                            navigator.navigate(MainNavRoutes.TcgArena(card1Id = cardId, card2Id = opponent))
+                        }
+                    )
+                }
+                entry<MainNavRoutes.TcgArena> { route ->
+                    com.example.taras.view.tcg.screens.BattleArenaScreen(
+                        initialCard1Id = route.card1Id,
+                        initialCard2Id = route.card2Id,
                         onBackClick = { navigator.goBack() }
                     )
                 }

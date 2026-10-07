@@ -21,12 +21,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.SportsMotorsports
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Style
 import com.example.taras.R
 import com.example.taras.network_calls.ApiConstants
 import com.example.taras.view.subview.PrivacyPolicyDialog
@@ -91,6 +95,7 @@ fun SettingDrawer(
     appearanceExpanded: Boolean = false,
     onAppearanceExpandChange: (Boolean) -> Unit = {},
     onOpenOnboarding: () -> Unit = {},
+    onNavigateToTcgBinder: () -> Unit = {},
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -108,6 +113,7 @@ fun SettingDrawer(
         ModalNavigationDrawer(
             modifier = modifier,
             drawerState = drawerState,
+            gesturesEnabled = drawerState.isOpen,
             drawerContent = {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     ModalDrawerSheet {
@@ -128,6 +134,28 @@ fun SettingDrawer(
                                 style = MaterialTheme.typography.titleMedium
                             )
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                            // F1 GridTCG 2026 Navigation Item
+                            NavigationDrawerItem(
+                                label = {
+                                    Text(
+                                        text = "F1 GridTCG Binder",
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                },
+                                selected = false,
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Filled.Style,
+                                        contentDescription = "F1 GridTCG",
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                },
+                                onClick = {
+                                    scope.launch { drawerState.close() }
+                                    onNavigateToTcgBinder()
+                                }
+                            )
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp))
                             Box {
                                 NavigationDrawerItem(
                                     label = { Text(stringResource(R.string.drawer_hello_user, userName)) },

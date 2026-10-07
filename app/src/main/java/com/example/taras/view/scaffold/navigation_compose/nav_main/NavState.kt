@@ -56,6 +56,9 @@ val serializerConfig = SavedStateConfiguration {
             subclass(MainNavRoutes.TeamsData::class)
             subclass(MainNavRoutes.DrawerSetting::class)
             subclass(MainNavRoutes.Comparison::class)
+            subclass(MainNavRoutes.TcgBinder::class)
+            subclass(MainNavRoutes.TcgScratchPack::class)
+            subclass(MainNavRoutes.TcgArena::class)
         }
     }
 }

@@ -1,30 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taras (तरस्) — High-Performance Formula 1 Companion for Android</title>
-    <meta name="description" content="Taras is a high-performance, tracker-free Formula 1 companion Android application built with Jetpack Compose, Material Design 3, and modern Android architecture.">
+    <meta name="description" content="Taras is an ultra-fast, tracker-free Formula 1 companion Android application built with Jetpack Compose, Material Design 3, and modern Android architecture.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
+            --theme-transition: background-color 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                                border-color 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                                color 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                                box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Dark Mode Tokens (Default F1 Marina Bay Midnight) */
             --bg-base: #080A0F;
             --bg-surface: #0E121A;
-            --bg-card: rgba(18, 24, 35, 0.78);
-            --bg-card-hover: rgba(25, 33, 49, 0.92);
+            --bg-card: rgba(18, 24, 35, 0.82);
+            --bg-card-hover: rgba(25, 33, 49, 0.95);
             --card-border: rgba(255, 255, 255, 0.08);
             --card-border-hover: rgba(225, 6, 0, 0.45);
-            
+            --header-bg: rgba(8, 10, 15, 0.92);
+            --nav-hover: rgba(255, 255, 255, 0.08);
+
             --f1-red: #E10600;
             --f1-red-dark: #B30000;
             --f1-red-glow: rgba(225, 6, 0, 0.4);
-            
+
             --text-main: #F3F4F6;
             --text-secondary: #9CA3AF;
             --text-muted: #6B7280;
-            
+
             --pill-green: #10B981;
             --pill-green-bg: rgba(16, 185, 129, 0.14);
             --pill-blue: #3B82F6;
@@ -33,6 +41,59 @@
             --pill-gold-bg: rgba(245, 158, 11, 0.14);
             --pill-purple: #8B5CF6;
             --pill-purple-bg: rgba(139, 92, 246, 0.14);
+
+            --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            --card-shadow-hover: 0 20px 40px -15px rgba(225, 6, 0, 0.25);
+            --mesh-glow: radial-gradient(circle at 50% 0%, rgba(225, 6, 0, 0.22) 0%, transparent 60%);
+            --officer-box-bg: rgba(14, 18, 26, 0.85);
+
+            --locked-bg: rgba(245, 158, 11, 0.04);
+            --locked-border: rgba(245, 158, 11, 0.28);
+            --locked-border-hover: rgba(245, 158, 11, 0.55);
+            --locked-badge-bg: rgba(245, 158, 11, 0.15);
+            --locked-badge-color: #FBBF24;
+            --locked-watermark: rgba(245, 158, 11, 0.04);
+        }
+
+        [data-theme="light"] {
+            /* Light Mode Tokens (matching Android Theme.kt / Color.kt Warm Paper) */
+            --bg-base: #FFF8F6;
+            --bg-surface: #FEF1EF;
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-card-hover: #FFFFFF;
+            --card-border: rgba(192, 1, 0, 0.12);
+            --card-border-hover: rgba(225, 6, 0, 0.45);
+            --header-bg: rgba(255, 248, 246, 0.92);
+            --nav-hover: rgba(192, 1, 0, 0.06);
+
+            --f1-red: #C00100;
+            --f1-red-dark: #930000;
+            --f1-red-glow: rgba(192, 1, 0, 0.25);
+
+            --text-main: #231918;
+            --text-secondary: #775651;
+            --text-muted: #9E8581;
+
+            --pill-green: #059669;
+            --pill-green-bg: rgba(16, 185, 129, 0.12);
+            --pill-blue: #2563EB;
+            --pill-blue-bg: rgba(59, 130, 246, 0.12);
+            --pill-gold: #D97706;
+            --pill-gold-bg: rgba(245, 158, 11, 0.14);
+            --pill-purple: #7C3AED;
+            --pill-purple-bg: rgba(139, 92, 246, 0.12);
+
+            --card-shadow: 0 10px 30px -10px rgba(119, 86, 81, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04);
+            --card-shadow-hover: 0 20px 40px -15px rgba(192, 1, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.06);
+            --mesh-glow: radial-gradient(circle at 50% 0%, rgba(225, 6, 0, 0.1) 0%, transparent 60%);
+            --officer-box-bg: rgba(249, 235, 233, 0.92);
+
+            --locked-bg: rgba(254, 243, 199, 0.45);
+            --locked-border: rgba(217, 119, 6, 0.35);
+            --locked-border-hover: rgba(217, 119, 6, 0.65);
+            --locked-badge-bg: rgba(217, 119, 6, 0.12);
+            --locked-badge-color: #B45309;
+            --locked-watermark: rgba(217, 119, 6, 0.05);
         }
 
         * {
@@ -44,16 +105,14 @@
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-base);
-            background-image: 
-                radial-gradient(circle at 50% 0%, rgba(225, 6, 0, 0.2) 0%, transparent 55%),
-                radial-gradient(circle at 100% 30%, rgba(59, 130, 246, 0.06) 0%, transparent 40%),
-                radial-gradient(circle at 0% 70%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
+            background-image: var(--mesh-glow);
             background-attachment: fixed;
             color: var(--text-main);
             line-height: 1.7;
             padding: 0;
             min-height: 100vh;
             overflow-x: hidden;
+            transition: var(--theme-transition);
         }
 
         /* Top Racing Progress Bar */
@@ -75,12 +134,12 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(8, 10, 15, 0.88);
+            background: var(--header-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--card-border);
             padding: 0.85rem 1.5rem;
-            transition: all 0.3s ease;
+            transition: var(--theme-transition);
         }
 
         .header-container {
@@ -98,52 +157,45 @@
             align-items: center;
             gap: 0.75rem;
             text-decoration: none;
-            color: var(--text-main);
         }
 
         .brand-logo-img {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 14px var(--f1-red-glow);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .brand-link:hover .brand-logo-img {
-            transform: scale(1.1) rotate(-4deg);
+            width: 38px;
+            height: 38px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: rgba(225, 6, 0, 0.1);
+            padding: 2px;
+            border: 1px solid rgba(225, 6, 0, 0.3);
         }
 
         .brand-name {
             font-family: 'Outfit', sans-serif;
-            font-weight: 800;
+            font-weight: 900;
             font-size: 1.35rem;
             letter-spacing: -0.02em;
-            background: linear-gradient(180deg, #FFFFFF 0%, #D1D5DB 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-main);
         }
 
         .brand-badge {
+            display: inline-block;
             font-size: 0.65rem;
             font-weight: 800;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
             padding: 0.15rem 0.45rem;
-            background: var(--pill-green-bg);
-            color: var(--pill-green);
-            border-radius: 9999px;
-            letter-spacing: 0.05em;
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            background: var(--f1-red);
+            color: #FFFFFF;
+            border-radius: 4px;
+            margin-left: 0.4rem;
+            vertical-align: middle;
         }
 
-        /* Nav Links */
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.5rem;
             list-style: none;
-            flex-wrap: wrap;
         }
 
         .nav-tab {
@@ -161,15 +213,15 @@
         }
 
         .nav-tab:hover {
-            color: #FFFFFF;
-            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-main);
+            background: var(--nav-hover);
         }
 
         .nav-tab.active {
-            color: #FFFFFF;
-            background: rgba(225, 6, 0, 0.15);
-            border: 1px solid rgba(225, 6, 0, 0.4);
-            box-shadow: 0 2px 10px rgba(225, 6, 0, 0.15);
+            color: var(--f1-red);
+            background: rgba(225, 6, 0, 0.12);
+            border: 1px solid rgba(225, 6, 0, 0.35);
+            box-shadow: 0 2px 10px rgba(225, 6, 0, 0.12);
         }
 
         .header-actions {
@@ -182,9 +234,9 @@
             display: inline-flex;
             align-items: center;
             gap: 0.45rem;
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--bg-card);
             border: 1px solid var(--card-border);
-            color: #FFFFFF;
+            color: var(--text-main);
             text-decoration: none;
             font-family: 'Outfit', sans-serif;
             font-weight: 700;
@@ -195,12 +247,37 @@
         }
 
         .btn-github-nav:hover {
-            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--f1-red);
             transform: translateY(-1px);
         }
 
+        .theme-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: var(--f1-red);
+            transform: translateY(-1px);
+            box-shadow: 0 0 12px var(--f1-red-glow);
+        }
+
+        [data-theme="light"] .theme-toggle-btn .icon-sun { display: none; }
+        [data-theme="light"] .theme-toggle-btn .icon-moon { display: block; }
+        [data-theme="dark"] .theme-toggle-btn .icon-sun { display: block; }
+        [data-theme="dark"] .theme-toggle-btn .icon-moon { display: none; }
+
         .lang-select {
-            background: rgba(18, 24, 35, 0.95);
+            background: var(--bg-card);
             color: var(--text-main);
             border: 1px solid var(--card-border);
             border-radius: 8px;
@@ -214,6 +291,7 @@
             background-repeat: no-repeat;
             background-position: right 0.5rem center;
             background-size: 1.1rem;
+            transition: var(--theme-transition);
         }
 
         .lang-select:hover, .lang-select:focus {
@@ -229,27 +307,79 @@
             padding: 2.5rem 1.5rem 4rem;
         }
 
-        /* F1 Start Lights Gantry */
-        .gantry-container {
+        /* Interactive F1 Start Lights Gantry */
+        .gantry-box {
             display: flex;
-            justify-content: center;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .gantry-frame {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(10, 14, 22, 0.95);
+            border: 2px solid #1F2937;
+            padding: 0.75rem 1.5rem;
+            border-radius: 14px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .gantry-box:hover .gantry-frame {
+            border-color: var(--f1-red);
+            box-shadow: 0 12px 30px var(--f1-red-glow);
+            transform: translateY(-1px);
         }
 
         .gantry-light {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            background: #2D3748;
-            border: 2px solid #1A202C;
-            transition: all 0.4s ease;
+            background: #1F2937;
+            border: 2px solid #111827;
+            transition: all 0.25s ease;
+            position: relative;
         }
 
         .gantry-light.lit {
             background: #E10600;
-            box-shadow: 0 0 16px #E10600, 0 0 28px #E10600;
-            border-color: #FF6B6B;
+            box-shadow: 0 0 16px #E10600, 0 0 32px #E10600;
+            border-color: #FFA5A5;
+        }
+
+        .gantry-light.green-flash {
+            background: #10B981;
+            box-shadow: 0 0 20px #10B981, 0 0 36px #10B981;
+            border-color: #A7F3D0;
+        }
+
+        .gantry-status {
+            margin-top: 0.75rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .gantry-status.away-we-go {
+            color: #10B981;
+            font-size: 0.95rem;
+            letter-spacing: 0.12em;
+            text-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+            animation: pulseGo 1s ease infinite;
+        }
+
+        @keyframes pulseGo {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.03); }
         }
 
         /* Hero Section */
@@ -277,6 +407,7 @@
             font-weight: 700;
             letter-spacing: 0.05em;
             text-transform: uppercase;
+            transition: var(--theme-transition);
         }
 
         .badge-red   { background: rgba(225, 6, 0, 0.15); color: #FF4D4D; border: 1px solid rgba(225, 6, 0, 0.3); }
@@ -291,6 +422,12 @@
             line-height: 1.15;
             margin-bottom: 1rem;
             background: linear-gradient(180deg, #FFFFFF 20%, #D1D5DB 70%, #9CA3AF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        [data-theme="light"] .hero-title {
+            background: linear-gradient(180deg, #231918 20%, #442925 70%, #775651 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -324,6 +461,7 @@
             text-decoration: none;
             cursor: pointer;
             transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: none;
         }
 
         .btn-primary {
@@ -339,15 +477,16 @@
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.06);
+            background: var(--bg-card);
             color: var(--text-main);
             border: 1px solid var(--card-border);
             backdrop-filter: blur(10px);
+            box-shadow: var(--card-shadow);
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.25);
+            background: var(--bg-card-hover);
+            border-color: var(--f1-red);
             transform: translateY(-2px);
         }
 
@@ -358,11 +497,12 @@
         }
 
         .section-tag {
+            display: inline-block;
             font-family: 'Outfit', sans-serif;
-            font-size: 0.8rem;
             font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
             color: var(--f1-red);
             margin-bottom: 0.5rem;
         }
@@ -370,65 +510,62 @@
         .section-title {
             font-family: 'Outfit', sans-serif;
             font-size: 2.2rem;
-            font-weight: 900;
+            font-weight: 800;
             letter-spacing: -0.02em;
-            color: #FFFFFF;
+            color: var(--text-main);
+            margin-bottom: 0.6rem;
         }
 
         .section-desc {
+            font-size: 1.05rem;
             color: var(--text-secondary);
-            font-size: 1rem;
             max-width: 650px;
-            margin: 0.5rem auto 0;
+            margin: 0 auto;
         }
 
-        /* Screenshots Showcase Grid */
+        /* Screenshots Grid */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.75rem;
+            margin-bottom: 4rem;
         }
 
         .device-card {
             background: var(--bg-card);
-            backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 1.25rem;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+            cursor: pointer;
             position: relative;
-            overflow: hidden;
         }
 
         .device-card:hover {
-            background: var(--bg-card-hover);
+            transform: translateY(-6px);
             border-color: var(--card-border-hover);
-            transform: translateY(-8px);
-            box-shadow: 0 16px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(225, 6, 0, 0.2);
+            box-shadow: var(--card-shadow-hover);
         }
 
         .device-img-wrapper {
-            width: 100%;
-            height: 440px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.25rem 1.25rem 0.5rem;
             display: flex;
-            align-items: center;
             justify-content: center;
-            border-radius: 14px;
+            align-items: center;
             overflow: hidden;
-            background: #05070A;
-            border: 2px solid rgba(255, 255, 255, 0.05);
-            margin-bottom: 1rem;
         }
 
         .device-img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+            width: 100%;
+            max-width: 260px;
+            height: auto;
             border-radius: 12px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.65);
             transition: transform 0.4s ease;
         }
 
@@ -437,131 +574,282 @@
         }
 
         .device-info {
-            width: 100%;
-            text-align: center;
+            padding: 1.25rem 1.5rem 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .device-title {
             font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            font-size: 1.15rem;
-            color: #FFFFFF;
-            margin-bottom: 0.35rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.45rem;
         }
 
         .device-caption {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
-            line-height: 1.5;
+            line-height: 1.55;
+            margin-bottom: 0.85rem;
         }
 
-        /* Bento Grid */
+        .inspect-badge {
+            margin-top: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--f1-red);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* LOCKED GOOGLE PLAY STORE VIP SHOWCASE CARD */
+        .playstore-locked-card {
+            background: var(--locked-bg);
+            border: 1px solid var(--locked-border);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            margin: 4rem 0 5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+            transition: var(--theme-transition);
+        }
+
+        .playstore-locked-card:hover {
+            border-color: var(--locked-border-hover);
+        }
+
+        .locked-watermark {
+            position: absolute;
+            right: -20px;
+            bottom: -30px;
+            width: 260px;
+            height: 260px;
+            color: var(--locked-watermark);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .locked-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .locked-header-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .locked-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--locked-badge-bg);
+            color: var(--locked-badge-color);
+            border: 1px solid var(--locked-border);
+            border-radius: 9999px;
+            padding: 0.4rem 1rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .status-radar {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .radar-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #F59E0B;
+            box-shadow: 0 0 10px #F59E0B;
+            animation: radarPulse 1.8s infinite;
+        }
+
+        @keyframes radarPulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        .locked-main-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+        }
+
+        .locked-lead-text {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 820px;
+            line-height: 1.65;
+            margin-bottom: 2.25rem;
+        }
+
+        .locked-features-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .locked-feat-box {
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 1.4rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.25s ease;
+        }
+
+        .locked-feat-box:hover {
+            border-color: var(--f1-red);
+            transform: translateY(-3px);
+        }
+
+        .locked-feat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(225, 6, 0, 0.12);
+            color: var(--f1-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.85rem;
+        }
+
+        .locked-feat-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.4rem;
+        }
+
+        .locked-feat-desc {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.55;
+        }
+
+        .locked-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        /* Bento Grid Section */
         .bento-grid {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
-            gap: 1.25rem;
-            margin-bottom: 3.5rem;
+            gap: 1.5rem;
+            margin-bottom: 4rem;
         }
 
         .col-12 { grid-column: span 12; }
-        .col-8  { grid-column: span 8; }
         .col-7  { grid-column: span 7; }
         .col-6  { grid-column: span 6; }
         .col-5  { grid-column: span 5; }
-        .col-4  { grid-column: span 4; }
 
-        @media (max-width: 860px) {
-            .col-8, .col-7, .col-6, .col-5, .col-4 {
-                grid-column: span 12;
-            }
+        @media (max-width: 900px) {
+            .col-7, .col-5, .col-6 { grid-column: span 12; }
         }
 
         .card {
             background: var(--bg-card);
-            backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
-            border-radius: 18px;
-            padding: 1.75rem;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            border-radius: 20px;
+            padding: 2.2rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
 
         .card:hover {
-            background: var(--bg-card-hover);
             border-color: var(--card-border-hover);
             transform: translateY(-4px);
-            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(225, 6, 0, 0.15);
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: transparent;
-            transition: background 0.3s ease;
-        }
-
-        .card:hover::before {
-            background: linear-gradient(90deg, var(--f1-red), transparent);
+            box-shadow: var(--card-shadow-hover);
         }
 
         .card-header {
             display: flex;
             align-items: center;
-            gap: 0.85rem;
-            margin-bottom: 1rem;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
         }
 
         .card-icon {
-            width: 42px;
-            height: 42px;
+            width: 48px;
+            height: 48px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
             flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover .card-icon {
+            transform: scale(1.08);
         }
 
         .icon-red    { background: rgba(225, 6, 0, 0.15); color: #FF4D4D; border: 1px solid rgba(225, 6, 0, 0.3); }
         .icon-green  { background: var(--pill-green-bg); color: var(--pill-green); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .icon-blue   { background: var(--pill-blue-bg); color: var(--pill-blue); border: 1px solid rgba(59, 130, 246, 0.3); }
         .icon-gold   { background: var(--pill-gold-bg); color: var(--pill-gold); border: 1px solid rgba(245, 158, 11, 0.3); }
         .icon-purple { background: var(--pill-purple-bg); color: var(--pill-purple); border: 1px solid rgba(139, 92, 246, 0.3); }
 
         .card-title {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: #FFFFFF;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
         }
 
         .card-text {
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 0.98rem;
             line-height: 1.65;
-            margin-bottom: 0.85rem;
+            margin-bottom: 1rem;
         }
 
         .feature-list {
             list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.65rem;
+            margin-top: 1rem;
         }
 
         .feature-item {
             display: flex;
             align-items: flex-start;
-            gap: 0.65rem;
-            font-size: 0.92rem;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
             color: var(--text-secondary);
         }
 
@@ -572,125 +860,221 @@
             background: var(--f1-red);
             margin-top: 0.55rem;
             flex-shrink: 0;
-            box-shadow: 0 0 6px var(--f1-red);
         }
 
-        /* Tech Stack Table */
+        /* Tech Table */
         .tech-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 0.75rem;
-            font-size: 0.88rem;
-        }
-
-        .tech-table th {
-            text-align: left;
-            padding: 0.65rem 0.85rem;
-            background: rgba(255, 255, 255, 0.04);
-            color: #FFFFFF;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 700;
-            border-bottom: 1px solid var(--card-border);
+            margin-top: 0.5rem;
         }
 
         .tech-table td {
-            padding: 0.65rem 0.85rem;
+            padding: 0.75rem 0.5rem;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 0.9rem;
             color: var(--text-secondary);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        /* Officer Box */
+        .tech-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Statutory Officer Box */
         .officer-box {
-            background: linear-gradient(135deg, rgba(225, 6, 0, 0.08) 0%, rgba(18, 24, 35, 0.8) 100%);
-            border: 1px solid rgba(225, 6, 0, 0.25);
+            background: var(--officer-box-bg);
+            border: 1px solid var(--card-border);
             border-radius: 16px;
-            padding: 1.5rem;
-            margin-top: 2rem;
+            padding: 1.75rem 2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1.5rem;
+            margin: 4rem 0 3rem;
+            box-shadow: var(--card-shadow);
+            transition: var(--theme-transition);
         }
 
         .officer-info h4 {
             font-family: 'Outfit', sans-serif;
-            font-weight: 800;
             font-size: 1.15rem;
-            color: #FFFFFF;
+            color: var(--text-main);
             margin-bottom: 0.25rem;
         }
 
         .officer-info p {
-            font-size: 0.88rem;
             color: var(--text-secondary);
+            font-size: 0.9rem;
         }
 
         .copy-email-btn {
-            background: rgba(225, 6, 0, 0.15);
-            color: #FF4D4D;
-            border: 1px solid rgba(225, 6, 0, 0.4);
-            padding: 0.6rem 1.1rem;
-            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
             font-family: 'Outfit', sans-serif;
             font-weight: 700;
             font-size: 0.88rem;
+            padding: 0.65rem 1.25rem;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s ease;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 0.5rem;
         }
 
         .copy-email-btn:hover {
-            background: var(--f1-red);
-            color: #FFFFFF;
-            transform: scale(1.03);
-            box-shadow: 0 4px 15px var(--f1-red-glow);
+            border-color: var(--f1-red);
+            box-shadow: 0 0 15px var(--f1-red-glow);
+            transform: translateY(-2px);
         }
 
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #111827;
-            color: #10B981;
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            padding: 0.75rem 1.5rem;
-            border-radius: 9999px;
+            right: 2rem;
+            background: #10B981;
+            color: #FFFFFF;
+            padding: 0.85rem 1.4rem;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
             font-weight: 700;
             font-size: 0.9rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
             opacity: 0;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            z-index: 999;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
             pointer-events: none;
+            z-index: 1000;
         }
 
         .toast.show {
-            transform: translateX(-50%) translateY(0);
             opacity: 1;
+            transform: translateY(0);
         }
 
-        /* Footer */
-        .site-footer {
-            border-top: 1px solid var(--card-border);
-            padding: 3.5rem 1.5rem 2.5rem;
-            background: #06080C;
+        /* Lightbox Modal */
+        .lightbox-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .lightbox-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .lightbox-dialog {
+            background: var(--bg-card);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            max-width: 820px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        .lightbox-modal.active .lightbox-dialog {
+            transform: scale(1);
+        }
+
+        .lightbox-body {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 1.5rem;
+            padding: 2rem;
+            align-items: center;
+        }
+
+        @media (max-width: 700px) {
+            .lightbox-body { grid-template-columns: 1fr; }
+        }
+
+        .lightbox-img-wrap {
             text-align: center;
         }
 
+        .lightbox-img-wrap img {
+            max-width: 100%;
+            max-height: 440px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .lightbox-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+        }
+
+        .lightbox-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .lightbox-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-main);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .lightbox-close-btn:hover {
+            background: var(--f1-red);
+            color: #FFFFFF;
+            transform: rotate(90deg);
+        }
+
+        /* Site Footer */
+        .site-footer {
+            border-top: 1px solid var(--card-border);
+            padding: 3.5rem 1.5rem 2.5rem;
+            background: var(--header-bg);
+            transition: var(--theme-transition);
+        }
+
         .footer-content {
-            max-width: 960px;
+            max-width: 1200px;
             margin: 0 auto;
+            text-align: center;
         }
 
         .footer-disclaimer {
             font-size: 0.85rem;
             color: var(--text-muted);
+            max-width: 820px;
+            margin: 0 auto 1.5rem;
             line-height: 1.6;
-            margin-bottom: 1.5rem;
         }
 
         .footer-links {
@@ -752,6 +1136,11 @@
                     <span>GitHub</span>
                 </a>
 
+                <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle Light and Dark Theme" title="Toggle Theme">
+                    <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                    <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                </button>
+
                 <select id="langSelect" class="lang-select" aria-label="Select Language">
                     <option value="en">English (EN)</option>
                     <option value="hi">हिन्दी (Hindi)</option>
@@ -767,13 +1156,16 @@
 
     <main class="main-wrapper">
 
-        <!-- F1 Starting Lights Gantry -->
-        <div class="gantry-container" id="gantryLights">
-            <div class="gantry-light lit"></div>
-            <div class="gantry-light lit"></div>
-            <div class="gantry-light lit"></div>
-            <div class="gantry-light lit"></div>
-            <div class="gantry-light lit"></div>
+        <!-- Interactive F1 Starting Lights Gantry -->
+        <div class="gantry-box" id="gantryBox" title="Click to trigger F1 Race Start Sequence">
+            <div class="gantry-frame" id="gantryFrame">
+                <div class="gantry-light" id="light0"></div>
+                <div class="gantry-light" id="light1"></div>
+                <div class="gantry-light" id="light2"></div>
+                <div class="gantry-light" id="light3"></div>
+                <div class="gantry-light" id="light4"></div>
+            </div>
+            <div class="gantry-status" id="gantryStatus" data-i18n="gantry_ready">F1 RACE START GANTRY • TAP TO TRIGGER LIGHTS OUT</div>
         </div>
 
         <!-- Hero Section -->
@@ -796,16 +1188,20 @@
                     </svg>
                     <span data-i18n="btn_github_repo">Star on GitHub</span>
                 </a>
+                <a href="#playstoreSection" class="btn btn-secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span data-i18n="btn_playstore_roadmap">Play Store Roadmap</span>
+                </a>
                 <a href="https://github.com/yashajagiya" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     <span data-i18n="btn_github_profile">Developer Profile</span>
                 </a>
                 <a href="about.html" class="btn btn-secondary">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>
                     <span data-i18n="nav_about">About Project</span>
                 </a>
                 <a href="privacy-policy.html" class="btn btn-secondary">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     <span data-i18n="nav_privacy">Privacy Policy</span>
                 </a>
             </div>
@@ -813,115 +1209,189 @@
 
         <!-- Screenshots Gallery Section -->
         <section class="section-header">
-            <div class="section-tag" data-i18n="gallery_tag">VISUAL SHOWCASE</div>
+            <div class="section-tag" data-i18n="gallery_tag">HIGH-FIDELITY INTERFACE</div>
             <h2 class="section-title" data-i18n="gallery_title">Experience Taras on Android</h2>
             <p class="section-desc" data-i18n="gallery_desc">
-                High-fidelity, responsive Material 3 design crafted with Compose, smooth animations, and zero clutter.
+                High-fidelity, responsive Material 3 design crafted with Compose, smooth animations, and zero clutter. Tap any screen for high-res telemetry view.
             </p>
         </section>
 
         <div class="gallery-grid">
 
             <!-- Shot 1: The Paddock -->
-            <div class="device-card">
+            <div class="device-card" onclick="openLightbox('assets/paddock.png', 'The Paddock (News)', 'Real-time motorsport journalism aggregated from public RSS feeds directly on-device using Ksoup. Zero server storage, instant offline reading.')">
                 <div class="device-img-wrapper">
                     <img src="assets/paddock.png" alt="The Paddock News" class="device-img" onerror="this.src='https://raw.githubusercontent.com/yashajagiya/Taras/vega-v5/assets/paddock.png'">
                 </div>
                 <div class="device-info">
                     <h3 class="device-title" data-i18n="shot_1_title">The Paddock (News)</h3>
                     <p class="device-caption" data-i18n="shot_1_desc">Real-time motorsport journalism aggregated from public RSS feeds directly on-device using Ksoup.</p>
+                    <span class="inspect-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg> <span data-i18n="btn_inspect">Inspect Full View</span></span>
                 </div>
             </div>
 
             <!-- Shot 2: Grid Drivers -->
-            <div class="device-card">
+            <div class="device-card" onclick="openLightbox('assets/grid_drivers.png', 'The Grid (Drivers)', 'Live driver standings, points tally, constructor badges, and real-time championship battle tracking.')">
                 <div class="device-img-wrapper">
                     <img src="assets/grid_drivers.png" alt="The Grid Drivers" class="device-img" onerror="this.src='https://raw.githubusercontent.com/yashajagiya/Taras/vega-v5/assets/grid_drivers.png'">
                 </div>
                 <div class="device-info">
                     <h3 class="device-title" data-i18n="shot_2_title">The Grid (Drivers)</h3>
                     <p class="device-caption" data-i18n="shot_2_desc">Live driver standings, points tally, constructor badges, and real-time championship battle tracking.</p>
+                    <span class="inspect-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg> <span data-i18n="btn_inspect">Inspect Full View</span></span>
                 </div>
             </div>
 
             <!-- Shot 3: Driver Profile -->
-            <div class="device-card">
+            <div class="device-card" onclick="openLightbox('assets/driver_profile.png', 'Driver Profiles & Telemetry', 'Career stats, milestones, points progression, and interactive Compose Charts data visualizations.')">
                 <div class="device-img-wrapper">
                     <img src="assets/driver_profile.png" alt="Driver Profile" class="device-img" onerror="this.src='https://raw.githubusercontent.com/yashajagiya/Taras/vega-v5/assets/driver_profile.png'">
                 </div>
                 <div class="device-info">
                     <h3 class="device-title" data-i18n="shot_3_title">Driver Profiles & Telemetry</h3>
                     <p class="device-caption" data-i18n="shot_3_desc">Career stats, milestones, points progression, and interactive Compose Charts data visualizations.</p>
+                    <span class="inspect-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg> <span data-i18n="btn_inspect">Inspect Full View</span></span>
                 </div>
             </div>
 
             <!-- Shot 4: Grid Teams -->
-            <div class="device-card">
+            <div class="device-card" onclick="openLightbox('assets/grid_teams.png', 'Constructor Standings', 'Constructor rankings, team points distribution, and car livery visual matching.')">
                 <div class="device-img-wrapper">
                     <img src="assets/grid_teams.png" alt="Constructors Standings" class="device-img" onerror="this.src='https://raw.githubusercontent.com/yashajagiya/Taras/vega-v5/assets/grid_teams.png'">
                 </div>
                 <div class="device-info">
                     <h3 class="device-title" data-i18n="shot_4_title">Constructor Standings</h3>
                     <p class="device-caption" data-i18n="shot_4_desc">Constructor rankings, team points distribution, and car livery visual matching.</p>
+                    <span class="inspect-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg> <span data-i18n="btn_inspect">Inspect Full View</span></span>
                 </div>
             </div>
 
             <!-- Shot 5: Team Profile -->
-            <div class="device-card">
+            <div class="device-card" onclick="openLightbox('assets/team_profile.png', 'Team Technical Insights', 'Engine manufacturers, base headquarters, team principals, and head-to-head teammate analysis.')">
                 <div class="device-img-wrapper">
                     <img src="assets/team_profile.png" alt="Team Profile" class="device-img" onerror="this.src='https://raw.githubusercontent.com/yashajagiya/Taras/vega-v5/assets/team_profile.png'">
                 </div>
                 <div class="device-info">
                     <h3 class="device-title" data-i18n="shot_5_title">Team Technical Insights</h3>
                     <p class="device-caption" data-i18n="shot_5_desc">Engine manufacturers, base headquarters, team principals, and head-to-head teammate analysis.</p>
+                    <span class="inspect-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg> <span data-i18n="btn_inspect">Inspect Full View</span></span>
                 </div>
             </div>
 
             <!-- Shot 6: Calendar -->
-            <div class="device-card">
+            <div class="device-card" onclick="openLightbox('assets/calendar.png', 'Grand Prix Calendar', 'Session countdown timers for FP1, FP2, FP3, Qualifying, Sprint, and Main Race with circuit flags.')">
                 <div class="device-img-wrapper">
                     <img src="assets/calendar.png" alt="Grand Prix Calendar" class="device-img" onerror="this.src='https://raw.githubusercontent.com/yashajagiya/Taras/vega-v5/assets/calendar.png'">
                 </div>
                 <div class="device-info">
                     <h3 class="device-title" data-i18n="shot_6_title">Grand Prix Calendar</h3>
                     <p class="device-caption" data-i18n="shot_6_desc">Session countdown timers for FP1, FP2, FP3, Qualifying, Sprint, and Main Race with circuit flags.</p>
+                    <span class="inspect-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg> <span data-i18n="btn_inspect">Inspect Full View</span></span>
                 </div>
             </div>
 
             <!-- Shot 7: Circuit Profile -->
-            <div class="device-card">
+            <div class="device-card" onclick="openLightbox('assets/circuit_profile.png', 'Circuit Intelligence', 'Track length, total corners, DRS detection zones, lap records, and high-res circuit layout maps.')">
                 <div class="device-img-wrapper">
                     <img src="assets/circuit_profile.png" alt="Circuit Profile" class="device-img" onerror="this.src='https://raw.githubusercontent.com/yashajagiya/Taras/vega-v5/assets/circuit_profile.png'">
                 </div>
                 <div class="device-info">
                     <h3 class="device-title" data-i18n="shot_7_title">Circuit Intelligence</h3>
                     <p class="device-caption" data-i18n="shot_7_desc">Track length, total corners, DRS detection zones, lap records, and high-res circuit layout maps.</p>
+                    <span class="inspect-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg> <span data-i18n="btn_inspect">Inspect Full View</span></span>
                 </div>
             </div>
 
             <!-- Shot 8: Results -->
-            <div class="device-card">
+            <div class="device-card" onclick="openLightbox('assets/results.png', 'Classification & Results', 'Race intervals, lap times, fastest lap badges, pitstops, and instant graphic card sharing.')">
                 <div class="device-img-wrapper">
                     <img src="assets/results.png" alt="Session Results" class="device-img" onerror="this.src='https://raw.githubusercontent.com/yashajagiya/Taras/vega-v5/assets/results.png'">
                 </div>
                 <div class="device-info">
                     <h3 class="device-title" data-i18n="shot_8_title">Classification & Results</h3>
                     <p class="device-caption" data-i18n="shot_8_desc">Race intervals, lap times, fastest lap badges, pitstops, and instant graphic card sharing.</p>
+                    <span class="inspect-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg> <span data-i18n="btn_inspect">Inspect Full View</span></span>
                 </div>
             </div>
 
             <!-- Shot 9: Navigation Drawer -->
-            <div class="device-card">
+            <div class="device-card" onclick="openLightbox('assets/drawer.png', 'Settings & Personalization', 'Dynamic Material 3 theme selector, multi-language switcher, and F1 GridTCG collection access.')">
                 <div class="device-img-wrapper">
                     <img src="assets/drawer.png" alt="Settings Drawer" class="device-img" onerror="this.src='https://raw.githubusercontent.com/yashajagiya/Taras/vega-v5/assets/drawer.png'">
                 </div>
                 <div class="device-info">
                     <h3 class="device-title" data-i18n="shot_9_title">Settings & Personalization</h3>
                     <p class="device-caption" data-i18n="shot_9_desc">Dynamic Material 3 theme selector, multi-language switcher, and F1 GridTCG collection access.</p>
+                    <span class="inspect-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg> <span data-i18n="btn_inspect">Inspect Full View</span></span>
                 </div>
             </div>
 
         </div>
+
+        <!-- LOCKED GOOGLE PLAY STORE VIP SHOWCASE SECTION -->
+        <section class="playstore-locked-card" id="playstoreSection">
+            <svg class="locked-watermark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <div class="locked-content">
+                <div class="locked-header-strip">
+                    <div class="locked-pill">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        <span data-i18n="ps_badge">COMING SOON • CLOSED BETA TESTING</span>
+                    </div>
+                    <div class="status-radar">
+                        <span class="radar-dot"></span>
+                        <span data-i18n="ps_status">Google Play Console Verification In Progress</span>
+                    </div>
+                </div>
+
+                <h2 class="locked-main-title" data-i18n="ps_title">Official Google Play Store Rollout</h2>
+                <p class="locked-lead-text" data-i18n="ps_desc">
+                    Taras is preparing for official distribution on the Google Play Store. The release build is architected with cryptographically signed Play App Bundles (AAB), zero telemetry tracking, and native Android 15 Glance widget integration.
+                </p>
+
+                <div class="locked-features-row">
+                    <div class="locked-feat-box">
+                        <div class="locked-feat-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <h4 class="locked-feat-title" data-i18n="ps_feat1_title">Cryptographically Signed AAB</h4>
+                        <p class="locked-feat-desc" data-i18n="ps_feat1_desc">Optimized Google Play App Bundle architecture delivering ultra-lean downloads under 18 MB with 60fps animations.</p>
+                    </div>
+
+                    <div class="locked-feat-box">
+                        <div class="locked-feat-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                        </div>
+                        <h4 class="locked-feat-title" data-i18n="ps_feat2_title">Android 15 & Glance Auto-Sync</h4>
+                        <p class="locked-feat-desc" data-i18n="ps_feat2_desc">Automatic WorkManager background synchronization directly powering live home-screen countdowns and points.</p>
+                    </div>
+
+                    <div class="locked-feat-box">
+                        <div class="locked-feat-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                        </div>
+                        <h4 class="locked-feat-title" data-i18n="ps_feat3_title">Zero Advertising Guarantee</h4>
+                        <p class="locked-feat-desc" data-i18n="ps_feat3_desc">Strict compliance with Google Play Families policy: 100% free of advertising banners, popups, and tracker SDKs.</p>
+                    </div>
+                </div>
+
+                <div class="locked-actions">
+                    <button class="btn btn-primary" onclick="notifyPlayStore()" id="notifyPlayBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                        <span id="notifyPlayBtnText" data-i18n="ps_cta_notify">Request Closed Beta Access</span>
+                    </button>
+                    <a href="https://github.com/yashajagiya/Taras/releases" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        <span data-i18n="ps_cta_apk">Direct GitHub APK Release</span>
+                    </a>
+                </div>
+            </div>
+        </section>
 
         <!-- Project Architectural Pillars (Bento Grid) -->
         <section class="section-header">
@@ -1007,23 +1477,23 @@
                     <table class="tech-table">
                         <tbody>
                             <tr>
-                                <td style="font-weight: 700; color: #FFFFFF;">UI & Design</td>
+                                <td style="font-weight: 700; color: var(--text-main);">UI & Design</td>
                                 <td>Jetpack Compose & Material 3 Dynamic Color</td>
                             </tr>
                             <tr>
-                                <td style="font-weight: 700; color: #FFFFFF;">Architecture</td>
+                                <td style="font-weight: 700; color: var(--text-main);">Architecture</td>
                                 <td>MVVM + Navigation 3 + Kotlin Coroutines</td>
                             </tr>
                             <tr>
-                                <td style="font-weight: 700; color: #FFFFFF;">Local Storage</td>
+                                <td style="font-weight: 700; color: var(--text-main);">Local Storage</td>
                                 <td>Room SQLite + Jetpack DataStore</td>
                             </tr>
                             <tr>
-                                <td style="font-weight: 700; color: #FFFFFF;">Networking</td>
+                                <td style="font-weight: 700; color: var(--text-main);">Networking</td>
                                 <td>Retrofit & Ksoup RSS Parser</td>
                             </tr>
                             <tr>
-                                <td style="font-weight: 700; color: #FFFFFF;">Data Backbone</td>
+                                <td style="font-weight: 700; color: var(--text-main);">Data Backbone</td>
                                 <td><a href="https://github.com/yashajagiya/tarasF1Data" target="_blank" style="color: var(--f1-red); text-decoration: none;">TarasF1Data</a> (GitHub Actions)</td>
                             </tr>
                         </tbody>
@@ -1049,6 +1519,25 @@
 
     <!-- Floating Toast Notification -->
     <div class="toast" id="toastMessage">Email copied: ajagiyayash@gmail.com</div>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox(event)">
+        <div class="lightbox-dialog" onclick="event.stopPropagation()">
+            <button class="lightbox-close-btn" onclick="closeLightboxDirect()" aria-label="Close Preview">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div class="lightbox-body">
+                <div class="lightbox-img-wrap">
+                    <img id="lightboxImg" src="" alt="Screenshot Detail">
+                </div>
+                <div>
+                    <h3 class="lightbox-title" id="lightboxTitle"></h3>
+                    <p class="lightbox-desc" id="lightboxDesc"></p>
+                    <button class="btn btn-secondary" onclick="closeLightboxDirect()" data-i18n="lightbox_close">Close Preview</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Site Footer -->
     <footer class="site-footer">
@@ -1082,13 +1571,17 @@
                 nav_about: "About Us",
                 nav_privacy: "Privacy Policy",
                 nav_terms: "Terms of Service",
+                gantry_ready: "F1 RACE START GANTRY • TAP TO TRIGGER LIGHTS OUT",
+                gantry_go: "LIGHTS OUT AND AWAY WE GO!",
                 home_title: "Taras (तरस्) — The Pure F1 Companion",
                 home_subtitle: "A high-performance, tracker-free Formula 1 Android application engineered with Jetpack Compose and Material Design 3. Built from scratch in India for motorsport enthusiasts worldwide.",
                 btn_github_repo: "Star on GitHub",
                 btn_github_profile: "Developer Profile",
-                gallery_tag: "VISUAL SHOWCASE",
+                btn_playstore_roadmap: "Play Store Roadmap",
+                gallery_tag: "HIGH-FIDELITY INTERFACE",
                 gallery_title: "Experience Taras on Android",
-                gallery_desc: "High-fidelity, responsive Material 3 design crafted with Compose, smooth animations, and zero clutter.",
+                gallery_desc: "High-fidelity, responsive Material 3 design crafted with Compose, smooth animations, and zero clutter. Tap any screen for high-res telemetry view.",
+                btn_inspect: "Inspect Full View",
                 shot_1_title: "The Paddock (News)",
                 shot_1_desc: "Real-time motorsport journalism aggregated from public RSS feeds directly on-device using Ksoup.",
                 shot_2_title: "The Grid (Drivers)",
@@ -1107,6 +1600,18 @@
                 shot_8_desc: "Race intervals, lap times, fastest lap badges, pitstops, and instant graphic card sharing.",
                 shot_9_title: "Settings & Personalization",
                 shot_9_desc: "Dynamic Material 3 theme selector, multi-language switcher, and F1 GridTCG collection access.",
+                ps_badge: "COMING SOON • CLOSED BETA TESTING",
+                ps_status: "Google Play Console Verification In Progress",
+                ps_title: "Official Google Play Store Rollout",
+                ps_desc: "Taras is preparing for official distribution on the Google Play Store. The release build is architected with cryptographically signed Play App Bundles (AAB), zero telemetry tracking, and native Android 15 Glance widget integration.",
+                ps_feat1_title: "Cryptographically Signed AAB",
+                ps_feat1_desc: "Optimized Google Play App Bundle architecture delivering ultra-lean downloads under 18 MB with 60fps animations.",
+                ps_feat2_title: "Android 15 & Glance Auto-Sync",
+                ps_feat2_desc: "Automatic WorkManager background synchronization directly powering live home-screen countdowns and points.",
+                ps_feat3_title: "Zero Advertising Guarantee",
+                ps_feat3_desc: "Strict compliance with Google Play Families policy: 100% free of advertising banners, popups, and tracker SDKs.",
+                ps_cta_notify: "Request Closed Beta Access",
+                ps_cta_apk: "Direct GitHub APK Release",
                 bento_tag: "CORE PILLARS",
                 bento_title: "Engineered with Purpose",
                 bento_desc: "Built to solve the bloat, intrusive ads, and privacy violations plaguing existing sports mobile applications.",
@@ -1129,6 +1634,7 @@
                 officer_name: "Designated Grievance Officer: Yash Ajagiya",
                 officer_sub: "Jurisdiction: Gujarat, India • Rule 3(2) IT Rules 2021 & Section 13 DPDPA 2023",
                 btn_copy_email: "Copy Grievance Email",
+                lightbox_close: "Close Preview",
                 footer_disclaimer: "Disclaimer: Taras is an unofficial, independent fan-created open-source companion application. Formula 1, F1, FORMULA ONE, GRAND PRIX, and related marks are trademarks of Formula One Licensing B.V. No official endorsement or affiliation is implied. All marks referenced under nominative fair use (Section 30 of Trade Marks Act 1999)."
             },
             hi: {
@@ -1140,13 +1646,17 @@
                 nav_about: "हमारे बारे में",
                 nav_privacy: "गोपनीयता नीति",
                 nav_terms: "सेवा की शर्तें",
+                gantry_ready: "F1 रेस स्टार्ट गैंट्री • लाइट्स आउट ट्रिगर करने के लिए टैप करें",
+                gantry_go: "लाइट्स आउट और रेस शुरू!",
                 home_title: "तरस् (Taras) — शुद्ध F1 साथी ऐप",
                 home_subtitle: "जेटपैक कंपोज़ और मटेरियल 3 के साथ तैयार किया गया एक उच्च-प्रदर्शन, ट्रैकर-मुक्त फॉर्मूला 1 एंड्रॉइड ऐप। दुनिया भर के मोटरस्पोर्ट प्रेमियों के लिए भारत में निर्मित।",
                 btn_github_repo: "गिटहब पर स्टार करें",
                 btn_github_profile: "डेवलपर प्रोफ़ाइल",
+                btn_playstore_roadmap: "प्ले स्टोर रोडमैप",
                 gallery_tag: "ऐप स्क्रीनशॉट",
                 gallery_title: "एंड्रॉइड पर तरस् का अनुभव करें",
                 gallery_desc: "कंपोज़ के साथ तैयार किया गया उत्तरदायी मटेरियल 3 डिज़ाइन, तरल एनिमेशन और शून्य विज्ञापन।",
+                btn_inspect: "विस्तार से देखें",
                 shot_1_title: "द पैडॉक (समाचार)",
                 shot_1_desc: "Ksoup का उपयोग करके सीधे डिवाइस पर सार्वजनिक RSS फ़ीड से समाचार विश्लेषण।",
                 shot_2_title: "द ग्रिड (ड्राइवर्स)",
@@ -1165,6 +1675,18 @@
                 shot_8_desc: "रेस अंतराल, लैप समय, सबसे तेज़ लैप बैज और ग्राफ़िक कार्ड शेयरिंग।",
                 shot_9_title: "सेटिंग्स और वैयक्तिकरण",
                 shot_9_desc: "मटेरियल 3 थीम चयनकर्ता, बहु-भाषा स्विचर और TCG कार्ड संग्रह।",
+                ps_badge: "जल्द आ रहा है • क्लोज़्ड बीटा टेस्टिंग",
+                ps_status: "गूगल प्ले कंसोल सत्यापन जारी है",
+                ps_title: "आधिकारिक गूगल प्ले स्टोर रिलीज़",
+                ps_desc: "तरस् गूगल प्ले स्टोर पर आधिकारिक रिलीज़ की तैयारी कर रहा है। प्रोडक्शन बिल्ड को हस्ताक्षरित ऐप बंडल (AAB) और शून्य टेलीमेट्री के साथ तैयार किया गया है।",
+                ps_feat1_title: "हस्ताक्षरित AAB बंडल",
+                ps_feat1_desc: "18 MB से कम का अल्ट्रा-लीन और बिजली जैसी तेज़ डाउनलोड गति।",
+                ps_feat2_title: "एंड्रॉइड 15 एवं ग्लांस ऑटो-सिंक",
+                ps_feat2_desc: "लाइव रेस काउंटडाउन और स्टैंडिंग्स बनाए रखने के लिए स्वचालित बैकग्राउंड सिंक।",
+                ps_feat3_title: "शून्य विज्ञापन गारंटी",
+                ps_feat3_desc: "गूगल प्ले नीतियों का पूर्ण अनुपालन: विज्ञापनों और ट्रैकर्स से 100% मुक्त।",
+                ps_cta_notify: "क्लोज़्ड बीटा एक्सेस का अनुरोध करें",
+                ps_cta_apk: "डायरेक्ट गिटहब APK डाउनलोड",
                 bento_tag: "मुख्य स्तंभ",
                 bento_title: "उद्देश्य के साथ निर्मित",
                 bento_desc: "भारी विज्ञापनों और गोपनीयता उल्लंघनों को समाप्त करने के लिए बनाया गया।",
@@ -1187,6 +1709,7 @@
                 officer_name: "नामित शिकायत निवारण अधिकारी: यश अजगिया",
                 officer_sub: "अधिकार क्षेत्र: गुजरात, भारत • आईटी नियम 2021 एवं DPDPA 2023",
                 btn_copy_email: "शिकायत ईमेल कॉपी करें",
+                lightbox_close: "पूर्वावलोकन बंद करें",
                 footer_disclaimer: "अस्वीकरण: तरस् एक अनौपचारिक प्रशंसक-निर्मित ओपन-सोर्स ऐप है।"
             },
             es: {
@@ -1198,13 +1721,17 @@
                 nav_about: "Sobre Nosotros",
                 nav_privacy: "Política de Privacidad",
                 nav_terms: "Términos de Servicio",
+                gantry_ready: "SEMÁFORO DE SALIDA F1 • TOCA PARA INICIAR LA SECUENCIA",
+                gantry_go: "¡LUCES FUERA Y ARRANCAMOS!",
                 home_title: "Taras (तरस्) — El Compañero F1 Puro",
                 home_subtitle: "Una aplicación Android de Fórmula 1 de alto rendimiento y sin rastreadores, construida con Jetpack Compose y Material 3.",
                 btn_github_repo: "Ver en GitHub",
                 btn_github_profile: "Perfil de Desarrollador",
+                btn_playstore_roadmap: "Hoja de Ruta Play Store",
                 gallery_tag: "GALERÍA DE LA APP",
                 gallery_title: "Descubre Taras en Android",
                 gallery_desc: "Diseño elegante Material 3 con animaciones fluidas y sin anuncios.",
+                btn_inspect: "Inspeccionar",
                 shot_1_title: "The Paddock (Noticias)",
                 shot_1_desc: "Noticias de motorsport en tiempo real mediante RSS con Ksoup.",
                 shot_2_title: "The Grid (Pilotos)",
@@ -1223,6 +1750,18 @@
                 shot_8_desc: "Clasificaciones de carreras y tarjetas compartibles.",
                 shot_9_title: "Ajustes y Temas",
                 shot_9_desc: "Selector de temas Material You y selector de idioma.",
+                ps_badge: "PRÓXIMAMENTE • BETA CERRADA",
+                ps_status: "Verificación en Google Play Console en curso",
+                ps_title: "Lanzamiento Oficial en Google Play Store",
+                ps_desc: "Taras se prepara para su lanzamiento oficial en Google Play Store con paquetes AAB optimizados y cero telemetría.",
+                ps_feat1_title: "Paquete AAB Firmado",
+                ps_feat1_desc: "Descargas ultraligeras de menos de 18 MB optimizadas para Play Store.",
+                ps_feat2_title: "Android 15 y Widgets Glance",
+                ps_feat2_desc: "Sincronización automática de cuentas regresivas y clasificaciones en vivo.",
+                ps_feat3_title: "Garantía Sin Anuncios",
+                ps_feat3_desc: "100% libre de anuncios invasivos y SDKs de seguimiento.",
+                ps_cta_notify: "Solicitar Acceso a Beta Cerrada",
+                ps_cta_apk: "Descarga Directa de APK (GitHub)",
                 bento_tag: "PILARES FUNDAMENTALES",
                 bento_title: "Ingeniería con Propósito",
                 bento_desc: "Creado para eliminar la publicidad invasiva y respetar la privacidad.",
@@ -1245,6 +1784,7 @@
                 officer_name: "Oficial de Quejas: Yash Ajagiya",
                 officer_sub: "Jurisdicción: Gujarat, India",
                 btn_copy_email: "Copiar Correo Oficial",
+                lightbox_close: "Cerrar",
                 footer_disclaimer: "Aviso: Taras es una app de fans independiente de código abierto."
             },
             de: {
@@ -1256,13 +1796,17 @@
                 nav_about: "Über Uns",
                 nav_privacy: "Datenschutz",
                 nav_terms: "Nutzungsbedingungen",
+                gantry_ready: "F1 STARTAMPEL • TIPPEN ZUM STARTEN",
+                gantry_go: "LIGHTS OUT AND AWAY WE GO!",
                 home_title: "Taras (तरस्) — Der Reine F1 Begleiter",
                 home_subtitle: "Eine werbefreie, performante Formel 1 Android-App mit Jetpack Compose und Material 3. Entwickelt in Indien.",
                 btn_github_repo: "GitHub Repository",
                 btn_github_profile: "Entwickler Profil",
+                btn_playstore_roadmap: "Play Store Roadmap",
                 gallery_tag: "APP VORSCHAU",
                 gallery_title: "Taras auf Android Erleben",
                 gallery_desc: "Minimalistisches Design ohne lästige Werbebanner oder Tracker.",
+                btn_inspect: "Vollbild ansehen",
                 shot_1_title: "The Paddock (News)",
                 shot_1_desc: "Echtzeit-Motorsportnachrichten über RSS mit Ksoup.",
                 shot_2_title: "The Grid (Fahrer)",
@@ -1281,6 +1825,18 @@
                 shot_8_desc: "Rennergebnisse und teilbare Grafikkarten.",
                 shot_9_title: "Einstellungen",
                 shot_9_desc: "Material 3 Designauswahl und Sprachauswahl.",
+                ps_badge: "DEMNÄCHST • CLOSED BETA",
+                ps_status: "Google Play Console Verifizierung läuft",
+                ps_title: "Offizieller Google Play Store Start",
+                ps_desc: "Taras wird für die Veröffentlichung im Google Play Store vorbereitet mit strikter Datenschutz-Zertifizierung.",
+                ps_feat1_title: "Signiertes AAB Bundle",
+                ps_feat1_desc: "Optimierte Android App Bundle Architektur unter 18 MB.",
+                ps_feat2_title: "Android 15 & Glance Auto-Sync",
+                ps_feat2_desc: "Automatischer Hintergrundabgleich für Live-Countdowns.",
+                ps_feat3_title: "Garantie Ohne Werbung",
+                ps_feat3_desc: "100% frei von Werbebannern und Tracking-Diensten.",
+                ps_cta_notify: "Closed-Beta Zugang Anfragen",
+                ps_cta_apk: "Direkter GitHub APK Download",
                 bento_tag: "KERNWERTE",
                 bento_title: "Mit Bedacht Entwickelt",
                 bento_desc: "Entwickelt, um Datenüberwachung und Akkuverbrauch zu beenden.",
@@ -1303,6 +1859,7 @@
                 officer_name: "Datenschutzbeauftragter: Yash Ajagiya",
                 officer_sub: "Gerichtsstand: Gujarat, Indien",
                 btn_copy_email: "E-Mail Kopieren",
+                lightbox_close: "Schließen",
                 footer_disclaimer: "Hinweis: Taras ist eine inoffizielle Open-Source-Fan-App."
             },
             fr: {
@@ -1314,13 +1871,17 @@
                 nav_about: "À Propos",
                 nav_privacy: "Confidentialité",
                 nav_terms: "Conditions d'Utilisation",
+                gantry_ready: "FEUX DE DÉPART F1 • TOUCHER POUR LANCER",
+                gantry_go: "LIGHTS OUT AND AWAY WE GO!",
                 home_title: "Taras (तरस्) — Le Compagnon F1 Pur",
                 home_subtitle: "Application Formule 1 haute performance sur Android avec Jetpack Compose et Material 3.",
                 btn_github_repo: "Voir sur GitHub",
                 btn_github_profile: "Profil Développeur",
+                btn_playstore_roadmap: "Feuille de Route Play Store",
                 gallery_tag: "CAPTURES D'ÉCRAN",
                 gallery_title: "Découvrez Taras sur Android",
                 gallery_desc: "Design Material 3 fluide, animations rapides et zéro publicité.",
+                btn_inspect: "Agrandir",
                 shot_1_title: "The Paddock (Actualités)",
                 shot_1_desc: "Flux RSS d'actualités motorsport lus en local avec Ksoup.",
                 shot_2_title: "The Grid (Pilotes)",
@@ -1339,6 +1900,18 @@
                 shot_8_desc: "Intervalles de course et cartes à partager.",
                 shot_9_title: "Paramètres et Thèmes",
                 shot_9_desc: "Thèmes dynamiques Material 3 et sélection de langue.",
+                ps_badge: "BIENTÔT DISPONIBLE • BÊTA FERMÉE",
+                ps_status: "Vérification Google Play Console en cours",
+                ps_title: "Lancement Officiel sur Google Play Store",
+                ps_desc: "Taras prépare activement sa sortie officielle sur le Google Play Store avec une certification stricte zéro traqueur.",
+                ps_feat1_title: "Paquet AAB Signé",
+                ps_feat1_desc: "Téléchargement ultra-léger de moins de 18 Mo.",
+                ps_feat2_title: "Android 15 et Widgets Glance",
+                ps_feat2_desc: "Synchronisation automatique en arrière-plan pour les comptes à rebours.",
+                ps_feat3_title: "Garantie Sans Publicité",
+                ps_feat3_desc: "Totalement exempt de bannières publicitaires et de traceurs.",
+                ps_cta_notify: "Demander l'Accès Bêta Fermée",
+                ps_cta_apk: "Téléchargement APK Direct (GitHub)",
                 bento_tag: "PILIERS ESSENTIELS",
                 bento_title: "Conçu avec Passion",
                 bento_desc: "Créé pour éliminer les publicités envahissantes et respecter la vie privée.",
@@ -1361,6 +1934,7 @@
                 officer_name: "Délégué aux Réclamations: Yash Ajagiya",
                 officer_sub: "Juridiction: Gujarat, Inde",
                 btn_copy_email: "Copier l'Email",
+                lightbox_close: "Fermer",
                 footer_disclaimer: "Avis: Taras est une application de fan open source non officielle."
             },
             ja: {
@@ -1372,13 +1946,17 @@
                 nav_about: "アプリについて",
                 nav_privacy: "プライバシーポリシー",
                 nav_terms: "利用規約",
+                gantry_ready: "F1 スタートシグナル • タップでシグナル点灯",
+                gantry_go: "LIGHTS OUT AND AWAY WE GO!",
                 home_title: "Taras (タラス) — 純粋なF1コンパニオン",
                 home_subtitle: "Jetpack ComposeとMaterial Design 3で構築された、広告・追跡ゼロの最高峰フォーミュラ1用Androidアプリ。",
                 btn_github_repo: "GitHub で見る",
                 btn_github_profile: "開発者プロフィール",
+                btn_playstore_roadmap: "Play Store ロードマップ",
                 gallery_tag: "スクリーンショット",
                 gallery_title: "Android で Taras を体験",
-                gallery_desc: "Composeによる滑らかな操作感、無駄な広告のない美しいマテリアルUI。",
+                gallery_desc: "Composeによる滑らかな操作感、無駄な広告のない美しいマテリアルUI。タップで拡大表示。",
+                btn_inspect: "拡大表示",
                 shot_1_title: "パドック（最新ニュース）",
                 shot_1_desc: "Ksoupを用いた端末上での高速モータースポーツRSSパース。",
                 shot_2_title: "グリッド（ドライバー）",
@@ -1397,6 +1975,18 @@
                 shot_8_desc: "公式リザルトと共有用グラフィックカード生成。",
                 shot_9_title: "設定とカスタマイズ",
                 shot_9_desc: "Material 3動的テーマ切り替えと多言語選択。",
+                ps_badge: "近日公開 • クローズドベータ",
+                ps_status: "Google Play Console 審査準備中",
+                ps_title: "Google Play 公式リリース予定",
+                ps_desc: "TarasはGoogle Play Storeでの正式リリースに向けてクローズドテストとセキュリティ検証を実施中です。",
+                ps_feat1_title: "署名付きAABパッケージ",
+                ps_feat1_desc: "18MB未満の超軽量・高速ダウンロードを実現。",
+                ps_feat2_title: "Android 15 & Glance自動同期",
+                ps_feat2_desc: "レースカウントダウンをホーム画面でリアルタイム自動更新。",
+                ps_feat3_title: "完全広告ゼロ保証",
+                ps_feat3_desc: "広告や追跡SDKを一切排除した最高品質の体験。",
+                ps_cta_notify: "クローズドベータ参加を希望",
+                ps_cta_apk: "GitHub から APK を直接ダウンロード",
                 bento_tag: "設計思想",
                 bento_title: "確かな目的を持った設計",
                 bento_desc: "既存アプリの過剰な広告とバッテリー消費を解消するために誕生。",
@@ -1419,6 +2009,7 @@
                 officer_name: "苦情対応責任者: Yash Ajagiya",
                 officer_sub: "管轄: インド・グジャラート州",
                 btn_copy_email: "メールアドレスをコピー",
+                lightbox_close: "閉じる",
                 footer_disclaimer: "免責事項：Tarasは非公式のオープンソースファンアプリです。"
             },
             pt: {
@@ -1430,13 +2021,17 @@
                 nav_about: "Sobre Nós",
                 nav_privacy: "Privacidade",
                 nav_terms: "Termos de Serviço",
+                gantry_ready: "LUZES DE LARGADA F1 • TOQUE PARA INICIAR",
+                gantry_go: "LIGHTS OUT AND AWAY WE GO!",
                 home_title: "Taras (तरस्) — O Puro Companheiro F1",
                 home_subtitle: "Um aplicativo Android de Fórmula 1 de alto desempenho construído com Jetpack Compose e Material 3.",
                 btn_github_repo: "Ver no GitHub",
                 btn_github_profile: "Perfil do Desenvolvedor",
+                btn_playstore_roadmap: "Roteiro Play Store",
                 gallery_tag: "GALERIA DO APP",
                 gallery_title: "Experimente o Taras no Android",
-                gallery_desc: "Design Material 3 fluido com animações suaves e sem propagandas.",
+                gallery_desc: "Design Material 3 fluido com animações suaves e sem propagandas. Toque para ampliar.",
+                btn_inspect: "Ver em Alta Resolução",
                 shot_1_title: "The Paddock (Notícias)",
                 shot_1_desc: "Notícias de automobilismo via RSS diretamente no aparelho.",
                 shot_2_title: "The Grid (Pilotos)",
@@ -1455,6 +2050,18 @@
                 shot_8_desc: "Intervalos de corrida, melhores voltas e cards para compartilhamento.",
                 shot_9_title: "Configurações e Temas",
                 shot_9_desc: "Seletor de temas dinâmicos Material You e troca de idioma.",
+                ps_badge: "EM BREVE • BETA FECHADO",
+                ps_status: "Verificação no Google Play Console em andamento",
+                ps_title: "Lançamento Oficial no Google Play Store",
+                ps_desc: "Taras está em preparação ativa para o lançamento oficial na Google Play Store com verificação rigorosa de privacidade e AAB otimizado.",
+                ps_feat1_title: "Pacote AAB Assinado",
+                ps_feat1_desc: "Downloads ultrarrápidos com tamanho inferior a 18 MB.",
+                ps_feat2_title: "Android 15 e Widgets Glance",
+                ps_feat2_desc: "Sincronização em segundo plano para contagens regressivas ao vivo.",
+                ps_feat3_title: "Garantia Sem Anúncios",
+                ps_feat3_desc: "100% livre de anúncios e SDKs comerciais de rastreamento.",
+                ps_cta_notify: "Solicitar Acesso ao Beta Fechado",
+                ps_cta_apk: "Download Direto do APK (GitHub)",
                 bento_tag: "PILARES DO PROJETO",
                 bento_title: "Engenharia com Propósito",
                 bento_desc: "Projetado para eliminar a poluição de anúncios e respeitar a privacidade.",
@@ -1477,6 +2084,7 @@
                 officer_name: "Encarregado de Ouvidoria: Yash Ajagiya",
                 officer_sub: "Jurisdição: Gujarat, Índia",
                 btn_copy_email: "Copiar E-mail",
+                lightbox_close: "Fechar",
                 footer_disclaimer: "Aviso: Taras é um app de fãs de código aberto não-oficial."
             }
         };
@@ -1509,32 +2117,176 @@
         const initialLang = queryLang || savedLang || (translations[browserLang] ? browserLang : 'en');
         setLanguage(initialLang);
 
+        /* Theme Engine */
+        function initTheme() {
+            const saved = localStorage.getItem('taras_theme');
+            const theme = saved || 'dark';
+            setTheme(theme);
+        }
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('taras_theme', theme);
+        }
+
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const current = document.documentElement.getAttribute('data-theme') || 'dark';
+                const next = current === 'dark' ? 'light' : 'dark';
+                setTheme(next);
+            });
+        }
+        initTheme();
+
+        /* Toast feedback */
+        function showToast(msg) {
+            const toast = document.getElementById('toastMessage');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
         function copyEmail() {
             const email = "ajagiyayash@gmail.com";
             navigator.clipboard.writeText(email).then(() => {
-                const toast = document.getElementById('toastMessage');
-                toast.classList.add('show');
+                showToast("Grievance Email copied: " + email);
                 const btnText = document.getElementById('copyBtnText');
-                const originalText = btnText.innerText;
-                btnText.innerText = "Copied!";
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                    btnText.innerText = originalText;
-                }, 2500);
+                if (btnText) {
+                    const orig = btnText.innerText;
+                    btnText.innerText = "Copied!";
+                    setTimeout(() => { btnText.innerText = orig; }, 2500);
+                }
             }).catch(() => {
-                prompt("Grievance Email:", "ajagiyayash@gmail.com");
+                prompt("Grievance Email:", email);
             });
         }
 
-        const lights = document.querySelectorAll('.gantry-light');
-        let currentLight = 0;
-        setInterval(() => {
-            lights.forEach(l => l.classList.remove('lit'));
-            for (let i = 0; i <= currentLight; i++) {
-                if (lights[i]) lights[i].classList.add('lit');
+        function notifyPlayStore() {
+            const email = "ajagiyayash@gmail.com";
+            navigator.clipboard.writeText(email).then(() => {
+                showToast("Email copied: " + email + " • Send note to join Closed Beta!");
+                const btn = document.getElementById('notifyPlayBtnText');
+                if (btn) {
+                    const orig = btn.innerText;
+                    btn.innerText = "Email Copied!";
+                    setTimeout(() => { btn.innerText = orig; }, 2500);
+                }
+            }).catch(() => {
+                prompt("Contact developer for Closed Beta:", email);
+            });
+        }
+
+        /* Lightbox Modal */
+        function openLightbox(imgSrc, title, desc) {
+            const modal = document.getElementById('lightboxModal');
+            const img = document.getElementById('lightboxImg');
+            const titleEl = document.getElementById('lightboxTitle');
+            const descEl = document.getElementById('lightboxDesc');
+            
+            img.src = imgSrc;
+            titleEl.innerText = title;
+            descEl.innerText = desc;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightboxDirect() {
+            const modal = document.getElementById('lightboxModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeLightbox(e) {
+            if (e.target.id === 'lightboxModal') {
+                closeLightboxDirect();
             }
-            currentLight = (currentLight + 1) % 6;
-        }, 600);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightboxDirect();
+        });
+
+        /* Interactive F1 Race Start Gantry */
+        const lights = [
+            document.getElementById('light0'),
+            document.getElementById('light1'),
+            document.getElementById('light2'),
+            document.getElementById('light3'),
+            document.getElementById('light4')
+        ];
+        const statusEl = document.getElementById('gantryStatus');
+        let isSequencing = false;
+        let idleInterval = null;
+
+        function runIdleLoop() {
+            if (isSequencing) return;
+            let current = 0;
+            if (idleInterval) clearInterval(idleInterval);
+            idleInterval = setInterval(() => {
+                if (isSequencing) return;
+                lights.forEach(l => {
+                    l.classList.remove('lit');
+                    l.classList.remove('green-flash');
+                });
+                for (let i = 0; i <= current; i++) {
+                    if (lights[i]) lights[i].classList.add('lit');
+                }
+                current = (current + 1) % 6;
+            }, 600);
+        }
+
+        function triggerF1RaceStart() {
+            if (isSequencing) return;
+            isSequencing = true;
+            if (idleInterval) clearInterval(idleInterval);
+
+            // Step 1: Turn all lights off
+            lights.forEach(l => {
+                l.classList.remove('lit');
+                l.classList.remove('green-flash');
+            });
+            statusEl.classList.remove('away-we-go');
+            statusEl.innerText = "FORMATION COMPLETE • STAND BY FOR START SEQUENCE...";
+
+            // Step 2: Sequence 1 to 5 lights
+            const delays = [500, 1000, 1500, 2000, 2500];
+            delays.forEach((delay, idx) => {
+                setTimeout(() => {
+                    if (lights[idx]) lights[idx].classList.add('lit');
+                    statusEl.innerText = "RED LIGHT " + (idx + 1) + " ON";
+                }, delay);
+            });
+
+            // Step 3: Random hold between 1.5s and 3.0s after 5th light
+            const randomHold = 2500 + Math.floor(Math.random() * 1500) + 1200;
+            setTimeout(() => {
+                // LIGHTS OUT!
+                lights.forEach(l => {
+                    l.classList.remove('lit');
+                    l.classList.add('green-flash');
+                });
+                statusEl.classList.add('away-we-go');
+                const curLang = localStorage.getItem('taras_lang') || 'en';
+                const goText = (translations[curLang] && translations[curLang].gantry_go) || "LIGHTS OUT AND AWAY WE GO!";
+                statusEl.innerText = goText;
+
+                // Step 4: After flash, return to ready after 4s
+                setTimeout(() => {
+                    lights.forEach(l => l.classList.remove('green-flash'));
+                    statusEl.classList.remove('away-we-go');
+                    const readyText = (translations[curLang] && translations[curLang].gantry_ready) || "F1 RACE START GANTRY • TAP TO TRIGGER LIGHTS OUT";
+                    statusEl.innerText = readyText;
+                    isSequencing = false;
+                    runIdleLoop();
+                }, 4000);
+            }, randomHold);
+        }
+
+        document.getElementById('gantryBox').addEventListener('click', triggerF1RaceStart);
+        runIdleLoop();
     </script>
 </body>
 </html>

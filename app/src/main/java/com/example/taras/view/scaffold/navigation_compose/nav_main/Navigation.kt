@@ -79,7 +79,9 @@ fun MainNavHost(
                 entry<MainNavRoutes.DrawerSetting> {
                     SettingDrawer(
                         appearanceViewModel = appearanceViewModel,
-                        userViewModel = userViewModel
+                        userViewModel = userViewModel,
+                        onNavigateToTcgBinder = { navigator.navigate(MainNavRoutes.TcgBinder) },
+                        onNavigateToLegalHub = { tab -> navigator.navigate(MainNavRoutes.LegalHub(tab)) }
                     ) { }
                 }
                 entry<MainNavRoutes.DriverProfile> { route ->
@@ -180,6 +182,12 @@ fun MainNavHost(
                     com.example.taras.view.tcg.screens.BattleArenaScreen(
                         initialCard1Id = route.card1Id,
                         initialCard2Id = route.card2Id,
+                        onBackClick = { navigator.goBack() }
+                    )
+                }
+                entry<MainNavRoutes.LegalHub> { route ->
+                    com.example.taras.view.scaffold.navigation_compose.nav_screens.nave_subscreens.LegalHubScreen(
+                        initialTabName = route.initialTab,
                         onBackClick = { navigator.goBack() }
                     )
                 }

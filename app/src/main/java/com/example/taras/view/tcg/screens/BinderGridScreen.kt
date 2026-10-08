@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
@@ -49,7 +50,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -239,15 +239,37 @@ fun BinderGridScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
-                items(uiState.filteredItems) { item ->
-                    BinderCardCell(
-                        item = item,
-                        onClick = {
-                            if (item.isUnlocked) {
-                                inspectedCard = item.card
+                if (uiState.selectedTier == null && uiState.selectedTeamId == null) {
+                    val groupedByTier = uiState.filteredItems.groupBy { it.card.tier }
+                    RarityTier.entries.forEach { tier ->
+                        val itemsInTier = groupedByTier[tier].orEmpty()
+                        if (itemsInTier.isNotEmpty()) {
+                            item(span = { GridItemSpan(3) }, key = "header_${tier.name}") {
+                                TierSectionHeader(tier = tier, count = itemsInTier.size)
+                            }
+                            items(itemsInTier, key = { it.card.id }) { item ->
+                                BinderCardCell(
+                                    item = item,
+                                    onClick = {
+                                        if (item.isUnlocked) {
+                                            inspectedCard = item.card
+                                        }
+                                    }
+                                )
                             }
                         }
-                    )
+                    }
+                } else {
+                    items(uiState.filteredItems, key = { it.card.id }) { item ->
+                        BinderCardCell(
+                            item = item,
+                            onClick = {
+                                if (item.isUnlocked) {
+                                    inspectedCard = item.card
+                                }
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -345,6 +367,59 @@ fun BinderGridScreen(
 }
 
 @Composable
+private fun TierSectionHeader(
+    tier: RarityTier,
+    count: Int
+) {
+    val tierTitle = when (tier) {
+        RarityTier.S_TIER -> "TIER S • GOLD RARE"
+        RarityTier.A_TIER -> "TIER A • SILVER CHROME"
+        RarityTier.B_TIER -> "TIER B • BRONZE METAL"
+        RarityTier.C_TIER -> "TIER C • MATTE STEEL"
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 10.dp, bottom = 4.dp, start = 2.dp, end = 2.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(19.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(tier.borderColor.copy(alpha = 0.25f))
+                    .border(1.dp, tier.borderColor, RoundedCornerShape(4.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = tier.badgeLabel,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Black,
+                    color = tier.borderColor
+                )
+            }
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = tierTitle,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 0.5.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        Text(
+            text = "$count cards",
+            fontSize = 10.5.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
 private fun BinderCardCell(
     item: BinderCardItem,
     onClick: () -> Unit
@@ -354,10 +429,6 @@ private fun BinderCardCell(
     val context = LocalContext.current
     val teamPrimaryColor = remember(card.primaryColorHex) {
         com.example.taras.view.tcg.components.parseHexColor(card.primaryColorHex, Color(0xFFE10600))
-    }
-    val watermarkNumber = remember(card.driverNumber, card.code) {
-        val cleaned = card.driverNumber.removePrefix("#").trim()
-        if (cleaned.isNotBlank()) cleaned else card.code
     }
 
     Box(
@@ -388,45 +459,7 @@ private fun BinderCardCell(
             )
     ) {
         if (item.isUnlocked) {
-            if (card.role == CardRole.CHASSIS) {
-                val teamLogoUrl = remember(card.teamId) {
-                    com.example.taras.view.tcg.components.getTeamLogoWatermarkUrl(card.teamId)
-                }
-                val logoRequest = remember(teamLogoUrl) {
-                    ImageRequest.Builder(context)
-                        .data(teamLogoUrl)
-                        .crossfade(true)
-                        .build()
-                }
-                // Giant Watermark Team Logo behind car cutout
-                AsyncImage(
-                    model = logoRequest,
-                    contentDescription = "${card.teamName} Logo Watermark",
-                    contentScale = ContentScale.Fit,
-                    alignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 10.dp, vertical = 20.dp)
-                        .alpha(0.25f)
-                )
-            } else {
-                // Giant Watermark Number behind driver cutout
-                Text(
-                    text = watermarkNumber,
-                    fontSize = if (watermarkNumber.length <= 2) 56.sp else 34.sp,
-                    fontWeight = FontWeight.Black,
-                    fontStyle = FontStyle.Italic,
-                    color = Color.White.copy(alpha = 0.24f),
-                    letterSpacing = (-3).sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.Center)
-                        .padding(bottom = 6.dp)
-                )
-            }
-
-            // Unlocked Card Thumbnail Content
+            // Unlocked Card Thumbnail Content (clean cutout without watermark number/logo)
             Column(
                 modifier = Modifier
                     .fillMaxSize()

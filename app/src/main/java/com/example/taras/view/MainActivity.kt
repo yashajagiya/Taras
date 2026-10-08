@@ -132,7 +132,8 @@ class MainActivity : ComponentActivity() {
                             appearanceExpanded = appearanceExpanded,
                             onAppearanceExpandChange = { appearanceExpanded = it },
                             onOpenOnboarding = { showManualOnboarding = true },
-                            onNavigateToTcgBinder = { navigator.navigate(MainNavRoutes.TcgBinder) }
+                            onNavigateToTcgBinder = { navigator.navigate(MainNavRoutes.TcgBinder) },
+                            onNavigateToLegalHub = { tab -> navigator.navigate(MainNavRoutes.LegalHub(tab)) }
                         ) {
                             Scaffold(
                                 modifier = Modifier.fillMaxSize(),

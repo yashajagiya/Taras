@@ -59,6 +59,7 @@ val serializerConfig = SavedStateConfiguration {
             subclass(MainNavRoutes.TcgBinder::class)
             subclass(MainNavRoutes.TcgScratchPack::class)
             subclass(MainNavRoutes.TcgArena::class)
+            subclass(MainNavRoutes.LegalHub::class)
         }
     }
 }

@@ -66,7 +66,10 @@ class TcgViewModel(
                 quantity = userEntry?.quantity ?: 0,
                 isScratchCompleted = userEntry?.isScratchCompleted ?: false
             )
-        }
+        }.sortedWith(
+            compareBy<BinderCardItem> { it.card.tier.ordinal }
+                .thenBy { it.card.name.lowercase() }
+        )
 
         val filtered = allItems.filter { item ->
             val tierMatch = selectedTier == null || item.card.tier == selectedTier

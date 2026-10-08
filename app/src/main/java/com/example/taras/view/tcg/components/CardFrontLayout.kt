@@ -25,10 +25,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.ScaleFactor
 import androidx.compose.ui.platform.LocalContext
@@ -59,10 +65,7 @@ import com.example.taras.core.tcg.model.RarityTier
 fun getOptimizedAvatarUrl(rawUrl: String): String {
     return if (rawUrl.contains("media.formula1.com/image/upload/")) {
         if (rawUrl.contains("carright")) {
-            rawUrl.replace(
-                Regex("image/upload/(?:c_[^/]+/)?(?:q_[^/]+/)?(?:d_[^/]+/)?"),
-                "image/upload/c_fit,w_1600/q_auto:best/"
-            )
+            rawUrl
         } else {
             rawUrl.replace(
                 Regex("image/upload/(?:c_[^/]+/)?(?:q_[^/]+/)?(?:d_[^/]+/)?"),
@@ -80,19 +83,102 @@ fun getOptimizedAvatarUrl(rawUrl: String): String {
 fun getTeamLogoWatermarkUrl(teamId: String): String {
     val cleanId = teamId.lowercase().replace("-", "").replace("_", "").replace(" ", "")
     return when (cleanId) {
-        "ferrari" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/ferrari/2025ferrarilogolight.webp"
-        "redbull", "redbullracing" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/redbullracing/2025redbullracinglogowhite.webp"
-        "mclaren" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/mclaren/2025mclarenlogowhite.webp"
-        "mercedes" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/mercedes/2025mercedeslogowhite.webp"
-        "astonmartin" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/astonmartin/2025astonmartinlogowhite.webp"
-        "williams" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/williams/2025williamslogowhite.webp"
-        "audi" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2026/audi/2026audilogowhite.webp"
-        "alpine" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/alpine/2025alpinelogowhite.webp"
-        "cadillac" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2026/cadillac/2026cadillaclogowhite.webp"
-        "racingbulls", "vcarb" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/racingbulls/2025racingbullslogowhite.webp"
-        "haas" -> "https://media.formula1.com/image/upload/c_fit,w_600/q_auto:best/v1740000001/common/f1/2025/haas/2025haaslogowhite.webp"
+        "mercedes" -> "https://media.formula1.com/image/upload/c_fit,w_1024/e_sharpen:100/q_auto:best/v1740000001/common/f1/2026/mercedes/2026mercedeslogowhite.png"
+        "ferrari" -> "https://media.formula1.com/image/upload/c_fit,w_1024/e_sharpen:100/q_auto:best/v1740000001/common/f1/2026/ferrari/2026ferrarilogowhite.png"
+        "mclaren" -> "https://media.formula1.com/image/upload/c_fit,w_1024/e_sharpen:100/q_auto:best/v1740000001/common/f1/2026/mclaren/2026mclarenlogowhite.png"
+        "redbull", "redbullracing" -> "https://media.formula1.com/image/upload/c_fit,w_1024/e_sharpen:100/q_auto:best/v1740000001/common/f1/2026/redbullracing/2026redbullracinglogowhite.png"
+        "alpine" -> "https://media.formula1.com/image/upload/c_fit,w_1024/e_sharpen:100/q_auto:best/v1740000001/common/f1/2026/alpine/2026alpinelogowhite.png"
+        "racingbulls", "vcarb" -> "https://media.formula1.com/image/upload/c_fit,w_1024/e_sharpen:100/q_auto:best/v1740000001/common/f1/2026/racingbulls/2026racingbullslogowhite.png"
+        "haas", "haasf1team" -> "https://media.formula1.com/image/upload/c_fit,w_1024/e_sharpen:100/q_auto:best/v1740000001/common/f1/2026/haasf1team/2026haasf1teamlogowhite.png"
+        "williams" -> "https://media.formula1.com/image/upload/c_fit,w_1024/e_sharpen:100/q_auto:best/v1740000001/common/f1/2026/williams/2026williamslogowhite.png"
+        "audi" -> "https://media.formula1.com/image/upload/c_fit,w_1024/e_sharpen:100/q_auto:best/v1740000001/common/f1/2026/audi/2026audilogowhite.png"
+        "astonmartin" -> "https://media.formula1.com/image/upload/c_fit,w_1024/e_sharpen:100/q_auto:best/v1740000001/common/f1/2026/astonmartin/2026astonmartinlogowhite.png"
+        "cadillac" -> "https://media.formula1.com/image/upload/c_fit,w_1024/e_sharpen:100/q_auto:best/v1740000001/common/f1/2026/cadillac/2026cadillaclogowhite.png"
         else -> ""
     }
+}
+
+/**
+ * Resolves the official F1 driver number logo URL (white stylized vector number)
+ * directly from the Formula 1 CDN asset structure.
+ */
+fun getDriverNumberLogoUrl(avatarUrl: String): String {
+    return if (avatarUrl.contains("media.formula1.com/image/upload/") && avatarUrl.contains("right.webp") && !avatarUrl.contains("carright.webp")) {
+        avatarUrl
+            .replace("right.webp", "numberwhite.webp")
+            .replace(
+                Regex("image/upload/(?:c_[^/]+/)?(?:q_[^/]+/)?(?:d_[^/]+/)?"),
+                "image/upload/c_fit,w_600/q_auto:best/"
+            )
+    } else {
+        ""
+    }
+}
+
+/**
+ * Lightweight GPU-accelerated holographic rainbow reflection effect.
+ * Dynamically shifts an iridescent prism gradient and specular sheen
+ * across the vector logo/number based on the card's 3D tilt coordinates (-25° .. +25°).
+ * Uses BlendMode.SrcAtop with offscreen compositing to ensure 100% of the reflection
+ * stays masked strictly inside the logo's alpha silhouette without bleeding.
+ */
+fun Modifier.holoFoilReflection(
+    tiltX: Float,
+    tiltY: Float,
+    baseAlpha: Float = 0.38f
+): Modifier {
+    val normX = ((tiltY + 25f) / 50f).coerceIn(0f, 1f)
+    val normY = ((tiltX + 25f) / 50f).coerceIn(0f, 1f)
+
+    val rainbowColors = listOf(
+        Color(0xFFFF3366), // Holographic Coral Pink
+        Color(0xFFFF9900), // Holographic Amber / Gold
+        Color(0xFFFFFF66), // Holographic Solar Gold
+        Color(0xFF33FF99), // Holographic Mint Neon
+        Color(0xFF33CCFF), // Holographic Cyan Ice
+        Color(0xFF9966FF), // Holographic Violet
+        Color(0xFFFF3366)  // Wrap
+    )
+
+    return this
+        .alpha(baseAlpha)
+        .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+        .drawWithContent {
+            drawContent()
+            val w = size.width
+            val h = size.height
+
+            val startX = (normX - 0.5f) * w * 2.2f
+            val startY = (normY - 0.5f) * h * 2.2f
+            val endX = startX + w * 1.3f
+            val endY = startY + h * 1.3f
+
+            // 1. Rainbow foil iridescence masked to the logo/number silhouette
+            drawRect(
+                brush = Brush.linearGradient(
+                    colors = rainbowColors,
+                    start = Offset(startX, startY),
+                    end = Offset(endX, endY)
+                ),
+                blendMode = BlendMode.SrcAtop,
+                alpha = 0.65f
+            )
+
+            // 2. Specular chrome gleam beam across the center of tilt
+            drawRect(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color.Transparent,
+                        Color.White.copy(alpha = 0.45f),
+                        Color.Transparent
+                    ),
+                    start = Offset(startX + w * 0.35f, startY),
+                    end = Offset(startX + w * 0.65f, endY)
+                ),
+                blendMode = BlendMode.SrcAtop,
+                alpha = 0.50f
+            )
+        }
 }
 
 /**
@@ -117,7 +203,9 @@ val DriverWaistCropScale = ContentScale.Fit
 @Composable
 fun CardFrontLayout(
     card: TcgCardEntity,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    tiltX: Float = 0f,
+    tiltY: Float = 0f
 ) {
     val cardShape = RoundedCornerShape(16.dp)
     val teamPrimaryColor = remember(card.primaryColorHex) {
@@ -209,6 +297,8 @@ fun CardFrontLayout(
                 teamPrimaryColor = teamPrimaryColor,
                 watermarkNumber = watermarkNumber,
                 tierColor = card.tier.borderColor,
+                tiltX = tiltX,
+                tiltY = tiltY,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1.15f)
@@ -345,6 +435,8 @@ private fun ArtworkWindow(
     teamPrimaryColor: Color,
     watermarkNumber: String,
     tierColor: Color,
+    tiltX: Float = 0f,
+    tiltY: Float = 0f,
     modifier: Modifier = Modifier
 ) {
     val windowShape = RoundedCornerShape(10.dp)
@@ -382,7 +474,7 @@ private fun ArtworkWindow(
                     .crossfade(true)
                     .build()
             }
-            // GIANT WATERMARK TEAM / CAR LOGO - In the back of the chassis
+            // WATERMARK TEAM / CAR LOGO - Sized gracefully with 3D rainbow reflection
             AsyncImage(
                 model = logoRequest,
                 contentDescription = "${card.teamName} Logo Watermark",
@@ -390,24 +482,48 @@ private fun ArtworkWindow(
                 alignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp, vertical = 20.dp)
-                    .alpha(0.28f)
+                    .padding(horizontal = 14.dp, vertical = 10.dp)
+                    .scale(1.05f)
+                    .holoFoilReflection(tiltX = tiltX, tiltY = tiltY, baseAlpha = 0.38f)
             )
         } else {
-            // GIANT WATERMARK DRIVER NUMBER - In the back of the driver
-            Text(
-                text = watermarkNumber,
-                fontSize = if (watermarkNumber.length <= 2) 160.sp else 100.sp,
-                fontWeight = FontWeight.Black,
-                fontStyle = FontStyle.Italic,
-                color = Color.White.copy(alpha = 0.28f),
-                letterSpacing = (-4).sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.Center)
-                    .padding(bottom = 4.dp)
-            )
+            val numberLogoUrl = remember(card.avatarUrl) { getDriverNumberLogoUrl(card.avatarUrl) }
+            if (numberLogoUrl.isNotBlank()) {
+                val numberLogoRequest = remember(numberLogoUrl) {
+                    ImageRequest.Builder(context)
+                        .data(numberLogoUrl)
+                        .crossfade(true)
+                        .build()
+                }
+                // DRIVER NUMBER LOGO - Sized gracefully with 3D rainbow reflection
+                AsyncImage(
+                    model = numberLogoRequest,
+                    contentDescription = "${card.name} Number Logo",
+                    contentScale = ContentScale.Fit,
+                    alignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                        .scale(1.10f)
+                        .holoFoilReflection(tiltX = tiltX, tiltY = tiltY, baseAlpha = 0.38f)
+                )
+            } else {
+                // Fallback Text Watermark with 3D rainbow reflection
+                Text(
+                    text = watermarkNumber,
+                    fontSize = if (watermarkNumber.length <= 2) 110.sp else 75.sp,
+                    fontWeight = FontWeight.Black,
+                    fontStyle = FontStyle.Italic,
+                    color = Color.White,
+                    letterSpacing = (-4).sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Center)
+                        .padding(bottom = 4.dp)
+                        .holoFoilReflection(tiltX = tiltX, tiltY = tiltY, baseAlpha = 0.30f)
+                )
+            }
         }
 
         // Driver Portrait or Chassis Car Cutout

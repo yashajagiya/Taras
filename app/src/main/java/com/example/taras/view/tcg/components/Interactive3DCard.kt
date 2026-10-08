@@ -131,6 +131,8 @@ fun Interactive3DCard(
             Box(modifier = Modifier.fillMaxSize()) {
                 CardFrontLayout(
                     card = card,
+                    tiltX = animatedTiltX,
+                    tiltY = animatedTiltY,
                     modifier = Modifier.fillMaxSize()
                 )
                 // Holographic Sheen Layer (Team Color & Specular Reflective)

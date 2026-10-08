@@ -42,4 +42,7 @@ sealed class MainNavRoutes : NavKey {
 
     @Serializable
     data class TcgArena(val card1Id: String = "card_fer_44", val card2Id: String = "card_rbr_03") : MainNavRoutes()
+
+    @Serializable
+    data class LegalHub(val initialTab: String = "about") : MainNavRoutes()
 }

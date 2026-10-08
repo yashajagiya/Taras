@@ -27,12 +27,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Gavel
 import androidx.compose.material.icons.filled.PrivacyTip
 import androidx.compose.material.icons.filled.SportsMotorsports
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Style
 import com.example.taras.R
 import com.example.taras.network_calls.ApiConstants
+import com.example.taras.view.subview.LegalAndAboutDialog
+import com.example.taras.view.subview.LegalTab
 import com.example.taras.view.subview.PrivacyPolicyDialog
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
@@ -96,11 +100,11 @@ fun SettingDrawer(
     onAppearanceExpandChange: (Boolean) -> Unit = {},
     onOpenOnboarding: () -> Unit = {},
     onNavigateToTcgBinder: () -> Unit = {},
+    onNavigateToLegalHub: (String) -> Unit = {},
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val openDialog = remember { mutableStateOf(false) }
-    val openPrivacyDialog = remember { mutableStateOf(false) }
 
     val gitLink = "https://github.com/yashajagiya"
     val uriHandler = LocalUriHandler.current
@@ -363,7 +367,22 @@ fun SettingDrawer(
                             )
 
                             NavigationDrawerItem(
-                                label = { Text(stringResource(R.string.drawer_about_privacy)) },
+                                label = { Text(stringResource(R.string.drawer_about_us)) },
+                                selected = false,
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = "About Us"
+                                    )
+                                },
+                                onClick = {
+                                    scope.launch { drawerState.close() }
+                                    onNavigateToLegalHub("about")
+                                }
+                            )
+
+                            NavigationDrawerItem(
+                                label = { Text(stringResource(R.string.drawer_privacy_policy)) },
                                 selected = false,
                                 icon = {
                                     Icon(
@@ -373,22 +392,24 @@ fun SettingDrawer(
                                 },
                                 onClick = {
                                     scope.launch { drawerState.close() }
-                                    openPrivacyDialog.value = true
+                                    onNavigateToLegalHub("privacy")
                                 }
                             )
 
-                            if (openPrivacyDialog.value) {
-                                PrivacyPolicyDialog(
-                                    onDismiss = { openPrivacyDialog.value = false },
-                                    onOpenOnlinePolicy = {
-                                        try {
-                                            uriHandler.openUri(ApiConstants.PRIVACY_POLICY_URL)
-                                        } catch (e: Exception) {
-                                            Toast.makeText(drawerContext, "Could not open browser", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-                                )
-                            }
+                            NavigationDrawerItem(
+                                label = { Text(stringResource(R.string.drawer_terms_of_service)) },
+                                selected = false,
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Gavel,
+                                        contentDescription = "Terms of Service"
+                                    )
+                                },
+                                onClick = {
+                                    scope.launch { drawerState.close() }
+                                    onNavigateToLegalHub("terms")
+                                }
+                            )
                         }
                     }
                 }

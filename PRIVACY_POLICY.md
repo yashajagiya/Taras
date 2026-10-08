@@ -120,7 +120,7 @@ In compliance with Rule 3(2) of the **Information Technology (Intermediary Guide
 
 - **Grievance Officer:** Yash Ajagiya
 - **Role:** Data Protection & Grievance Redressal Officer
-- **Email:** [yashajagiya@gmail.com](mailto:yashajagiya@gmail.com)
+- **Email:** [ajagiyayash@gmail.com](mailto:ajagiyayash@gmail.com)
 - **GitHub Repository:** [https://github.com/yashajagiya/Taras](https://github.com/yashajagiya/Taras)
 - **Jurisdiction & Location:** Gujarat, India
 

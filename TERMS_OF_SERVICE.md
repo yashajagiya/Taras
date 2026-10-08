@@ -103,7 +103,7 @@ Subject to the grievance redressal mechanism outlined below, the competent civil
 In accordance with Rule 3(2) of the **Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021**, any concern, feedback, or grievance regarding these Terms, intermediary content, or intellectual property fair use may be addressed to our designated Grievance Officer:
 
 - **Grievance Officer:** Yash Ajagiya
-- **Email:** [yashajagiya@gmail.com](mailto:yashajagiya@gmail.com)
+- **Email:** [ajagiyayash@gmail.com](mailto:ajagiyayash@gmail.com)
 - **GitHub:** [https://github.com/yashajagiya/Taras](https://github.com/yashajagiya/Taras)
 - **Jurisdiction:** Gujarat, India
 

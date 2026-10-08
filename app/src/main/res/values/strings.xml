@@ -89,7 +89,7 @@
     <string name="privacy_sec_grievance_title">Grievance Officer (IT Rules 2021 &amp; DPDPA 2023)</string>
     <string name="privacy_sec_grievance_desc">In accordance with Rule 3(2) of the Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021 and Section 13 of DPDPA 2023, queries or grievances are acknowledged within 48 hours and resolved within 15–30 days.</string>
     <string name="grievance_officer_name">Grievance Officer: Yash Ajagiya</string>
-    <string name="grievance_officer_email">Email: yashajagiya@gmail.com</string>
+    <string name="grievance_officer_email">Email: ajagiyayash@gmail.com</string>
     <string name="grievance_officer_location">Jurisdiction: Gujarat, India</string>
     <string name="privacy_sec_opensource_title">Open Source Transparency</string>
     <string name="privacy_sec_opensource_desc">Taras is completely open-source under the Apache 2.0 license. Anyone can inspect the code on GitHub to verify our privacy commitments.</string>

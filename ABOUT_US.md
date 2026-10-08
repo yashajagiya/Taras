@@ -78,7 +78,7 @@ Taras was built to deliver the exact opposite: **a lightning-fast, minimalist, a
 
 - **Unofficial Status:** Taras is an independent, non-commercial fan application not affiliated with Formula One Licensing B.V. or FOM.
 - **Grievance Officer:** Yash Ajagiya
-- **Email:** [yashajagiya@gmail.com](mailto:yashajagiya@gmail.com)
+- **Email:** [ajagiyayash@gmail.com](mailto:ajagiyayash@gmail.com)
 - **Jurisdiction:** Gujarat, India
 - **Repository:** [https://github.com/yashajagiya/Taras](https://github.com/yashajagiya/Taras)
 - **Hosted Portal:** [https://yashajagiya.github.io/TarasF1/about.html](https://yashajagiya.github.io/TarasF1/about.html)

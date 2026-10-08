@@ -5,7 +5,7 @@ object ApiConstants {
     const val PRIVACY_POLICY_URL = "https://yashajagiya.github.io/TarasF1/privacy-policy.html"
     const val TERMS_OF_SERVICE_URL = "https://yashajagiya.github.io/TarasF1/terms-of-service.html"
     const val ABOUT_URL = "https://yashajagiya.github.io/TarasF1/about.html"
-    const val GRIEVANCE_EMAIL = "yashajagiya@gmail.com"
+    const val GRIEVANCE_EMAIL = "ajagiyayash@gmail.com"
     const val GITHUB_REPO_URL = "https://github.com/yashajagiya/Taras"
     const val FALLBACK_DRIVER_IMAGE_URL =
         "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/d_common:f1:2026:fallback:driver:2026fallbackdriverright.webp/"

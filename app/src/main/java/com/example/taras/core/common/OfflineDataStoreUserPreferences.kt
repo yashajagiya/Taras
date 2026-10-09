@@ -150,7 +150,20 @@ class UserPreferences(private val context: Context) {
         }
     }
 
+    fun getCachedHasSeenWelcome(): Boolean? {
+        val sp = context.getSharedPreferences("user_sync_cache", Context.MODE_PRIVATE)
+        return if (sp.contains("has_seen_welcome")) sp.getBoolean("has_seen_welcome", false) else null
+    }
+
+    fun cacheHasSeenWelcome(seen: Boolean) {
+        context.getSharedPreferences("user_sync_cache", Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean("has_seen_welcome", seen)
+            .apply()
+    }
+
     suspend fun setHasSeenWelcome(seen: Boolean = true) {
+        cacheHasSeenWelcome(seen)
         context.userNameDataStore.edit { prefs ->
             prefs[HAS_SEEN_WELCOME_KEY] = seen
         }

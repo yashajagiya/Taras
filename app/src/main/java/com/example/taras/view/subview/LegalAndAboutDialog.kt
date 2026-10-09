@@ -315,7 +315,7 @@ fun LegalAndAboutDialog(
                         )
                         Spacer(Modifier.width(4.dp))
                         Text(
-                            text = "Grievance",
+                            text = stringResource(R.string.legal_fab_grievance),
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 11.sp
                         )

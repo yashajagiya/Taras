@@ -14,6 +14,7 @@
     <string name="nav_grid">グリッド</string>
     <string name="nav_calendar">カレンダー</string>
     <string name="nav_results">リザルト</string>
+    <string name="nav_tcg">TCG</string>
     <string name="topbar_user_profile">ユーザープロファイル</string>
     <string name="action_back">戻る</string>
 
@@ -72,6 +73,7 @@
     <string name="privacy_sec_opensource_title">オープンソースの透明性</string>
     <string name="privacy_sec_opensource_desc">Tarasは完全オープンソースです。GitHubでソースコードをいつでもご確認いただけます。</string>
     <string name="privacy_btn_view_online">オンライン版を見る</string>
+    <string name="legal_fab_grievance">苦情・お問い合わせ</string>
     <string name="privacy_btn_got_it">確認しました</string>
     <string name="drawer_notifications_already_granted">すでに許可されています</string>
     <string name="drawer_could_not_open_settings">設定を開けませんでした</string>
@@ -276,4 +278,24 @@
     <string name="news_open_error">記事のリンクを開けませんでした</string>
     <string name="news_by_author">執筆: %1$s</string>
     <string name="news_no_title">タイトルなし</string>
+
+    <!-- App Guide & Setup -->
+    <string name="guide_title">アプリガイド＆機能</string>
+    <string name="guide_subtitle">リアルタイムテレメトリやカウントダウンから3D F1 Grid TCGバインダーまで、Tarasの魅力をすべて体験してください。</string>
+    <string name="guide_tab_guide">アプリガイド</string>
+    <string name="guide_tab_setup">マイ設定</string>
+    <string name="guide_chip_overview">概要</string>
+    <string name="guide_chip_paddock">パドック</string>
+    <string name="guide_chip_grid">グリッド＆ドライバー</string>
+    <string name="guide_chip_calendar">カレンダー</string>
+    <string name="guide_chip_results">結果</string>
+    <string name="guide_chip_tcg">F1 Grid TCG</string>
+    <string name="guide_chip_widgets">ウィジェット＆テーマ</string>
+    <string name="guide_action_open_tcg">TCGバインダーを開く</string>
+    <string name="guide_action_open_grid">グリッドを探索</string>
+    <string name="guide_action_open_calendar">カレンダーを見る</string>
+    <string name="guide_action_open_results">結果を確認</string>
+    <string name="guide_action_enter_app">パドックに入る</string>
+    <string name="guide_action_edit_setup">設定を変更</string>
+    <string name="guide_close">閉じる</string>
 </resources>

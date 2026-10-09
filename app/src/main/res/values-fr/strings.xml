@@ -14,6 +14,7 @@
     <string name="nav_grid">Grille</string>
     <string name="nav_calendar">Calendrier</string>
     <string name="nav_results">Résultats</string>
+    <string name="nav_tcg">TCG</string>
     <string name="topbar_user_profile">Profil utilisateur</string>
     <string name="action_back">Retour</string>
 
@@ -72,6 +73,7 @@
     <string name="privacy_sec_opensource_title">Transparence Open Source</string>
     <string name="privacy_sec_opensource_desc">Taras est totalement open source. Vous pouvez inspecter le code sur GitHub à tout moment.</string>
     <string name="privacy_btn_view_online">Voir la politique en ligne</string>
+    <string name="legal_fab_grievance">Recours et réclamations</string>
     <string name="privacy_btn_got_it">Compris</string>
     <string name="drawer_notifications_already_granted">Autorisation déjà accordée</string>
     <string name="drawer_could_not_open_settings">Impossible d\'ouvrir les paramètres</string>
@@ -276,4 +278,24 @@
     <string name="news_open_error">Impossible d\'ouvrir le lien de l\'article</string>
     <string name="news_by_author">par %1$s</string>
     <string name="news_no_title">Sans titre</string>
+
+    <!-- App Guide & Setup -->
+    <string name="guide_title">Guide de l\'application &amp; fonctionnalités</string>
+    <string name="guide_subtitle">Découvrez toutes les fonctionnalités de Taras — de la télémétrie en direct et comptes à rebours au classeur 3D F1 Grid TCG.</string>
+    <string name="guide_tab_guide">Guide de l\'app</string>
+    <string name="guide_tab_setup">Ma configuration</string>
+    <string name="guide_chip_overview">Aperçu</string>
+    <string name="guide_chip_paddock">Paddock</string>
+    <string name="guide_chip_grid">Grille &amp; Pilotes</string>
+    <string name="guide_chip_calendar">Calendrier</string>
+    <string name="guide_chip_results">Résultats</string>
+    <string name="guide_chip_tcg">F1 Grid TCG</string>
+    <string name="guide_chip_widgets">Widgets &amp; Thème</string>
+    <string name="guide_action_open_tcg">Ouvrir le classeur TCG</string>
+    <string name="guide_action_open_grid">Explorer la grille</string>
+    <string name="guide_action_open_calendar">Voir le calendrier</string>
+    <string name="guide_action_open_results">Consulter les résultats</string>
+    <string name="guide_action_enter_app">Entrer dans le Paddock</string>
+    <string name="guide_action_edit_setup">Modifier la configuration</string>
+    <string name="guide_close">Fermer</string>
 </resources>

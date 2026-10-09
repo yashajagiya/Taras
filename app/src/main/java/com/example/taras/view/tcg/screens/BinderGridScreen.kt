@@ -81,6 +81,7 @@ import com.example.taras.viewmodel.TcgViewModel
 @Composable
 fun BinderGridScreen(
     viewModel: TcgViewModel,
+    showBackButton: Boolean = false,
     onBackClick: () -> Unit = {},
     onOpenPackClick: () -> Unit = {},
     onBattleClick: (card1Id: String, card2Id: String) -> Unit = { _, _ -> }
@@ -107,16 +108,18 @@ fun BinderGridScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(
-                        onClick = onBackClick
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
+                    if (showBackButton) {
+                        IconButton(
+                            onClick = onBackClick
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back",
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                        Spacer(Modifier.width(4.dp))
                     }
-                    Spacer(Modifier.width(4.dp))
                     Column {
                         Text(
                             text = "F1 GRID TCG",
@@ -220,13 +223,17 @@ fun BinderGridScreen(
                         label = { Text("All Tiers", fontSize = 11.sp, fontWeight = FontWeight.Bold) }
                     )
                 }
-                items(RarityTier.entries) { tier ->
+                items(RarityTier.entries, key = { it.name }) { tier ->
                     FilterChip(
                         selected = uiState.selectedTier == tier,
                         onClick = { viewModel.selectTierFilter(if (uiState.selectedTier == tier) null else tier) },
                         label = { Text("Tier ${tier.badgeLabel}", fontSize = 11.sp, fontWeight = FontWeight.Bold) }
                     )
                 }
+            }
+
+            val groupedByTier = remember(uiState.filteredItems) {
+                uiState.filteredItems.groupBy { it.card.tier }
             }
 
             // 3x3 Binder Grid
@@ -240,7 +247,6 @@ fun BinderGridScreen(
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
                 if (uiState.selectedTier == null && uiState.selectedTeamId == null) {
-                    val groupedByTier = uiState.filteredItems.groupBy { it.card.tier }
                     RarityTier.entries.forEach { tier ->
                         val itemsInTier = groupedByTier[tier].orEmpty()
                         if (itemsInTier.isNotEmpty()) {

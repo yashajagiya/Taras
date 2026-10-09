@@ -138,28 +138,6 @@ fun SettingDrawer(
                                 style = MaterialTheme.typography.titleMedium
                             )
                             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                            // F1 GridTCG 2026 Navigation Item
-                            NavigationDrawerItem(
-                                label = {
-                                    Text(
-                                        text = "F1 GridTCG Binder",
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                },
-                                selected = false,
-                                icon = {
-                                    Icon(
-                                        imageVector = Icons.Filled.Style,
-                                        contentDescription = "F1 GridTCG",
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                },
-                                onClick = {
-                                    scope.launch { drawerState.close() }
-                                    onNavigateToTcgBinder()
-                                }
-                            )
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 6.dp))
                             Box {
                                 NavigationDrawerItem(
                                     label = { Text(stringResource(R.string.drawer_hello_user, userName)) },
@@ -279,11 +257,13 @@ fun SettingDrawer(
                             // Language Selector
                             var languageExpanded by remember { mutableStateOf(false) }
                             val drawerContext = LocalContext.current
+                            val drawerConfig = androidx.compose.ui.platform.LocalConfiguration.current
                             val currentLocaleTag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 val localeManager = drawerContext.getSystemService(Context.LOCALE_SERVICE) as? android.app.LocaleManager
-                                localeManager?.applicationLocales?.toLanguageTags()?.split(",")?.firstOrNull() ?: ""
+                                val appLocales = localeManager?.applicationLocales?.toLanguageTags()?.split(",")?.firstOrNull() ?: ""
+                                if (appLocales.isNotEmpty()) appLocales else drawerConfig.locales[0]?.language ?: ""
                             } else {
-                                java.util.Locale.getDefault().language
+                                drawerConfig.locales[0]?.language ?: java.util.Locale.getDefault().language
                             }
 
                             val languageOptions = listOf(
@@ -336,8 +316,8 @@ fun SettingDrawer(
                                                     java.util.Locale.setDefault(locale)
                                                     val config = drawerContext.resources.configuration
                                                     config.setLocale(locale)
+                                                    @Suppress("DEPRECATION")
                                                     drawerContext.resources.updateConfiguration(config, drawerContext.resources.displayMetrics)
-                                                    (drawerContext as? android.app.Activity)?.recreate()
                                                 }
                                             }
                                         )

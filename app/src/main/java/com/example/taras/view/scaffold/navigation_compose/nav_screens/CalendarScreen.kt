@@ -51,12 +51,15 @@ fun NavCalendarScreen(
     val racesState by racesViewModel.combinedRaces.collectAsStateWithLifecycle()
     val racesCurrentState by racesViewModel.upcomingRoundInfo.collectAsStateWithLifecycle()
     val isRefreshing by racesViewModel.isRefreshing.collectAsStateWithLifecycle()
+    val hasAutoScrolled by racesViewModel.hasAutoScrolledCalendar.collectAsStateWithLifecycle()
 
     CalendarComposable(
-        racesState,
-        racesCurrentState,
+        racesState = racesState,
+        racesCurrentState = racesCurrentState,
         isRefreshing = isRefreshing,
-        onCircuitClick,
+        hasAutoScrolled = hasAutoScrolled,
+        onAutoScrolled = { racesViewModel.setAutoScrolledCalendar(true) },
+        onCircuitClick = onCircuitClick,
         onRefresh = {
             racesViewModel.fetchRacesData(isRefresh = true)
         },
@@ -70,6 +73,8 @@ fun CalendarComposable(
     racesState: UiState<ImmutableList<RaceClearData>>,
     racesCurrentState: CurrentRound?,
     isRefreshing: Boolean,
+    hasAutoScrolled: Boolean = false,
+    onAutoScrolled: () -> Unit = {},
     onCircuitClick: (String) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
@@ -138,10 +143,12 @@ fun CalendarComposable(
                         Modifier.fillMaxSize(),
                     ) {
                         RacesCards(
-                            racesList,
-                            racesCurrentState,
-                            onCircuitClick,
-                            Modifier
+                            racesList1 = racesList,
+                            racesCurrentState = racesCurrentState,
+                            onCircuitClick = onCircuitClick,
+                            modifier = Modifier,
+                            hasAutoScrolled = hasAutoScrolled,
+                            onAutoScrolled = onAutoScrolled
                         )
 
                     }

@@ -226,7 +226,7 @@ private fun ResultContent(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        items(availableRounds) { round ->
+                        items(availableRounds, key = { it }) { round ->
                             val isSelected = selectedRound == round
                             val isLatest = round == availableRounds.firstOrNull()
                             val chipText = if (isLatest) "Round $round (Latest)" else "Round $round"

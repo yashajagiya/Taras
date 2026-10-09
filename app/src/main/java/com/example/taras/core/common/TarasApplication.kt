@@ -7,7 +7,11 @@ import coil3.SingletonImageLoader
 import coil3.disk.DiskCache
 import coil3.disk.directory
 import coil3.memory.MemoryCache
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import coil3.request.CachePolicy
+import coil3.request.allowHardware
 import coil3.request.crossfade
+import com.example.taras.network_calls.NetworkModule
 
 class TarasApplication : Application(), SingletonImageLoader.Factory {
     companion object {
@@ -18,10 +22,14 @@ class TarasApplication : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         instance = this
+        SingletonImageLoader.setSafe { newImageLoader(it) }
     }
 
     override fun newImageLoader(context: PlatformContext): ImageLoader {
         return ImageLoader.Builder(context)
+            .components {
+                add(OkHttpNetworkFetcherFactory(callFactory = { NetworkModule.okHttpClient }))
+            }
             .memoryCache {
                 MemoryCache.Builder()
                     .maxSizePercent(context, 0.25)
@@ -30,9 +38,13 @@ class TarasApplication : Application(), SingletonImageLoader.Factory {
             .diskCache {
                 DiskCache.Builder()
                     .directory(cacheDir.resolve("image_cache"))
-                    .maxSizeBytes(100L * 1024 * 1024) 
+                    .maxSizeBytes(150L * 1024 * 1024) 
                     .build()
             }
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .networkCachePolicy(CachePolicy.ENABLED)
+            .allowHardware(true)
             .crossfade(true)
             .build()
     }

@@ -58,6 +58,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.example.taras.core.common.CurrentData
 import com.example.taras.core.common.UiState
 import com.example.taras.core.helpercore.parseSessionTimeToInstant
@@ -295,8 +298,19 @@ fun CircuitHeader(
                     .fillMaxWidth()
                     .aspectRatio(1.2f) // Taller aspect ratio to make image feel bigger
             ) {
+                val context = LocalContext.current
+                val trackImageRequest = remember(race.trackImage) {
+                    ImageRequest.Builder(context)
+                        .data(race.trackImage.ifEmpty { "https://f1tv.formula1.com/static/favicon.ico" })
+                        .crossfade(true)
+                        .memoryCachePolicy(CachePolicy.ENABLED)
+                        .diskCachePolicy(CachePolicy.ENABLED)
+                        .networkCachePolicy(CachePolicy.ENABLED)
+                        .build()
+                }
+
                 AsyncImage(
-                    model = race.trackImage.ifEmpty { "https://f1tv.formula1.com/static/favicon.ico" },
+                    model = trackImageRequest,
                     contentDescription = "Circuit Map",
                     modifier = Modifier
                         .fillMaxSize()

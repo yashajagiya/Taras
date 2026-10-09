@@ -38,8 +38,7 @@ class DriversViewModel(
 ) : ViewModel() {
     private val logTag = "DriversViewModel"
 
-    private val tarasDataService =
-        NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
+    private val tarasDataService = NetworkModule.tarasDataService
 
     private val _driversList =
         MutableStateFlow<UiState<List<DriverDetailResponseV2>>>(UiState.Loading)

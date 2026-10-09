@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Style
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.taras.R
@@ -38,5 +39,10 @@ val NAV_BAR_PARAMETER = persistentMapOf(
         icon = Icons.Default.DirectionsCar,
         title = "Result",
         titleRes = R.string.nav_results
+    ),
+    MainNavRoutes.TcgBinder to NavBarItemData(
+        icon = Icons.Filled.Style,
+        title = "TCG",
+        titleRes = R.string.nav_tcg
     )
 )

@@ -6,6 +6,10 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import coil3.SingletonImageLoader
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
+import com.example.taras.core.common.TarasApplication
 import com.example.taras.core.common.CurrentData
 import com.example.taras.core.common.SessionType
 import com.example.taras.core.common.UiState
@@ -29,13 +33,20 @@ class RacesViewModel(
 ) : ViewModel() {
     private val logTag = "RacesViewModel"
 
-    private val racesDataService = NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
+    private val racesDataService = NetworkModule.tarasDataService
 
     private val _races = MutableStateFlow<UiState<List<CalendarRaceEvent>>>(UiState.Loading)
     val races = _races.asStateFlow()
 
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
+
+    private val _hasAutoScrolledCalendar = MutableStateFlow(false)
+    val hasAutoScrolledCalendar = _hasAutoScrolledCalendar.asStateFlow()
+
+    fun setAutoScrolledCalendar(scrolled: Boolean) {
+        _hasAutoScrolledCalendar.value = scrolled
+    }
 
     init {
         fetchRacesData(isRefresh = false)
@@ -47,6 +58,7 @@ class RacesViewModel(
                     if (_races.value is UiState.Loading) {
                         _races.value = UiState.Success(cachedData)
                     }
+                    preloadTrackImages(cachedData)
                 }
             } catch (e: Exception) {
                 Log.e(logTag, "Error loading initial races cache", e)
@@ -55,6 +67,9 @@ class RacesViewModel(
     }
 
     fun fetchRacesData(isRefresh: Boolean = false) {
+        if (isRefresh) {
+            _hasAutoScrolledCalendar.value = false
+        }
         viewModelScope.launch(Dispatchers.IO) {
             if (isRefresh) {
                 _isRefreshing.value = true
@@ -65,6 +80,7 @@ class RacesViewModel(
             try {
                 val calendarData = racesDataService.getCalendar()
                 _races.value = UiState.Success(calendarData)
+                preloadTrackImages(calendarData)
                 try {
                     val json = NetworkModule.json.encodeToString(calendarData)
                     currentData.saveRacesData(json)
@@ -80,6 +96,7 @@ class RacesViewModel(
                     if (cachedJson != null) {
                         val cachedData = NetworkModule.json.decodeFromString<List<CalendarRaceEvent>>(cachedJson)
                         _races.value = UiState.Success(cachedData)
+                        preloadTrackImages(cachedData)
                     } else if (_races.value !is UiState.Success) {
                         _races.value = UiState.Error(e.toAppError())
                     }
@@ -91,6 +108,42 @@ class RacesViewModel(
                 }
             } finally {
                 _isRefreshing.value = false
+            }
+        }
+    }
+
+    private fun preloadTrackImages(races: List<CalendarRaceEvent>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val context = TarasApplication.instance
+                val imageLoader = SingletonImageLoader.get(context)
+
+                // 1. Prioritize upcoming/current round track image first for immediate display
+                val upcoming = RaceStateEngine.findCurrentOrUpcomingRaces(races).firstOrNull()
+                val currentTrackImage = upcoming?.trackImage
+                if (!currentTrackImage.isNullOrBlank()) {
+                    val priorityRequest = ImageRequest.Builder(context)
+                        .data(currentTrackImage)
+                        .memoryCachePolicy(CachePolicy.ENABLED)
+                        .diskCachePolicy(CachePolicy.ENABLED)
+                        .build()
+                    imageLoader.enqueue(priorityRequest)
+                }
+
+                // 2. Prefetch all other calendar circuits in the background over HTTP/2
+                races.forEach { race ->
+                    val img = race.circuit.trackImage
+                    if (!img.isNullOrBlank() && img != currentTrackImage) {
+                        val request = ImageRequest.Builder(context)
+                            .data(img)
+                            .memoryCachePolicy(CachePolicy.ENABLED)
+                            .diskCachePolicy(CachePolicy.ENABLED)
+                            .build()
+                        imageLoader.enqueue(request)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(logTag, "Error preloading track images", e)
             }
         }
     }

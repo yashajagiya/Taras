@@ -17,6 +17,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,10 +25,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -35,8 +34,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.MenuOpen
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Email
@@ -51,6 +52,7 @@ import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.SportsMotorsports
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.Style
+import androidx.compose.material.icons.filled.SupportAgent
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -58,23 +60,27 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingActionButtonMenu
+import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SecondaryScrollableTabRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.ToggleFloatingActionButton
+import androidx.compose.material3.ToggleFloatingActionButtonDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -82,6 +88,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
@@ -92,7 +100,7 @@ import com.example.taras.R
 import com.example.taras.network_calls.ApiConstants
 import com.example.taras.view.subview.LegalTab
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LegalHubScreen(
     initialTabName: String = "about",
@@ -110,6 +118,9 @@ fun LegalHubScreen(
 
     var selectedTab by remember { mutableStateOf(initialTab) }
     var languageMenuExpanded by remember { mutableStateOf(false) }
+    var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
+
+    BackHandler(fabMenuExpanded) { fabMenuExpanded = false }
 
     val languages = listOf(
         "" to stringResource(R.string.lang_system_default),
@@ -122,11 +133,13 @@ fun LegalHubScreen(
         "pt" to stringResource(R.string.lang_pt)
     )
 
+    val configuration = LocalConfiguration.current
     val currentLocaleTag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         val localeManager = context.getSystemService(Context.LOCALE_SERVICE) as? android.app.LocaleManager
-        localeManager?.applicationLocales?.toLanguageTags()?.split(",")?.firstOrNull() ?: ""
+        val appLocales = localeManager?.applicationLocales?.toLanguageTags()?.split(",")?.firstOrNull() ?: ""
+        if (appLocales.isNotEmpty()) appLocales else configuration.locales[0]?.language ?: ""
     } else {
-        java.util.Locale.getDefault().language
+        configuration.locales[0]?.language ?: java.util.Locale.getDefault().language
     }
 
     val currentLangLabel = languages.firstOrNull { it.first == currentLocaleTag }?.second
@@ -158,19 +171,35 @@ fun LegalHubScreen(
         }
     }
 
-    Scaffold(
-        modifier = modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-        topBar = {
-            TopAppBar(
-                title = {
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Header Row: Back button, Title & Current tab subtitle, Language Selector
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.action_back),
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    Spacer(Modifier.width(4.dp))
                     Column {
                         Text(
                             text = stringResource(R.string.legal_hub_title),
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = when (selectedTab) {
@@ -183,158 +212,84 @@ fun LegalHubScreen(
                             fontWeight = FontWeight.SemiBold
                         )
                     }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.action_back)
-                        )
-                    }
-                },
-                actions = {
-                    // Language Switcher in Top Bar
-                    Box {
-                        Surface(
-                            shape = RoundedCornerShape(20.dp),
-                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(20.dp))
-                                .clickable { languageMenuExpanded = true }
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Language,
-                                    contentDescription = "Language",
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(Modifier.width(6.dp))
-                                Text(
-                                    text = currentLangLabel,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
-                        }
+                }
 
-                        DropdownMenu(
-                            expanded = languageMenuExpanded,
-                            onDismissRequest = { languageMenuExpanded = false },
-                            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
+                // Language Switcher in Header Row
+                Box {
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .clickable { languageMenuExpanded = true }
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                         ) {
-                            languages.forEach { (tag, name) ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            text = name,
-                                            fontWeight = if (tag == currentLocaleTag) FontWeight.Bold else FontWeight.Normal,
-                                            color = if (tag == currentLocaleTag) Color(0xFFE10600) else MaterialTheme.colorScheme.onSurface
-                                        )
-                                    },
-                                    onClick = {
-                                        languageMenuExpanded = false
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                            val localeManager = context.getSystemService(Context.LOCALE_SERVICE) as? android.app.LocaleManager
-                                            if (tag.isEmpty()) {
-                                                localeManager?.applicationLocales = android.os.LocaleList.getEmptyLocaleList()
-                                            } else {
-                                                localeManager?.applicationLocales = android.os.LocaleList.forLanguageTags(tag)
-                                            }
+                            Icon(
+                                imageVector = Icons.Default.Language,
+                                contentDescription = "Language",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = currentLangLabel,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+
+                    DropdownMenu(
+                        expanded = languageMenuExpanded,
+                        onDismissRequest = { languageMenuExpanded = false },
+                        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
+                    ) {
+                        languages.forEach { (tag, name) ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = name,
+                                        fontWeight = if (tag == currentLocaleTag) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (tag == currentLocaleTag) Color(0xFFE10600) else MaterialTheme.colorScheme.onSurface
+                                    )
+                                },
+                                onClick = {
+                                    languageMenuExpanded = false
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                        val localeManager = context.getSystemService(Context.LOCALE_SERVICE) as? android.app.LocaleManager
+                                        if (tag.isEmpty()) {
+                                            localeManager?.applicationLocales = android.os.LocaleList.getEmptyLocaleList()
                                         } else {
-                                            val locale = if (tag.isEmpty()) java.util.Locale.getDefault() else java.util.Locale.forLanguageTag(tag)
-                                            java.util.Locale.setDefault(locale)
-                                            val config = context.resources.configuration
-                                            config.setLocale(locale)
-                                            @Suppress("DEPRECATION")
-                                            context.resources.updateConfiguration(config, context.resources.displayMetrics)
-                                            (context as? Activity)?.recreate()
+                                            localeManager?.applicationLocales = android.os.LocaleList.forLanguageTags(tag)
                                         }
+                                    } else {
+                                        val locale = if (tag.isEmpty()) java.util.Locale.getDefault() else java.util.Locale.forLanguageTag(tag)
+                                        java.util.Locale.setDefault(locale)
+                                        val config = context.resources.configuration
+                                        config.setLocale(locale)
+                                        @Suppress("DEPRECATION")
+                                        context.resources.updateConfiguration(config, context.resources.displayMetrics)
                                     }
-                                )
-                            }
+                                }
+                            )
                         }
-                    }
-                    Spacer(Modifier.width(8.dp))
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        },
-        bottomBar = {
-            Surface(
-                color = MaterialTheme.colorScheme.surfaceContainerLow,
-                tonalElevation = 6.dp,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    OutlinedButton(
-                        onClick = openOnline,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            text = stringResource(R.string.privacy_btn_view_online),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp
-                        )
-                    }
-
-                    Button(
-                        onClick = contactGrievanceOfficer,
-                        modifier = Modifier.weight(1.2f),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Email,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            text = "Grievance",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp
-                        )
                     }
                 }
             }
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
+
             // Hero Header Card with gradient and badges
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                shape = RoundedCornerShape(20.dp),
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(12.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -351,7 +306,7 @@ fun LegalHubScreen(
                                     fontWeight = FontWeight.Black,
                                     letterSpacing = 1.sp,
                                     color = Color(0xFFE10600),
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                                 )
                             }
                             Spacer(Modifier.width(8.dp))
@@ -369,7 +324,7 @@ fun LegalHubScreen(
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = badgeColor,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                                 )
                             }
                         }
@@ -388,7 +343,7 @@ fun LegalHubScreen(
                         }
                     }
 
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(6.dp))
 
                     Text(
                         text = when (selectedTab) {
@@ -396,7 +351,7 @@ fun LegalHubScreen(
                             LegalTab.PRIVACY -> stringResource(R.string.privacy_core_commitment)
                             LegalTab.TERMS -> stringResource(R.string.terms_badge_it_act)
                         },
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -475,6 +430,70 @@ fun LegalHubScreen(
                     }
                 }
             }
+        }
+
+        // Scrim backdrop when FAB menu is expanded
+        if (fabMenuExpanded) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.35f))
+                    .clickable { fabMenuExpanded = false }
+            )
+        }
+
+        // Material 3 FAB Menu
+        FloatingActionButtonMenu(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(bottom = 16.dp, end = 16.dp),
+            expanded = fabMenuExpanded,
+            button = {
+                ToggleFloatingActionButton(
+                    checked = fabMenuExpanded,
+                    onCheckedChange = { fabMenuExpanded = !fabMenuExpanded }
+                ) {
+                    val imageVector by remember {
+                        derivedStateOf {
+                            if (checkedProgress > 0.5f) Icons.Default.Close else Icons.AutoMirrored.Filled.MenuOpen
+                        }
+                    }
+                    Icon(
+                        painter = rememberVectorPainter(imageVector),
+                        contentDescription = if (fabMenuExpanded) "Close legal actions" else "Legal actions menu",
+                        modifier = with(ToggleFloatingActionButtonDefaults) {
+                            Modifier.animateIcon({ checkedProgress })
+                        }
+                    )
+                }
+            }
+        ) {
+            FloatingActionButtonMenuItem(
+                onClick = {
+                    fabMenuExpanded = false
+                    openOnline()
+                },
+                text = { Text(stringResource(R.string.privacy_btn_view_online)) },
+                icon = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                        contentDescription = null
+                    )
+                }
+            )
+            FloatingActionButtonMenuItem(
+                onClick = {
+                    fabMenuExpanded = false
+                    contactGrievanceOfficer()
+                },
+                text = { Text(stringResource(R.string.legal_fab_grievance)) },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.SupportAgent,
+                        contentDescription = null
+                    )
+                }
+            )
         }
     }
 }
@@ -627,6 +646,7 @@ private fun FullAboutContent(onContactGrievance: () -> Unit) {
                 }
             }
         }
+        Spacer(Modifier.height(80.dp))
     }
 }
 
@@ -796,6 +816,7 @@ private fun FullPrivacyContent(onContactGrievance: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+        Spacer(Modifier.height(80.dp))
     }
 }
 
@@ -935,6 +956,7 @@ private fun FullTermsContent(onContactGrievance: () -> Unit) {
             LegalBulletPoint(title = stringResource(R.string.grievance_officer_name))
             LegalBulletPoint(title = stringResource(R.string.grievance_officer_email))
         }
+        Spacer(Modifier.height(80.dp))
     }
 }
 

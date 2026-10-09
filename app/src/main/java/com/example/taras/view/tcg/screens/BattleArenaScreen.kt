@@ -87,8 +87,9 @@ import com.example.taras.view.tcg.components.Interactive3DCard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileOutputStream
+import okio.FileSystem
+import okio.Path.Companion.toOkioPath
+import okio.buffer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,7 +98,13 @@ fun BattleArenaScreen(
     initialCard2Id: String = "card_rbr_03",
     onBackClick: () -> Unit = {}
 ) {
-    val allCards = remember { RosterSeedData.allCards }
+    val allCards = remember {
+        RosterSeedData.allCards.sortedWith(
+            compareBy<com.example.taras.core.db.tcg.TcgCardEntity> { it.tier.ordinal }
+                .thenByDescending { it.ovr }
+                .thenBy { it.name.lowercase() }
+        )
+    }
     var card1 by remember {
         mutableStateOf(allCards.find { it.id == initialCard1Id } ?: allCards[0])
     }
@@ -509,7 +516,7 @@ fun BattleArenaScreen(
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                         contentPadding = PaddingValues(bottom = 24.dp)
                     ) {
-                        items(allCards) { selectableCard ->
+                        items(allCards, key = { it.id }) { selectableCard ->
                             Box(
                                 modifier = Modifier
                                     .width(130.dp)
@@ -690,16 +697,17 @@ private suspend fun shareBattleStory(
         val androidBitmap = imageBitmap.asAndroidBitmap()
 
         withContext(Dispatchers.IO) {
-            val imagesFolder = File(context.cacheDir, "images").apply { mkdirs() }
-            val file = File(imagesFolder, "tcg_battle_${System.currentTimeMillis()}.png")
-            FileOutputStream(file).use { out ->
-                androidBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            val imagesPath = context.cacheDir.toOkioPath() / "images"
+            FileSystem.SYSTEM.createDirectories(imagesPath)
+            val filePath = imagesPath / "tcg_battle_${System.currentTimeMillis()}.png"
+            FileSystem.SYSTEM.sink(filePath).buffer().use { sink ->
+                androidBitmap.compress(Bitmap.CompressFormat.PNG, 100, sink.outputStream())
             }
 
             val contentUri = FileProvider.getUriForFile(
                 context,
                 "${context.packageName}.fileprovider",
-                file
+                filePath.toFile()
             )
 
             val shareIntent = Intent(Intent.ACTION_SEND).apply {

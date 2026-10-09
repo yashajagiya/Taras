@@ -7,6 +7,7 @@ import com.example.taras.core.common.UserPreferences
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -19,10 +20,13 @@ class UserViewModel (private val userPreferences: UserPreferences) : ViewModel()
 
     val hasSeenWelcome = userPreferences.hasSeenWelcomeFlow
         .map<Boolean, Boolean?> { it }
+        .onEach { seen ->
+            if (seen != null) userPreferences.cacheHasSeenWelcome(seen)
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = null
+            initialValue = userPreferences.getCachedHasSeenWelcome()
         )
 
     val favoriteDriverNumber = userPreferences.favoriteDriverNumberFlow.stateIn(

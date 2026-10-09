@@ -78,7 +78,7 @@ As a lifelong F1 fan, I built Taras to solve a personal need for a clean, minima
 | **UI** | [Jetpack Compose](https://developer.android.com/jetpack/compose) | Declarative UI development |
 | **Design** | [Material Design 3](https://m3.material.io/) | Google-style minimalist design system |
 | **Navigation** | [Navigation 3](https://developer.android.com/jetpack/compose/navigation) | Modern, type-safe navigation |
-| **Networking** | [Retrofit](https://square.github.io/retrofit/) | Primary API communication |
+| **Networking** | [Ktor](https://ktor.io/) | Primary asynchronous API communication |
 | **XML/RSS** | [Ksoup](https://github.com/fleeksoft/ksoup) | Fast parsing of F1 news feeds |
 | **Database** | [Room](https://developer.android.com/training/data-storage/room) | Local data persistence for profiles/standings |
 | **Preferences** | [DataStore](https://developer.android.com/topic/libraries/architecture/datastore) | Reactive user settings management |

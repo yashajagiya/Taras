@@ -14,6 +14,7 @@
     <string name="nav_grid">Startaufstellung</string>
     <string name="nav_calendar">Kalender</string>
     <string name="nav_results">Ergebnisse</string>
+    <string name="nav_tcg">TCG</string>
     <string name="topbar_user_profile">Benutzerprofil</string>
     <string name="action_back">Zurück</string>
 
@@ -72,6 +73,7 @@
     <string name="privacy_sec_opensource_title">Open-Source-Transparenz</string>
     <string name="privacy_sec_opensource_desc">Taras ist vollständig quelloffen. Der Code kann auf GitHub frei eingesehen und überprüft werden.</string>
     <string name="privacy_btn_view_online">Online-Richtlinie ansehen</string>
+    <string name="legal_fab_grievance">Beschwerdestelle</string>
     <string name="privacy_btn_got_it">Verstanden</string>
     <string name="drawer_notifications_already_granted">Berechtigung bereits erteilt</string>
     <string name="drawer_could_not_open_settings">Einstellungen konnten nicht geöffnet werden</string>
@@ -276,4 +278,24 @@
     <string name="news_open_error">Artikel-Link konnte nicht geöffnet werden</string>
     <string name="news_by_author">von %1$s</string>
     <string name="news_no_title">Kein Titel</string>
+
+    <!-- App Guide & Setup -->
+    <string name="guide_title">App-Leitfaden &amp; Funktionen</string>
+    <string name="guide_subtitle">Entdecke alle Funktionen von Taras — von Live-Telemetrie und Renn-Countdowns bis hin zum 3D F1 Grid TCG Sammelordner.</string>
+    <string name="guide_tab_guide">App-Leitfaden</string>
+    <string name="guide_tab_setup">Mein Setup</string>
+    <string name="guide_chip_overview">Übersicht</string>
+    <string name="guide_chip_paddock">Paddock</string>
+    <string name="guide_chip_grid">Grid &amp; Fahrer</string>
+    <string name="guide_chip_calendar">Kalender</string>
+    <string name="guide_chip_results">Ergebnisse</string>
+    <string name="guide_chip_tcg">F1 Grid TCG</string>
+    <string name="guide_chip_widgets">Widgets &amp; Theme</string>
+    <string name="guide_action_open_tcg">TCG-Sammelordner öffnen</string>
+    <string name="guide_action_open_grid">Grid erkunden</string>
+    <string name="guide_action_open_calendar">Kalender anzeigen</string>
+    <string name="guide_action_open_results">Ergebnisse prüfen</string>
+    <string name="guide_action_enter_app">Paddock betreten</string>
+    <string name="guide_action_edit_setup">Setup anpassen</string>
+    <string name="guide_close">Schließen</string>
 </resources>

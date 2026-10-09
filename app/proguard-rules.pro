@@ -18,7 +18,7 @@
 -keep class * extends androidx.room.RoomDatabase
 -dontwarn androidx.room.paging.**
 
-# Retrofit, OkHttp, Okio
+# Ktor, OkHttp, Okio
 -dontwarn okhttp3.**
 -dontwarn okio.**
--dontwarn retrofit2.**
+-dontwarn io.ktor.**

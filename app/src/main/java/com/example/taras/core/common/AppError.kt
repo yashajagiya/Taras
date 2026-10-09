@@ -1,8 +1,12 @@
 package com.example.taras.core.common
 
+import io.ktor.client.network.sockets.ConnectTimeoutException as KtorConnectTimeoutException
+import io.ktor.client.network.sockets.SocketTimeoutException as KtorSocketTimeoutException
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.ResponseException
+import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.serialization.SerializationException
-import retrofit2.HttpException
-import java.io.IOException
+import okio.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
@@ -39,10 +43,15 @@ sealed interface AppError {
 
 fun Throwable.toAppError(): AppError {
     return when (this) {
-        is UnknownHostException, is SocketTimeoutException -> AppError.Network(cause = this)
+        is UnknownHostException,
+        is UnresolvedAddressException,
+        is SocketTimeoutException,
+        is KtorSocketTimeoutException,
+        is HttpRequestTimeoutException,
+        is KtorConnectTimeoutException -> AppError.Network(cause = this)
         is IOException -> AppError.Network(cause = this)
-        is HttpException -> {
-            when (val statusCode = code()) {
+        is ResponseException -> {
+            when (val statusCode = response.status.value) {
                 404 -> AppError.NotFound(cause = this)
                 in 500..599 -> AppError.Server(code = statusCode, cause = this)
                 else -> AppError.Server(

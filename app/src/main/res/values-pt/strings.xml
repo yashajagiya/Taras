@@ -14,6 +14,7 @@
     <string name="nav_grid">Grid</string>
     <string name="nav_calendar">Calendário</string>
     <string name="nav_results">Resultados</string>
+    <string name="nav_tcg">TCG</string>
     <string name="topbar_user_profile">Perfil do Usuário</string>
     <string name="action_back">Voltar</string>
 
@@ -72,6 +73,7 @@
     <string name="privacy_sec_opensource_title">Transparência de código aberto</string>
     <string name="privacy_sec_opensource_desc">O Taras é totalmente de código aberto no GitHub para que qualquer um possa verificar nossos compromissos de privacidade.</string>
     <string name="privacy_btn_view_online">Ver política online</string>
+    <string name="legal_fab_grievance">Canal de reclamações</string>
     <string name="privacy_btn_got_it">Entendido</string>
     <string name="drawer_notifications_already_granted">Permissão já concedida</string>
     <string name="drawer_could_not_open_settings">Não foi possível abrir as configurações</string>
@@ -276,4 +278,24 @@
     <string name="news_open_error">Não foi possível abrir o link do artigo</string>
     <string name="news_by_author">por %1$s</string>
     <string name="news_no_title">Sem Título</string>
+
+    <!-- App Guide & Setup -->
+    <string name="guide_title">Guia do App e Recursos</string>
+    <string name="guide_subtitle">Explore tudo o que o Taras oferece — desde telemetria ao vivo e contagens regressivas até o fichário 3D F1 Grid TCG.</string>
+    <string name="guide_tab_guide">Guia do App</string>
+    <string name="guide_tab_setup">Minha Configuração</string>
+    <string name="guide_chip_overview">Visão Geral</string>
+    <string name="guide_chip_paddock">Paddock</string>
+    <string name="guide_chip_grid">Grid e Pilotos</string>
+    <string name="guide_chip_calendar">Calendário</string>
+    <string name="guide_chip_results">Resultados</string>
+    <string name="guide_chip_tcg">F1 Grid TCG</string>
+    <string name="guide_chip_widgets">Widgets e Tema</string>
+    <string name="guide_action_open_tcg">Abrir Fichário TCG</string>
+    <string name="guide_action_open_grid">Explorar Grid</string>
+    <string name="guide_action_open_calendar">Ver Calendário</string>
+    <string name="guide_action_open_results">Conferir Resultados</string>
+    <string name="guide_action_enter_app">Entrar no Paddock</string>
+    <string name="guide_action_edit_setup">Ajustar Configuração</string>
+    <string name="guide_close">Fechar</string>
 </resources>

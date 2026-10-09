@@ -14,6 +14,7 @@
     <string name="nav_grid">ग्रिड</string>
     <string name="nav_calendar">कैलेंडर</string>
     <string name="nav_results">परिणाम</string>
+    <string name="nav_tcg">टीसीजी</string>
     <string name="topbar_user_profile">उपयोगकर्ता प्रोफ़ाइल</string>
     <string name="action_back">पीछे जाएं</string>
 
@@ -94,6 +95,7 @@
     <string name="privacy_sec_opensource_title">ओपन सोर्स पारदर्शिता</string>
     <string name="privacy_sec_opensource_desc">तरास अपाचे 2.0 लाइसेंस के तहत पूरी तरह से ओपन-सोर्स है। कोई भी गिटहब पर कोड की समीक्षा कर सकता है।</string>
     <string name="privacy_btn_view_online">ऑनलाइन देखें</string>
+    <string name="legal_fab_grievance">शिकायत निवारण</string>
     <string name="privacy_btn_got_it">समझ गया</string>
 
     <!-- In-App Terms of Service (Indian Law Compliant) -->
@@ -340,4 +342,24 @@
     <string name="news_open_error">लेख का लिंक नहीं खोला जा सका</string>
     <string name="news_by_author">द्वारा: %1$s</string>
     <string name="news_no_title">कोई शीर्षक नहीं</string>
+
+    <!-- App Guide & Setup -->
+    <string name="guide_title">ऐप गाइड और सुविधाएं</string>
+    <string name="guide_subtitle">तारास की सभी सुविधाओं का अन्वेषण करें — लाइव टेलीमेट्री और रेस काउंटडाउन से लेकर 3D F1 ग्रिड TCG कलेक्टर बाइंडर तक।</string>
+    <string name="guide_tab_guide">ऐप गाइड</string>
+    <string name="guide_tab_setup">मेरा सेटअप</string>
+    <string name="guide_chip_overview">अवलोकन</string>
+    <string name="guide_chip_paddock">पैडॉक</string>
+    <string name="guide_chip_grid">ग्रिड और ड्राइवर्स</string>
+    <string name="guide_chip_calendar">कैलेंडर</string>
+    <string name="guide_chip_results">परिणाम</string>
+    <string name="guide_chip_tcg">F1 ग्रिड TCG</string>
+    <string name="guide_chip_widgets">विजेट्स और थीम</string>
+    <string name="guide_action_open_tcg">TCG बाइंडर खोलें</string>
+    <string name="guide_action_open_grid">ग्रिड देखें</string>
+    <string name="guide_action_open_calendar">कैलेंडर देखें</string>
+    <string name="guide_action_open_results">परिणाम जांचें</string>
+    <string name="guide_action_enter_app">पैडॉक में प्रवेश करें</string>
+    <string name="guide_action_edit_setup">सेटअप अनुकूलित करें</string>
+    <string name="guide_close">बंद करें</string>
 </resources>

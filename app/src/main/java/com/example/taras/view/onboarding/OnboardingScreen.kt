@@ -111,6 +111,7 @@ import com.example.taras.ui.theme.TeamVisaCashApp
 import com.example.taras.ui.theme.TeamWilliams
 import com.example.taras.viewmodel.AppearanceViewModel
 import com.example.taras.viewmodel.UserViewModel
+import com.example.taras.core.navigation.MainNavRoutes
 import kotlinx.coroutines.launch
 
 data class OnboardingDriver(
@@ -167,11 +168,19 @@ val ONBOARDING_TEAMS = listOf(
  *
  * Saves all user preferences directly to DataStore and marks [hasSeenWelcome] = true.
  */
+enum class OnboardingMode {
+    GUIDE,
+    SETUP
+}
+
 @Composable
 fun OnboardingScreen(
     userViewModel: UserViewModel,
     appearanceViewModel: AppearanceViewModel,
     modifier: Modifier = Modifier,
+    initialMode: OnboardingMode = OnboardingMode.SETUP,
+    onNavigateToRoute: (MainNavRoutes) -> Unit = {},
+    onStartTutorial: () -> Unit = {},
     onFinish: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -184,6 +193,7 @@ fun OnboardingScreen(
     val currentAppearance by appearanceViewModel.appearanceData.collectAsStateWithLifecycle()
     val savedNotificationsEnabled by userViewModel.notificationsEnabled.collectAsStateWithLifecycle()
 
+    var currentMode by rememberSaveable { mutableStateOf(initialMode) }
     var currentStep by rememberSaveable { mutableIntStateOf(0) }
     val totalSteps = 3
 
@@ -267,103 +277,222 @@ fun OnboardingScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
-            // Top Navigation & Step Indicator
-            OnboardingHeader(
-                currentStep = currentStep,
-                totalSteps = totalSteps,
-                onSkip = { completeOnboarding() }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Animated Step Content
-            Box(
+            // Mode Switcher Header with App Guide / Setup Tabs & Dismiss button
+            Row(
                 modifier = Modifier
-                    .weight(1f)
                     .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                AnimatedContent(
-                    targetState = currentStep,
-                    transitionSpec = {
-                        if (targetState > initialState) {
-                            (slideInHorizontally { width -> width } + fadeIn()).togetherWith(
-                                slideOutHorizontally { width -> -width } + fadeOut()
-                            )
-                        } else {
-                            (slideInHorizontally { width -> -width } + fadeIn()).togetherWith(
-                                slideOutHorizontally { width -> width } + fadeOut()
-                            )
-                        }
-                    },
-                    label = "OnboardingStepAnimation"
-                ) { step ->
-                    when (step) {
-                        0 -> StepIdentity(
-                            name = nameInput,
-                            onNameChange = { nameInput = it },
-                            onNext = {
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                        .padding(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    val isGuide = currentMode == OnboardingMode.GUIDE
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(if (isGuide) MaterialTheme.colorScheme.primary else Color.Transparent)
+                            .clickable {
                                 RefreshHapticFeedback.triggerStartHaptic(context, view)
-                                currentStep = 1
+                                currentMode = OnboardingMode.GUIDE
                             }
-                        )
-                        1 -> StepFavorites(
-                            selectedDriverNumber = selectedDriverNumber,
-                            onSelectDriver = { num ->
-                                RefreshHapticFeedback.triggerStartHaptic(context, view)
-                                selectedDriverNumber = if (selectedDriverNumber == num) null else num
-                            },
-                            selectedTeamName = selectedTeamName,
-                            onSelectTeam = { team ->
-                                RefreshHapticFeedback.triggerStartHaptic(context, view)
-                                selectedTeamName = if (selectedTeamName == team) null else team
-                            }
-                        )
-                        2 -> StepPreferences(
-                            selectedTheme = selectedTheme,
-                            onSelectTheme = { theme ->
-                                RefreshHapticFeedback.triggerStartHaptic(context, view)
-                                selectedTheme = theme
-                                appearanceViewModel.updateAppearance(theme)
-                            },
-                            notificationsEnabled = notificationsEnabled,
-                            onToggleNotifications = { enabled ->
-                                RefreshHapticFeedback.triggerStartHaptic(context, view)
-                                notificationsEnabled = enabled
-                                if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    val hasPermission = ContextCompat.checkSelfPermission(
-                                        context,
-                                        Manifest.permission.POST_NOTIFICATIONS
-                                    ) == PackageManager.PERMISSION_GRANTED
-                                    if (!hasPermission) {
-                                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                                    }
-                                }
-                            }
+                            .padding(horizontal = 14.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.guide_tab_guide),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isGuide) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+
+                    val isSetup = currentMode == OnboardingMode.SETUP
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(if (isSetup) MaterialTheme.colorScheme.primary else Color.Transparent)
+                            .clickable {
+                                RefreshHapticFeedback.triggerStartHaptic(context, view)
+                                currentMode = OnboardingMode.SETUP
+                            }
+                            .padding(horizontal = 14.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.guide_tab_setup),
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isSetup) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                IconButton(
+                    onClick = onFinish
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = stringResource(R.string.guide_close),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 
-            // Bottom Navigation Buttons
-            Spacer(modifier = Modifier.height(16.dp))
-            OnboardingBottomBar(
-                currentStep = currentStep,
-                totalSteps = totalSteps,
-                onBack = {
-                    RefreshHapticFeedback.triggerStartHaptic(context, view)
-                    if (currentStep > 0) currentStep--
-                },
-                onNext = {
-                    RefreshHapticFeedback.triggerStartHaptic(context, view)
-                    if (currentStep < totalSteps - 1) {
-                        currentStep++
-                    } else {
-                        completeOnboarding()
+            if (currentMode == OnboardingMode.GUIDE) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.SportsMotorsports,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(64.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Interactive Real-App Tour",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Experience an interactive walkthrough directly across the real Paddock, Grid, Calendar, Results, and F1 Grid TCG screens with spotlight guides.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Button(
+                            onClick = onStartTutorial,
+                            shape = RoundedCornerShape(14.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Start Real Screen Tour", fontWeight = FontWeight.Bold)
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                        OutlinedButton(
+                            onClick = { currentMode = OnboardingMode.SETUP },
+                            shape = RoundedCornerShape(14.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Configure Profile & Setup")
+                        }
                     }
                 }
-            )
+            } else {
+                // Top Navigation & Step Indicator
+                OnboardingHeader(
+                    currentStep = currentStep,
+                    totalSteps = totalSteps,
+                    onSkip = { completeOnboarding() }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Animated Step Content
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ) {
+                    AnimatedContent(
+                        targetState = currentStep,
+                        transitionSpec = {
+                            if (targetState > initialState) {
+                                (slideInHorizontally { width -> width } + fadeIn()).togetherWith(
+                                    slideOutHorizontally { width -> -width } + fadeOut()
+                                )
+                            } else {
+                                (slideInHorizontally { width -> -width } + fadeIn()).togetherWith(
+                                    slideOutHorizontally { width -> width } + fadeOut()
+                                )
+                            }
+                        },
+                        label = "OnboardingStepAnimation"
+                    ) { step ->
+                        when (step) {
+                            0 -> StepIdentity(
+                                name = nameInput,
+                                onNameChange = { nameInput = it },
+                                onNext = {
+                                    RefreshHapticFeedback.triggerStartHaptic(context, view)
+                                    currentStep = 1
+                                }
+                            )
+                            1 -> StepFavorites(
+                                selectedDriverNumber = selectedDriverNumber,
+                                onSelectDriver = { num ->
+                                    RefreshHapticFeedback.triggerStartHaptic(context, view)
+                                    selectedDriverNumber = if (selectedDriverNumber == num) null else num
+                                },
+                                selectedTeamName = selectedTeamName,
+                                onSelectTeam = { team ->
+                                    RefreshHapticFeedback.triggerStartHaptic(context, view)
+                                    selectedTeamName = if (selectedTeamName == team) null else team
+                                }
+                            )
+                            2 -> StepPreferences(
+                                selectedTheme = selectedTheme,
+                                onSelectTheme = { theme ->
+                                    RefreshHapticFeedback.triggerStartHaptic(context, view)
+                                    selectedTheme = theme
+                                    appearanceViewModel.updateAppearance(theme)
+                                },
+                                notificationsEnabled = notificationsEnabled,
+                                onToggleNotifications = { enabled ->
+                                    RefreshHapticFeedback.triggerStartHaptic(context, view)
+                                    notificationsEnabled = enabled
+                                    if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                        val hasPermission = ContextCompat.checkSelfPermission(
+                                            context,
+                                            Manifest.permission.POST_NOTIFICATIONS
+                                        ) == PackageManager.PERMISSION_GRANTED
+                                        if (!hasPermission) {
+                                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                        }
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
+
+                // Bottom Navigation Buttons
+                Spacer(modifier = Modifier.height(16.dp))
+                OnboardingBottomBar(
+                    currentStep = currentStep,
+                    totalSteps = totalSteps,
+                    onBack = {
+                        RefreshHapticFeedback.triggerStartHaptic(context, view)
+                        if (currentStep > 0) currentStep--
+                    },
+                    onNext = {
+                        RefreshHapticFeedback.triggerStartHaptic(context, view)
+                        if (currentStep < totalSteps - 1) {
+                            currentStep++
+                        } else {
+                            completeOnboarding()
+                        }
+                    }
+                )
+            }
         }
     }
 }

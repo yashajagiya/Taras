@@ -14,7 +14,7 @@ import com.example.taras.viewmodel.SessionInfo
 import kotlinx.coroutines.flow.firstOrNull
 
 class RaceRepository(
-    private val racesDataService: TarasDataService = NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
+    private val racesDataService: TarasDataService = NetworkModule.tarasDataService
 ) {
     suspend fun getNextRaceData(context: Context): Pair<UiState<CurrentRace?>, SessionInfo?> {
         return try {

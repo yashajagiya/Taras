@@ -14,6 +14,7 @@
     <string name="nav_grid">Grid</string>
     <string name="nav_calendar">Calendar</string>
     <string name="nav_results">Results</string>
+    <string name="nav_tcg">TCG</string>
     <string name="topbar_user_profile">User Profile</string>
     <string name="action_back">Back</string>
 
@@ -94,6 +95,7 @@
     <string name="privacy_sec_opensource_title">Open Source Transparency</string>
     <string name="privacy_sec_opensource_desc">Taras is completely open-source under the Apache 2.0 license. Anyone can inspect the code on GitHub to verify our privacy commitments.</string>
     <string name="privacy_btn_view_online">View Online</string>
+    <string name="legal_fab_grievance">Grievance Redressal</string>
     <string name="privacy_btn_got_it">Got It</string>
 
     <!-- In-App Terms of Service (Indian Law Compliant) -->
@@ -340,4 +342,24 @@
     <string name="news_open_error">Unable to open article link</string>
     <string name="news_by_author">by %1$s</string>
     <string name="news_no_title">No Title</string>
+
+    <!-- App Guide & Setup -->
+    <string name="guide_title">App Guide &amp; Features</string>
+    <string name="guide_subtitle">Explore everything Taras has to offer — from live telemetry and race countdowns to the 3D F1 Grid TCG collector binder.</string>
+    <string name="guide_tab_guide">App Guide</string>
+    <string name="guide_tab_setup">My Setup</string>
+    <string name="guide_chip_overview">Overview</string>
+    <string name="guide_chip_paddock">Paddock</string>
+    <string name="guide_chip_grid">Grid &amp; Drivers</string>
+    <string name="guide_chip_calendar">Calendar</string>
+    <string name="guide_chip_results">Results</string>
+    <string name="guide_chip_tcg">F1 Grid TCG</string>
+    <string name="guide_chip_widgets">Widgets &amp; Theme</string>
+    <string name="guide_action_open_tcg">Open TCG Binder</string>
+    <string name="guide_action_open_grid">Explore Grid</string>
+    <string name="guide_action_open_calendar">View Calendar</string>
+    <string name="guide_action_open_results">Check Results</string>
+    <string name="guide_action_enter_app">Enter Paddock</string>
+    <string name="guide_action_edit_setup">Customize Setup</string>
+    <string name="guide_close">Close</string>
 </resources>

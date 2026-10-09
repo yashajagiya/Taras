@@ -19,7 +19,9 @@ import com.example.taras.core.db.AppDatabase
 import com.example.taras.core.tcg.repository.TcgRepository
 import com.example.taras.view.MainActivity
 import java.util.Calendar
-import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.toJavaDuration
 
 class WeeklyPackWorker(
     private val context: Context,
@@ -119,9 +121,9 @@ class WeeklyPackWorker(
             }
             val initialDelay = (nextMonday.timeInMillis - now.timeInMillis).coerceAtLeast(0)
 
-            val periodicRequest = PeriodicWorkRequestBuilder<WeeklyPackWorker>(7, TimeUnit.DAYS)
+            val periodicRequest = PeriodicWorkRequestBuilder<WeeklyPackWorker>(7.days.toJavaDuration())
                 .setConstraints(constraints)
-                .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
+                .setInitialDelay(initialDelay.milliseconds.toJavaDuration())
                 .build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(

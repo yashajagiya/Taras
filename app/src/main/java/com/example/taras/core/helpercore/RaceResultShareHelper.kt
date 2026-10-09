@@ -16,9 +16,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import com.example.taras.viewmodel.ResultRowData
-import java.io.File
+import okio.FileSystem
+import okio.Path.Companion.toOkioPath
 import okio.buffer
-import okio.sink
 import kotlinx.datetime.TimeZone.Companion.currentSystemDefault
 import kotlinx.datetime.toLocalDateTime
 import androidx.core.graphics.toColorInt
@@ -337,12 +337,13 @@ object RaceResultShareHelper {
         title: String = "Race Results"
     ) {
         try {
-            val imagesFolder = File(context.cacheDir, "images").apply { mkdirs() }
-            val file = File(imagesFolder, "race_result_${System.currentTimeMillis()}.png")
-            file.sink().buffer().use { sink ->
+            val imagesPath = context.cacheDir.toOkioPath() / "images"
+            FileSystem.SYSTEM.createDirectories(imagesPath)
+            val filePath = imagesPath / "race_result_${System.currentTimeMillis()}.png"
+            FileSystem.SYSTEM.sink(filePath).buffer().use { sink ->
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, sink.outputStream())
             }
-            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", filePath.toFile())
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "image/png"
                 putExtra(Intent.EXTRA_STREAM, uri)

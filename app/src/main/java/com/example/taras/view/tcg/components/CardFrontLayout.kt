@@ -115,6 +115,22 @@ fun getDriverNumberLogoUrl(avatarUrl: String): String {
     }
 }
 
+private val HOLO_RAINBOW_COLORS = listOf(
+    Color(0xFFFF3366), // Holographic Coral Pink
+    Color(0xFFFF9900), // Holographic Amber / Gold
+    Color(0xFFFFFF66), // Holographic Solar Gold
+    Color(0xFF33FF99), // Holographic Mint Neon
+    Color(0xFF33CCFF), // Holographic Cyan Ice
+    Color(0xFF9966FF), // Holographic Violet
+    Color(0xFFFF3366)  // Wrap
+)
+
+private val SPECULAR_GLEAM_COLORS = listOf(
+    Color.Transparent,
+    Color.White.copy(alpha = 0.45f),
+    Color.Transparent
+)
+
 /**
  * Lightweight GPU-accelerated holographic rainbow reflection effect.
  * Dynamically shifts an iridescent prism gradient and specular sheen
@@ -129,16 +145,6 @@ fun Modifier.holoFoilReflection(
 ): Modifier {
     val normX = ((tiltY + 25f) / 50f).coerceIn(0f, 1f)
     val normY = ((tiltX + 25f) / 50f).coerceIn(0f, 1f)
-
-    val rainbowColors = listOf(
-        Color(0xFFFF3366), // Holographic Coral Pink
-        Color(0xFFFF9900), // Holographic Amber / Gold
-        Color(0xFFFFFF66), // Holographic Solar Gold
-        Color(0xFF33FF99), // Holographic Mint Neon
-        Color(0xFF33CCFF), // Holographic Cyan Ice
-        Color(0xFF9966FF), // Holographic Violet
-        Color(0xFFFF3366)  // Wrap
-    )
 
     return this
         .alpha(baseAlpha)
@@ -156,7 +162,7 @@ fun Modifier.holoFoilReflection(
             // 1. Rainbow foil iridescence masked to the logo/number silhouette
             drawRect(
                 brush = Brush.linearGradient(
-                    colors = rainbowColors,
+                    colors = HOLO_RAINBOW_COLORS,
                     start = Offset(startX, startY),
                     end = Offset(endX, endY)
                 ),
@@ -167,11 +173,7 @@ fun Modifier.holoFoilReflection(
             // 2. Specular chrome gleam beam across the center of tilt
             drawRect(
                 brush = Brush.linearGradient(
-                    colors = listOf(
-                        Color.Transparent,
-                        Color.White.copy(alpha = 0.45f),
-                        Color.Transparent
-                    ),
+                    colors = SPECULAR_GLEAM_COLORS,
                     start = Offset(startX + w * 0.35f, startY),
                     end = Offset(startX + w * 0.65f, endY)
                 ),
@@ -466,6 +468,24 @@ private fun ArtworkWindow(
             )
             .border(1.2.dp, tierColor.copy(alpha = 0.85f), windowShape)
     ) {
+        val isWideLogoTeam = remember(card.role, card.teamId) {
+            if (card.role == CardRole.CHASSIS) {
+                val cleanId = card.teamId.lowercase().replace("-", "").replace("_", "").replace(" ", "")
+                cleanId in setOf(
+                    "mclaren",
+                    "redbull",
+                    "redbullracing",
+                    "astonmartin",
+                    "williams",
+                    "alpine",
+                    "audi",
+                    "racingbulls",
+                    "vcarb",
+                    "cadillac"
+                )
+            } else false
+        }
+
         if (card.role == CardRole.CHASSIS) {
             val teamLogoUrl = remember(card.teamId) { getTeamLogoWatermarkUrl(card.teamId) }
             val logoRequest = remember(teamLogoUrl) {
@@ -474,15 +494,22 @@ private fun ArtworkWindow(
                     .crossfade(true)
                     .build()
             }
-            // WATERMARK TEAM / CAR LOGO - Sized gracefully with 3D rainbow reflection
+            // WATERMARK TEAM / CAR LOGO - Sized gracefully with 3D rainbow reflection.
+            // Wide logos (McLaren, Red Bull, Aston Martin, Williams, Alpine, Audi, Racing Bulls, Cadillac)
+            // are moved up so they sit clearly visible above the chassis car.
             AsyncImage(
                 model = logoRequest,
                 contentDescription = "${card.teamName} Logo Watermark",
                 contentScale = ContentScale.Fit,
-                alignment = Alignment.Center,
+                alignment = if (isWideLogoTeam) Alignment.TopCenter else Alignment.Center,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 14.dp, vertical = 10.dp)
+                    .padding(
+                        start = 14.dp,
+                        end = 14.dp,
+                        top = if (isWideLogoTeam) 8.dp else 10.dp,
+                        bottom = if (isWideLogoTeam) 42.dp else 10.dp
+                    )
                     .scale(1.05f)
                     .holoFoilReflection(tiltX = tiltX, tiltY = tiltY, baseAlpha = 0.38f)
             )
@@ -531,10 +558,19 @@ private fun ArtworkWindow(
             model = imageRequest,
             contentDescription = card.name,
             contentScale = ContentScale.Fit,
-            alignment = if (card.role == CardRole.CHASSIS) Alignment.Center else Alignment.BottomCenter,
+            alignment = if (card.role == CardRole.CHASSIS) {
+                if (isWideLogoTeam) Alignment.BottomCenter else Alignment.Center
+            } else Alignment.BottomCenter,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(if (card.role == CardRole.CHASSIS) 6.dp else 2.dp)
+                .padding(
+                    start = if (card.role == CardRole.CHASSIS) 6.dp else 2.dp,
+                    end = if (card.role == CardRole.CHASSIS) 6.dp else 2.dp,
+                    top = if (card.role == CardRole.CHASSIS) {
+                        if (isWideLogoTeam) 20.dp else 6.dp
+                    } else 2.dp,
+                    bottom = if (card.role == CardRole.CHASSIS) 6.dp else 2.dp
+                )
                 .clip(windowShape)
         )
     }

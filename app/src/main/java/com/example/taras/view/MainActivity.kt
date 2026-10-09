@@ -40,7 +40,15 @@ import com.example.taras.view.onboarding.OnboardingScreen
 import com.example.taras.core.tcg.worker.WeeklyPackWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalConfiguration
+import com.example.taras.core.db.AppDatabase
+import com.example.taras.core.tcg.repository.TcgRepository
+import com.example.taras.view.tutorial.AppTutorialStep
+import com.example.taras.view.tutorial.RealAppTutorialOverlay
+import com.example.taras.viewmodel.TcgViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -69,6 +77,20 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             )
+            val tcgViewModel: TcgViewModel = viewModel(
+                factory = object : ViewModelProvider.Factory {
+                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                        val db = AppDatabase.getDatabase(context.applicationContext)
+                        val repo = TcgRepository(db.tcgCardDao())
+                        @Suppress("UNCHECKED_CAST")
+                        return TcgViewModel(repo) as T
+                    }
+                }
+            )
+
+            var isTutorialActive by rememberSaveable { mutableStateOf(false) }
+            var tutorialStep by rememberSaveable { mutableStateOf(AppTutorialStep.PADDOCK) }
+
             val appearance by appearanceViewModel.appearanceData.collectAsStateWithLifecycle()
             val darkTheme = when (appearance) {
                 "Dark" -> true
@@ -91,7 +113,14 @@ class MainActivity : ComponentActivity() {
             )
             val navigator = remember { Navigator(navigationState) }
 
-            val hasSeenWelcome by userViewModel.hasSeenWelcome.collectAsStateWithLifecycle()
+            // Cache hasSeenWelcome across any activity or configuration recreation so we never flash cold-start buffer
+            val hasSeenWelcomeFlow by userViewModel.hasSeenWelcome.collectAsStateWithLifecycle()
+            var cachedHasSeenWelcome by rememberSaveable { mutableStateOf<Boolean?>(null) }
+            if (hasSeenWelcomeFlow != null) {
+                cachedHasSeenWelcome = hasSeenWelcomeFlow
+            }
+            val hasSeenWelcome = hasSeenWelcomeFlow ?: cachedHasSeenWelcome
+
             var showManualOnboarding by remember {
                 mutableStateOf(intent?.getBooleanExtra("reset_onboarding", false) ?: false)
             }
@@ -116,8 +145,22 @@ class MainActivity : ComponentActivity() {
                         OnboardingScreen(
                             userViewModel = userViewModel,
                             appearanceViewModel = appearanceViewModel,
+                            initialMode = com.example.taras.view.onboarding.OnboardingMode.SETUP,
+                            onNavigateToRoute = { route ->
+                                showManualOnboarding = false
+                                navigator.navigate(route)
+                            },
+                            onStartTutorial = {
+                                showManualOnboarding = false
+                                navigator.navigate(MainNavRoutes.Paddock)
+                                tutorialStep = AppTutorialStep.PADDOCK
+                                isTutorialActive = true
+                            },
                             onFinish = {
                                 showManualOnboarding = false
+                                navigator.navigate(MainNavRoutes.Paddock)
+                                tutorialStep = AppTutorialStep.PADDOCK
+                                isTutorialActive = true
                             }
                         )
                     } else if (hasSeenWelcome != null) {
@@ -131,48 +174,81 @@ class MainActivity : ComponentActivity() {
                             userViewModel = userViewModel,
                             appearanceExpanded = appearanceExpanded,
                             onAppearanceExpandChange = { appearanceExpanded = it },
-                            onOpenOnboarding = { showManualOnboarding = true },
+                            onOpenOnboarding = {
+                                scope.launch {
+                                    drawerState.close()
+                                    navigator.navigate(MainNavRoutes.Paddock)
+                                    tutorialStep = AppTutorialStep.PADDOCK
+                                    isTutorialActive = true
+                                }
+                            },
                             onNavigateToTcgBinder = { navigator.navigate(MainNavRoutes.TcgBinder) },
                             onNavigateToLegalHub = { tab -> navigator.navigate(MainNavRoutes.LegalHub(tab)) }
                         ) {
-                            Scaffold(
-                                modifier = Modifier.fillMaxSize(),
-                                topBar = {
-                                    TarasTopBar(
-                                        onProfileClick = {
-                                            scope.launch { drawerState.open() }
-                                        }
-                                    )
-                                },
-                                bottomBar = {
-                                    MainNavBar(
-                                        selectedItem = navigationState.topLevelRoute,
-                                        onSelectedItem = { navigator.navigate(it) }
-                                    )
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                Scaffold(
+                                    modifier = Modifier.fillMaxSize(),
+                                    topBar = {
+                                        TarasTopBar(
+                                            onProfileClick = {
+                                                scope.launch { drawerState.open() }
+                                            }
+                                        )
+                                    },
+                                    bottomBar = {
+                                        MainNavBar(
+                                            selectedItem = navigationState.topLevelRoute,
+                                            onSelectedItem = { navigator.navigate(it) }
+                                        )
+                                    }
+                                ) { innerPadding ->
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(innerPadding)
+                                    ) {
+                                        MainNavHost(
+                                            navigationState = navigationState,
+                                            navigator = navigator,
+                                            appearanceViewModel = appearanceViewModel,
+                                            userViewModel = userViewModel
+                                        )
+                                    }
                                 }
-                            ) { innerPadding ->
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(innerPadding)
-                                ) {
-                                    MainNavHost(
-                                        navigationState = navigationState,
+
+                                if (isTutorialActive) {
+                                    RealAppTutorialOverlay(
+                                        currentStep = tutorialStep,
                                         navigator = navigator,
-                                        appearanceViewModel = appearanceViewModel,
-                                        userViewModel = userViewModel
+                                        tcgViewModel = tcgViewModel,
+                                        onStepChange = { nextStep -> tutorialStep = nextStep },
+                                        onDismiss = { isTutorialActive = false }
                                     )
                                 }
                             }
                         }
                     } else {
-                        // Cold start buffer while DataStore loads initial state
-                        Box(modifier = Modifier.fillMaxSize())
+                        // Cold start buffer while DataStore loads initial state — themed with smooth loader
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            color = MaterialTheme.colorScheme.background
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = androidx.compose.ui.Alignment.Center
+                            ) {
+                                androidx.compose.material3.CircularProgressIndicator()
+                            }
+                        }
                     }
                 }
             }
 
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
     }
 
     override fun onNewIntent(intent: android.content.Intent) {

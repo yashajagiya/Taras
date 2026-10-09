@@ -38,7 +38,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import coil3.compose.AsyncImage
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.example.taras.core.helpercore.formatToLocalSession
 import com.example.taras.core.helpercore.parseSessionTimeToInstant
 import com.example.taras.core.helpercore.toGetDate
@@ -70,7 +74,9 @@ fun RacesCards(
     racesList1: ImmutableList<RaceClearData>?,
     racesCurrentState: CurrentRound?,
     onCircuitClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    hasAutoScrolled: Boolean = false,
+    onAutoScrolled: () -> Unit = {}
 ) {
     if (racesList1 == null) return
 
@@ -81,11 +87,16 @@ fun RacesCards(
         racesList1.indexOfFirst { it.roundNumber == currentRound }.coerceAtLeast(0)
     }
 
-    LaunchedEffect(currentIndex) {
-        if (currentIndex > 0) {
-            listState.scrollToItem(
-                index = currentIndex, scrollOffset = -80
-            )
+    LaunchedEffect(currentIndex, hasAutoScrolled, racesCurrentState) {
+        if (!hasAutoScrolled && racesList1.isNotEmpty()) {
+            if (currentIndex > 0) {
+                listState.scrollToItem(
+                    index = currentIndex, scrollOffset = -80
+                )
+            }
+            if (racesCurrentState != null || currentIndex == 0) {
+                onAutoScrolled()
+            }
         }
     }
 
@@ -299,11 +310,22 @@ fun CurrentRaceExtended(
         shape = MaterialTheme.shapes.large,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
     ) {
+        val context = LocalContext.current
+        val trackImageRequest = remember(race.trackImage) {
+            ImageRequest.Builder(context)
+                .data(race.trackImage.ifEmpty { "https://f1tv.formula1.com/static/favicon.ico" })
+                .crossfade(true)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .networkCachePolicy(CachePolicy.ENABLED)
+                .build()
+        }
+
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
             AsyncImage(
-                model = race.trackImage.ifEmpty { "https://f1tv.formula1.com/static/favicon.ico" },
+                model = trackImageRequest,
                 contentDescription = "track",
                 modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop,

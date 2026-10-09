@@ -50,7 +50,7 @@ data class RaceResultWidgetData(
 )
 
 class WidgetDataRepository(
-    private val dataService: TarasDataService = NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
+    private val dataService: TarasDataService = NetworkModule.tarasDataService
 ) {
     private val tag = "WidgetDataRepo"
 

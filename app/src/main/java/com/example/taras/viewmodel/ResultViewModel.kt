@@ -56,8 +56,7 @@ class ResultViewModel(
 
     private val logTag = "ResultViewModel"
 
-    private val tarasDataService =
-        NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
+    private val tarasDataService = NetworkModule.tarasDataService
 
     private val _weekendResults =
         MutableStateFlow<UiState<WeekendResultsResponse>>(UiState.Loading)

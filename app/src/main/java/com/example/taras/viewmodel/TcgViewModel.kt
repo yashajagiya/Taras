@@ -68,6 +68,7 @@ class TcgViewModel(
             )
         }.sortedWith(
             compareBy<BinderCardItem> { it.card.tier.ordinal }
+                .thenByDescending { it.card.ovr }
                 .thenBy { it.card.name.lowercase() }
         )
 

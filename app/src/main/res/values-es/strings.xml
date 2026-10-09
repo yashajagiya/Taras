@@ -14,6 +14,7 @@
     <string name="nav_grid">Parrilla</string>
     <string name="nav_calendar">Calendario</string>
     <string name="nav_results">Resultados</string>
+    <string name="nav_tcg">TCG</string>
     <string name="topbar_user_profile">Perfil de Usuario</string>
     <string name="action_back">Atrás</string>
 
@@ -72,6 +73,7 @@
     <string name="privacy_sec_opensource_title">Transparencia de código abierto</string>
     <string name="privacy_sec_opensource_desc">Taras es completamente de código abierto. Cualquiera puede inspeccionar el código en GitHub para verificar nuestros compromisos de privacidad.</string>
     <string name="privacy_btn_view_online">Ver política en línea</string>
+    <string name="legal_fab_grievance">Atención de quejas</string>
     <string name="privacy_btn_got_it">Entendido</string>
     <string name="drawer_notifications_already_granted">Permiso ya concedido</string>
     <string name="drawer_could_not_open_settings">No se pudo abrir la configuración</string>
@@ -276,4 +278,24 @@
     <string name="news_open_error">No se pudo abrir el enlace del artículo</string>
     <string name="news_by_author">por %1$s</string>
     <string name="news_no_title">Sin título</string>
+
+    <!-- App Guide & Setup -->
+    <string name="guide_title">Guía de la app y funciones</string>
+    <string name="guide_subtitle">Explora todo lo que Taras ofrece — desde telemetría en vivo y cuenta regresiva de carreras hasta el archivador 3D de F1 Grid TCG.</string>
+    <string name="guide_tab_guide">Guía de la app</string>
+    <string name="guide_tab_setup">Mi configuración</string>
+    <string name="guide_chip_overview">Resumen</string>
+    <string name="guide_chip_paddock">Paddock</string>
+    <string name="guide_chip_grid">Parrilla y Pilotos</string>
+    <string name="guide_chip_calendar">Calendario</string>
+    <string name="guide_chip_results">Resultados</string>
+    <string name="guide_chip_tcg">F1 Grid TCG</string>
+    <string name="guide_chip_widgets">Widgets y Tema</string>
+    <string name="guide_action_open_tcg">Abrir Archivador TCG</string>
+    <string name="guide_action_open_grid">Explorar Parrilla</string>
+    <string name="guide_action_open_calendar">Ver Calendario</string>
+    <string name="guide_action_open_results">Comprobar Resultados</string>
+    <string name="guide_action_enter_app">Entrar al Paddock</string>
+    <string name="guide_action_edit_setup">Editar Configuración</string>
+    <string name="guide_close">Cerrar</string>
 </resources>

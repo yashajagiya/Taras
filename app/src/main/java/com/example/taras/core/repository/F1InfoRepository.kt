@@ -8,7 +8,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class F1InfoRepository(
-    private val tarasDataService: TarasDataService = NetworkModule.tarasGithubRetrofit.create(TarasDataService::class.java)
+    private val tarasDataService: TarasDataService = NetworkModule.tarasDataService
 ) {
     private val mutex = Mutex()
     private var cachedDriversV2: List<DriverDetailResponseV2>? = null

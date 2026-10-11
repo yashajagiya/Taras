@@ -191,8 +191,9 @@ def load_all_known_sessions(repo_dir=None):
     - On Sunday: Grand Prix results & points are populated; status transitions to 'completed'.
     Never leaks stale data from previous races into the active weekend.
     """
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    current_dir = os.path.abspath(os.path.join(base_dir, "..", "data", "current"))
     if repo_dir is None:
-        base_dir = os.path.dirname(os.path.abspath(__file__))
         candidates = [
             os.path.abspath(os.path.join(base_dir, "..", "v1")),
             os.path.abspath(os.path.join(base_dir, "..", "..", "v1")),
@@ -204,21 +205,22 @@ def load_all_known_sessions(repo_dir=None):
 
     calendar_races = _load_calendar()
 
-    # Define all 7 session files and their cleaners
+    # Define all 7 session files and their cleaners (local data/current/ takes priority over legacy v1)
     session_defs = [
-        ("practice_1", os.path.join(repo_dir, "practice1", "fp1_extracted.json"), clean_practice),
-        ("practice_2", os.path.join(repo_dir, "practice2", "fp2_extracted.json"), clean_practice),
-        ("practice_3", os.path.join(repo_dir, "practice3", "fp3_extracted.json"), clean_practice),
-        ("qualifying", os.path.join(repo_dir, "qualifying", "qualifying_results.json"), clean_qualifying),
-        ("sprint_qualifying", os.path.join(repo_dir, "sprint-quly", "sprint_quly_result.json"), clean_sprint_qualifying),
-        ("sprint_race", os.path.join(repo_dir, "sprint-race", "sprint_race_result.json"), clean_race),
-        ("race", os.path.join(repo_dir, "race-result", "race_results.json"), clean_race),
+        ("practice_1", [os.path.join(current_dir, "fp1_extracted.json"), os.path.join(repo_dir, "practice1", "fp1_extracted.json")], clean_practice),
+        ("practice_2", [os.path.join(current_dir, "fp2_extracted.json"), os.path.join(repo_dir, "practice2", "fp2_extracted.json")], clean_practice),
+        ("practice_3", [os.path.join(current_dir, "fp3_extracted.json"), os.path.join(repo_dir, "practice3", "fp3_extracted.json")], clean_practice),
+        ("qualifying", [os.path.join(current_dir, "qualifying_results.json"), os.path.join(repo_dir, "qualifying", "qualifying_results.json")], clean_qualifying),
+        ("sprint_qualifying", [os.path.join(current_dir, "sprint_quly_result.json"), os.path.join(repo_dir, "sprint-quly", "sprint_quly_result.json")], clean_sprint_qualifying),
+        ("sprint_race", [os.path.join(current_dir, "sprint_race_result.json"), os.path.join(repo_dir, "sprint-race", "sprint_race_result.json")], clean_race),
+        ("race", [os.path.join(current_dir, "race_results.json"), os.path.join(repo_dir, "race-result", "race_results.json")], clean_race),
     ]
 
     # Collect sessions grouped by round number
     round_buckets = {}  # round_num: {"cal_entry": ..., "meta": ..., "sessions": {}}
 
-    for session_key, file_path, cleaner_fn in session_defs:
+    for session_key, file_paths, cleaner_fn in session_defs:
+        file_path = next((p for p in file_paths if os.path.exists(p)), file_paths[0])
         data = _safe_load_json(file_path)
         if not data:
             continue

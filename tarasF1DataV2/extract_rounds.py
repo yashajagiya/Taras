@@ -515,6 +515,21 @@ def export_round_to_legacy_directories(round_payload):
         rows = s.get(s_key)
         if rows is None:
             continue
+        # Always update local self-contained tarasF1DataV2/data/current/
+        v2_current_dir = os.path.join(DATA_DIR, "current")
+        os.makedirs(v2_current_dir, exist_ok=True)
+        session_payload = {
+            "country": country,
+            "session": s_key.upper().replace("_", " "),
+            "raceName": f"{r_name} - {s_key.upper()}".upper(),
+            "date": d_range,
+            "circuitName": c_name,
+            "circuitId": c_id,
+            "results": rows,
+        }
+        with open(os.path.join(v2_current_dir, out_file), "w", encoding="utf-8") as f:
+            json.dump(session_payload, f, indent=4, ensure_ascii=False)
+
         dest_dirs = [
             os.path.join(ROOT_REPO_DIR, "v1", folder),
             os.path.join(ROOT_REPO_DIR, folder),
@@ -523,19 +538,11 @@ def export_round_to_legacy_directories(round_payload):
         ]
         for dest_dir in dest_dirs:
             if os.path.exists(dest_dir):
-                payload = {
-                    "country": country,
-                    "session": s_key.upper().replace("_", " "),
-                    "raceName": f"{r_name} - {s_key.upper()}".upper(),
-                    "date": d_range,
-                    "circuitName": c_name,
-                    "circuitId": c_id,
-                    "results": rows,
-                }
                 target_path = os.path.join(dest_dir, out_file)
                 with open(target_path, "w", encoding="utf-8") as f:
-                    json.dump(payload, f, indent=4, ensure_ascii=False)
+                    json.dump(session_payload, f, indent=4, ensure_ascii=False)
                 print(f"   ✓ Updated {dest_dir}/{out_file} ({len(rows)} entries)")
+
 
 
 def extract_round_data(round_num: int, verbose: bool = True, export_legacy: bool = False):

@@ -152,12 +152,16 @@ def build_v2_api():
             print("  • Successfully loaded cached standings from tarasF1DataV2/output/standings.json")
         else:
             cached_d_candidates = [
+                os.path.join(data_dir, "driversperrace.json"),
+                os.path.join(data_dir, "f1_standings.json"),
                 os.path.join(BASE_DIR, "..", "v1", "driversperrace.json"),
                 os.path.join(BASE_DIR, "..", "v1", "f1_standings.json"),
                 os.path.join(BASE_DIR, "..", "tarasF1Data", "driversperrace.json"),
                 os.path.join(BASE_DIR, "..", "driversperrace.json"),
             ]
             cached_t_candidates = [
+                os.path.join(data_dir, "carperrace.json"),
+                os.path.join(data_dir, "f1_constructor_standings.json"),
                 os.path.join(BASE_DIR, "..", "v1", "carperrace.json"),
                 os.path.join(BASE_DIR, "..", "v1", "f1_constructor_standings.json"),
                 os.path.join(BASE_DIR, "..", "tarasF1Data", "carperrace.json"),
@@ -555,6 +559,7 @@ def run_session_scraper(session_name):
         return False
 
     candidates = [
+        os.path.abspath(os.path.join(BASE_DIR, "scrapers", "sessions", target[-1])),
         os.path.abspath(os.path.join(BASE_DIR, "..", "v1", *target)),
         os.path.abspath(os.path.join(BASE_DIR, "..", "..", "v1", *target)),
         os.path.abspath(os.path.join(BASE_DIR, "..", *target)),

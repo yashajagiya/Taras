@@ -130,7 +130,14 @@ def run_integrity_tests():
         assert len(r17_res["sessions"]["practice_1"]) >= 20, "Round 17 FP1 results missing drivers!"
         if "sprint_qualifying" in r17_res.get("completed_sessions", []):
             assert len(r17_res["sessions"]["sprint_qualifying"]) >= 20, "Round 17 Sprint Qualy results missing drivers!"
-        print("  [PASS] 8. results/round_17.json integrity verified (Singapore Sprint Weekend, FP1 + Sprint Qualy intact)")
+        if "sprint_race" in r17_res.get("completed_sessions", []):
+            assert len(r17_res["sessions"]["sprint_race"]) >= 20, "Round 17 Sprint Race results missing drivers!"
+        if "qualifying" in r17_res.get("completed_sessions", []):
+            assert len(r17_res["sessions"]["qualifying"]) >= 20, "Round 17 Qualifying results missing drivers!"
+        if "race" in r17_res.get("completed_sessions", []):
+            assert len(r17_res["sessions"]["race"]) >= 20, "Round 17 Grand Prix Race results missing drivers!"
+        print("  [PASS] 8. results/round_17.json integrity verified (Singapore Sprint Weekend, all sessions intact)")
+
 
     print("\n" + "=" * 70)
     print("  ✅ ALL INTEGRITY TESTS PASSED: 100% DATA RETENTION CONFIRMED!")

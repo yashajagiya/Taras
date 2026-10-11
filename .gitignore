@@ -5,6 +5,18 @@ PROJECT.md
 tarasF1Data/
 *token.json
 *notificationhistory.json
+github_token.txt
+*.token*
+*.exe
+cloudflared.exe
+*.cache.json
+state_cache.json
+timeline_cache.json
+link.json
+.idea/
+build/
+*.iml
 __pycache__/
 *.pyc
+
 

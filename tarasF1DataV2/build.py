@@ -515,8 +515,8 @@ def git_commit_and_push(repo_dir):
         try:
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             print(f"\n[Git] Syncing repository at: {r_dir}...")
-            subprocess.run(["git", "pull", "--rebase", "--autostash", "origin", "main"], cwd=r_dir, check=False)
-            subprocess.run(["git", "add", "."], cwd=r_dir, check=True)
+            v2_targets = [p for p in ["v2", "v1", "tarasF1DataV2", "extract_rounds.py", "update_v2.py", ".gitignore"] if os.path.exists(os.path.join(r_dir, p))]
+            subprocess.run(["git", "add"] + v2_targets, cwd=r_dir, check=True)
             
             diff = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=r_dir)
             if diff.returncode != 0:

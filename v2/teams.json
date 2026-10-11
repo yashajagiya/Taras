@@ -25,7 +25,7 @@
     ],
     "standings": {
       "rank": 1,
-      "points": 556,
+      "points": 578,
       "races": [
         {
           "round": 1,
@@ -175,9 +175,9 @@
           "round": 19,
           "race_code": "SGP",
           "race_name": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "points": 0,
-          "display_value": ""
+          "played": true,
+          "points": 22,
+          "display_value": "22"
         },
         {
           "round": 20,
@@ -285,7 +285,7 @@
     ],
     "standings": {
       "rank": 2,
-      "points": 405,
+      "points": 444,
       "races": [
         {
           "round": 1,
@@ -435,9 +435,9 @@
           "round": 19,
           "race_code": "SGP",
           "race_name": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "points": 0,
-          "display_value": ""
+          "played": true,
+          "points": 39,
+          "display_value": "39"
         },
         {
           "round": 20,
@@ -545,7 +545,7 @@
     ],
     "standings": {
       "rank": 3,
-      "points": 316,
+      "points": 339,
       "races": [
         {
           "round": 1,
@@ -695,9 +695,9 @@
           "round": 19,
           "race_code": "SGP",
           "race_name": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "points": 0,
-          "display_value": ""
+          "played": true,
+          "points": 23,
+          "display_value": "23"
         },
         {
           "round": 20,
@@ -805,7 +805,7 @@
     ],
     "standings": {
       "rank": 4,
-      "points": 298,
+      "points": 332,
       "races": [
         {
           "round": 1,
@@ -955,9 +955,9 @@
           "round": 19,
           "race_code": "SGP",
           "race_name": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "points": 0,
-          "display_value": ""
+          "played": true,
+          "points": 34,
+          "display_value": "34"
         },
         {
           "round": 20,
@@ -1066,7 +1066,7 @@
     ],
     "standings": {
       "rank": 5,
-      "points": 90,
+      "points": 100,
       "races": [
         {
           "round": 1,
@@ -1216,9 +1216,9 @@
           "round": 19,
           "race_code": "SGP",
           "race_name": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "points": 0,
-          "display_value": ""
+          "played": true,
+          "points": 10,
+          "display_value": "10"
         },
         {
           "round": 20,
@@ -1476,9 +1476,9 @@
           "round": 19,
           "race_code": "SGP",
           "race_name": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "points": 0,
-          "display_value": ""
+          "display_value": "-"
         },
         {
           "round": 20,
@@ -1586,7 +1586,7 @@
     ],
     "standings": {
       "rank": 7,
-      "points": 27,
+      "points": 30,
       "races": [
         {
           "round": 1,
@@ -1736,9 +1736,9 @@
           "round": 19,
           "race_code": "SGP",
           "race_name": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "points": 0,
-          "display_value": ""
+          "played": true,
+          "points": 3,
+          "display_value": "3"
         },
         {
           "round": 20,
@@ -1841,12 +1841,12 @@
       "logo": "https://media.formula1.com/image/upload/c_fit,w_1024/e_sharpen:100/q_auto:best/v1740000001/common/f1/2026/audi/2026audilogowhite.png"
     },
     "drivers": [
-      "gabriel-bortoleto",
-      "nico-hulkenberg"
+      "nico-hulkenberg",
+      "gabriel-bortoleto"
     ],
     "standings": {
       "rank": 8,
-      "points": 17,
+      "points": 23,
       "races": [
         {
           "round": 1,
@@ -1996,9 +1996,9 @@
           "round": 19,
           "race_code": "SGP",
           "race_name": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "points": 0,
-          "display_value": ""
+          "played": true,
+          "points": 6,
+          "display_value": "6"
         },
         {
           "round": 20,
@@ -2256,9 +2256,9 @@
           "round": 19,
           "race_code": "SGP",
           "race_name": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "points": 0,
-          "display_value": ""
+          "display_value": "-"
         },
         {
           "round": 20,
@@ -2516,9 +2516,9 @@
           "round": 19,
           "race_code": "SGP",
           "race_name": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "points": 0,
-          "display_value": ""
+          "display_value": "-"
         },
         {
           "round": 20,
@@ -2776,9 +2776,9 @@
           "round": 19,
           "race_code": "SGP",
           "race_name": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "points": 0,
-          "display_value": ""
+          "display_value": "-"
         },
         {
           "round": 20,

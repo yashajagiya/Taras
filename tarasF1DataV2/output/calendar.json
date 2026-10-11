@@ -983,7 +983,11 @@
         "time": "13:00:00Z"
       }
     },
-    "winner": null
+    "winner": {
+      "drivernumber": 3,
+      "fullName": "Max Verstappen",
+      "teamWinner": "Red Bull Racing"
+    }
   },
   {
     "round": 18,

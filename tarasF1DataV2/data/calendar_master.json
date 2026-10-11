@@ -817,7 +817,11 @@
         "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026tracksingaporedetailed.webp",
         "gpName": "Singapore Airlines Singapore GP"
       },
-      "winner": null
+      "winner": {
+        "drivernumber": 3,
+        "fullName": "Max Verstappen",
+        "teamWinner": "Red Bull Racing"
+      }
     },
     {
       "raceId": "united_states_2026",

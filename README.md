@@ -318,43 +318,41 @@ TarasAPIstatic/
 ├── .github/
 │   └── workflows/
 │       └── update-f1.yml        ← Weekly automated GitHub Actions scraper & deployer
-├── v2/                          ← Unified Next-Gen REST API (Primary)
-│   ├── overview.json            ← Home dashboard in 1 request
-│   ├── drivers.json             ← All 23 drivers with portraits & stats
-│   ├── teams.json               ← All 11 constructors with car cutouts & logos
-│   ├── standings.json           ← Championship tables & round progression
-│   ├── calendar.json            ← 24-race schedule & track maps
-│   ├── live.json                ← Live race session state
-│   └── results/
-│       ├── latest.json
-│       └── round_1.json ... round_18.json
-├── v1/                          ← Legacy v1 API endpoints (backward compatibility)
+├── v2/                          ← 100% Self-Contained Modern REST API Module
+│   ├── overview.json            ← Public endpoint: Home dashboard in 1 request
+│   ├── drivers.json             ← Public endpoint: All 23 drivers with portraits & stats
+│   ├── teams.json               ← Public endpoint: All 11 constructors with car cutouts & logos
+│   ├── standings.json           ← Public endpoint: Championship tables & round progression
+│   ├── calendar.json            ← Public endpoint: 24-race schedule & track maps
+│   ├── live.json                ← Public endpoint: Live race session state
+│   ├── results/                 ← Session classifications (latest & round_{1..18}.json)
+│   ├── build.py                 ← Master V2 Build Engine
+│   ├── update.py                ← Single-command update & verify orchestrator
+│   ├── extract_rounds.py        ← Historical round extractor
+│   ├── test_v2_integrity.py     ← 8-suite zero data loss verification tests
+│   ├── collectors/              ← Data adapters (ESPN, F1 Encyclopedia, Sessions)
+│   ├── scrapers/                ← Official F1 session scrapers
+│   ├── data/                    ← Master registries (teams, calendar, sessions)
+│   └── README.md
+├── v1/                          ← 100% Self-Contained Legacy API Module
 │   ├── driversperrace.json
 │   ├── carperrace.json
+│   ├── peerracepointdriver.py
+│   ├── peerracepointcar.py
 │   ├── f1Info/
 │   ├── practice1/ ... practice3/
 │   ├── qualifying/
 │   ├── sprint-quly/ ... sprint-race/
 │   ├── race-result/
 │   └── README.md
-├── tarasF1DataV2/               ← Master V2 Build Engine & Registries
-│   ├── data/                    ← Authoritative master data registries
-│   │   ├── teams_registry.json
-│   │   ├── calendar_master.json
-│   │   └── sessions/            ← Master round sessions storage
-│   ├── collectors/              ← Data adapters (ESPN, F1 Encyclopedia)
-│   ├── scrapers/                ← Session scrapers
-│   ├── build.py                 ← Master Build Engine
-│   ├── extract_rounds.py        ← Historical Rounds Extractor
-│   └── test_v2_integrity.py     ← Zero Data Loss Automated Tests
 ├── docs/                        ← Complete Documentation Suite
 │   ├── API_REFERENCE.md         ← Full endpoint reference & schemas
 │   ├── ARCHITECTURE.md          ← Clean architecture & extension guide
 │   ├── F1_DATA_SOURCES.md       ← External data sources catalog
 │   ├── PROJECT.md               ← Ecosystem background & product role
 │   └── mobile_app_specs/        ← Android TARAS app UI specifications
-├── update_v2.py                 ← Master Pipeline CLI entry point
-├── extract_rounds.py            ← Root Extractor CLI entry point
+├── update_v2.py                 ← Root CLI shortcut delegating to v2/update.py
+├── extract_rounds.py            ← Root CLI shortcut delegating to v2/extract_rounds.py
 └── README.md                    ← You are here!
 ```
 
@@ -368,13 +366,15 @@ TarasAPIstatic/
 
 ### 2. Regenerate the V2 API
 ```bash
-python tarasF1DataV2/build.py
+python v2/build.py
+# or from root:
+python update_v2.py --skip-scrape
 ```
-This runs all collectors, merges encyclopedias, consolidates sessions, writes endpoints to `tarasF1DataV2/output/`, and automatically syncs to public `v2/`.
+This runs all collectors, merges encyclopedias, consolidates sessions, and writes standardized endpoints directly into `v2/`.
 
 ### 3. Verify Data Integrity
 ```bash
-python tarasF1DataV2/test_v2_integrity.py
+python v2/test_v2_integrity.py
 ```
 Validates that 100% of driver fields, team specs, track maps, standings, and round session classifications are preserved without data loss.
 

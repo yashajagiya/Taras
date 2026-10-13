@@ -19,8 +19,8 @@ from bs4 import BeautifulSoup
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 SESSIONS_DIR = os.path.join(DATA_DIR, "sessions")
-OUTPUT_RESULTS_DIR = os.path.join(BASE_DIR, "output", "results")
-PUBLIC_V2_RESULTS_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "v2", "results"))
+OUTPUT_RESULTS_DIR = os.path.join(BASE_DIR, "results")
+PUBLIC_V2_RESULTS_DIR = os.path.join(BASE_DIR, "results")
 ROOT_REPO_DIR = os.path.abspath(os.path.join(BASE_DIR, ".."))
 
 if sys.platform == "win32":

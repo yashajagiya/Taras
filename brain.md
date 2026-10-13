@@ -32,22 +32,27 @@ TarasAPIstatic/
 ├── .github/
 │   └── workflows/
 │       └── update-f1.yml        # Automated weekly GitHub Actions pipeline
-├── v2/                          # Unified v2 REST API (Primary)
+├── v2/                          # 100% Self-Contained Modern REST API Module
 │   ├── overview.json            # Home screen in 1 request
 │   ├── drivers.json             # All 23 drivers with portraits & stats
 │   ├── teams.json               # All 11 constructors with car cutouts & logos
 │   ├── standings.json           # Championship tables & round progression
 │   ├── calendar.json            # 24-race schedule & circuit vectors
 │   ├── live.json                # Live session status metadata
-│   └── results/                 # Session classifications (latest & round_{1..18}.json)
-├── v1/                          # Legacy v1 endpoints (isolated backward compatibility)
-├── tarasF1DataV2/               # Master Build Engine & Data Pipeline
-│   ├── build.py                 # Core aggregator
-│   ├── update.py                # Pipeline orchestrator
+│   ├── results/                 # Session classifications (latest & round_{1..18}.json)
+│   ├── build.py                 # Master endpoint builder & aggregator
+│   ├── update.py                # Pipeline orchestrator (scrape -> build -> verify -> git)
+│   ├── extract_rounds.py        # Historical round extraction & normalization
 │   ├── test_v2_integrity.py     # 8-suite automated integrity verification
 │   ├── collectors/              # Data adapters (ESPN, Encyclopedia, Sessions)
-│   ├── scrapers/                # Official F1 session HTML parsers
-│   └── data/                    # Authoritative registries & session cache
+│   ├── scrapers/                # Official Formula 1 session HTML parsers
+│   └── data/                    # Authoritative registries (teams, calendar, sessions)
+├── v1/                          # 100% Self-Contained Legacy API Module
+│   ├── peerracepointdriver.py   # Driver standings scraper & generator
+│   ├── peerracepointcar.py      # Constructor standings scraper & generator
+│   ├── f1Info/                  # Driver & race metadata scrapers
+│   ├── practice1/ ...           # Session-specific legacy folders & outputs
+│   └── *.json                   # Legacy public JSON datasets
 └── docs/                        # Complete technical documentation
     ├── API_REFERENCE.md         # Full REST API endpoint reference & schemas
     ├── ARCHITECTURE.md          # Architecture & extension guide
@@ -618,9 +623,23 @@ TarasAPIstatic/
     - Modernized `.gitignore`, `AGENTS.md`, and `README.md`.
   - **Verification:**
     - Tested pipeline (`python update_v2.py --skip-scrape --no-push`): 100% data retention confirmed (all 8 integrity test suites passed).
-
-
-
+- **Session 46: 100% Standalone V1 & V2 Modular Architecture:**
+  - **User Directive:** "make the v1 and v2 satnd alone like if any scraper or any file need for the v2 so it have all that in it so it shoudeb be clena so it can uplad in to the github"
+  - **Actions Executed:**
+    - Fully consolidated all scrapers, collectors, build engine, data registries, and test suites directly into `v2/`:
+      - Moved `collectors/`, `scrapers/`, `data/`, `build.py`, `update.py`, `extract_rounds.py`, `test_v2_integrity.py` into `v2/`.
+      - Updated `v2/build.py` to write endpoints directly to `v2/` (`output_dir = BASE_DIR`), removing redundant copy steps.
+      - Updated `v2/test_v2_integrity.py` to validate `v2/` endpoints directly.
+      - Updated `v2/extract_rounds.py` to save session results directly to `v2/results/`.
+    - Removed redundant root `tarasF1DataV2/` folder entirely.
+    - Updated root `update_v2.py` and `extract_rounds.py` shortcuts to delegate to `v2/update.py` and `v2/extract_rounds.py`.
+    - Verified `v1/` is 100% self-contained with its own scrapers (`peerracepointdriver.py`, `peerracepointcar.py`, `f1Info/`) and JSON endpoints.
+    - Updated `.github/workflows/update-f1.yml`, `docs/ARCHITECTURE.md`, `README.md`, and `AGENTS.md`.
+  - **Verification:**
+    - Tested `python v2/build.py` — successfully built in `v2/`.
+    - Tested `python v2/test_v2_integrity.py` — 8/8 suites passed.
+    - Tested `python update_v2.py --skip-scrape --no-push` from root — 100% data retention confirmed.
+    - Tested `v1/peerracepointdriver.py` and `v1/peerracepointcar.py` — executed with 100% success.
 
 
 

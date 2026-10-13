@@ -42,11 +42,11 @@ jobs:
 
       - name: Verify 100% Data Integrity
         run: |
-          python tarasF1DataV2/test_v2_integrity.py
+          python v2/test_v2_integrity.py
 
       - name: Deploy Updated Static Endpoints to GitHub Pages
         run: |
-          git add v1/ v2/ tarasF1DataV2/ docs/ index.html
+          git add v1/ v2/ docs/ index.html
           if git diff --cached --quiet; then
             echo "No data changes detected. Working tree clean."
           else

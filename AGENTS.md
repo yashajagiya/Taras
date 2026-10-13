@@ -6,11 +6,11 @@
 
 ## Project Conventions (`Taras F1 Static API`)
 - **Nature of Project:** 100% Static Formula 1 REST API served directly from GitHub Pages edge CDN (`github.io`).
-- **Core Stack:** Python 3.x pipeline (`tarasF1DataV2/`), static JSON datasets (`v2/` primary, `v1/` legacy), GitHub Pages portal (`index.html`).
+- **Core Stack:** 100% self-contained `v1/` and `v2/` modules, GitHub Pages portal (`index.html`).
 - **Run / Test Commands:**
-  - Build V2 API: `python update_v2.py --skip-scrape`
-  - Scrape specific round: `python update_v2.py --round <round_num>`
-  - Run integrity verification: `python tarasF1DataV2/test_v2_integrity.py`
-  - Extract/sync rounds: `python extract_rounds.py --round <round_num>`
+  - Build V2 API: `python v2/build.py` (or `python update_v2.py --skip-scrape`)
+  - Scrape specific round: `python v2/update.py --round <round_num>`
+  - Run integrity verification: `python v2/test_v2_integrity.py`
+  - Extract/sync rounds: `python v2/extract_rounds.py --round <round_num>`
 - **Coding & Design Style:** Clean, modular Python scripts, strictly validated JSON schemas, zero data loss, zero application runtime servers.
 - **Communication:** Concise, precise, actionable responses with clickable file links.

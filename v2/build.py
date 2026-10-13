@@ -112,7 +112,7 @@ def build_v2_api():
     print("=" * 70)
 
     data_dir = os.path.join(BASE_DIR, "data")
-    output_dir = os.path.join(BASE_DIR, "output")
+    output_dir = BASE_DIR
     results_dir = os.path.join(output_dir, "results")
     os.makedirs(results_dir, exist_ok=True)
 
@@ -471,17 +471,6 @@ def build_v2_api():
         size_kb = round(os.path.getsize(dest) / 1024, 1)
         print(f"  ✓ {rel_path:<25} ({size_kb:>5} KB)")
 
-    # Auto-sync to public v2 directory for GitHub Pages
-    import shutil
-    sync_target = os.path.abspath(os.path.join(BASE_DIR, "..", "v2"))
-    if os.path.exists(os.path.dirname(sync_target)):
-        try:
-            os.makedirs(sync_target, exist_ok=True)
-            shutil.copytree(output_dir, sync_target, dirs_exist_ok=True)
-            print(f"  ✓ Synchronized to public v2 directory: {sync_target}")
-        except Exception as e:
-            print(f"  ⚠️ v2 sync note ({sync_target}): {e}")
-
     print("\n[5/5] Verification & Integrity Check:")
     print(f"  • Drivers included: {len(unified_drivers)} (all 23 verified, Tsunoda #22 included)")
     print(f"  • Teams included:   {len(unified_teams)} (all 11 verified)")
@@ -500,7 +489,7 @@ def git_commit_and_push(repo_dir):
     try:
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"\n[Git] Syncing repository at: {repo_dir}...")
-        v2_targets = [p for p in ["v2", "v1", "tarasF1DataV2", "extract_rounds.py", "update_v2.py", ".gitignore", "index.html", "docs"] if os.path.exists(os.path.join(repo_dir, p))]
+        v2_targets = [p for p in ["v2", "v1", "extract_rounds.py", "update_v2.py", ".gitignore", "index.html", "docs"] if os.path.exists(os.path.join(repo_dir, p))]
         subprocess.run(["git", "add"] + v2_targets, cwd=repo_dir, check=True)
         
         diff = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=repo_dir)

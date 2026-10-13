@@ -8,7 +8,7 @@ import os
 import sys
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+OUTPUT_DIR = BASE_DIR
 
 if sys.platform == "win32":
     try:

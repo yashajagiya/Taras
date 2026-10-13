@@ -1,6 +1,6 @@
 """
 Root Launcher for Taras F1 API v2 Master Pipeline
-Delegates directly to tarasF1DataV2/update.py
+Delegates directly to v2/update.py
 """
 
 import os
@@ -14,7 +14,7 @@ if sys.platform == "win32":
         pass
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-SCRIPT_PATH = os.path.join(BASE_DIR, "tarasF1DataV2", "update.py")
+SCRIPT_PATH = os.path.join(BASE_DIR, "v2", "update.py")
 
 if __name__ == "__main__":
     if not os.path.exists(SCRIPT_PATH):

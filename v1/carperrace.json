@@ -4,7 +4,16 @@
   "entries": [
     {
       "rank": 1,
-      "team": "Mercedes",
+      "team": {
+        "id": "106893",
+        "name": "Mercedes",
+        "displayName": "Mercedes",
+        "shortDisplayName": "Mercedes",
+        "abbreviation": "LP",
+        "color": "00D2BE",
+        "alternateColor": "",
+        "logo": ""
+      },
       "points": {
         "value": 578,
         "displayValue": "578"
@@ -189,7 +198,16 @@
     },
     {
       "rank": 2,
-      "team": "Ferrari",
+      "team": {
+        "id": "106842",
+        "name": "Ferrari",
+        "displayName": "Ferrari",
+        "shortDisplayName": "Ferrari",
+        "abbreviation": "JK",
+        "color": "DC0000",
+        "alternateColor": "",
+        "logo": ""
+      },
       "points": {
         "value": 444,
         "displayValue": "444"
@@ -374,7 +392,16 @@
     },
     {
       "rank": 3,
-      "team": "McLaren",
+      "team": {
+        "id": "106892",
+        "name": "McLaren",
+        "displayName": "McLaren",
+        "shortDisplayName": "McLaren",
+        "abbreviation": "DH",
+        "color": "FF8700",
+        "alternateColor": "",
+        "logo": ""
+      },
       "points": {
         "value": 339,
         "displayValue": "339"
@@ -559,7 +586,16 @@
     },
     {
       "rank": 4,
-      "team": "Red Bull Racing",
+      "team": {
+        "id": "106921",
+        "name": "Red Bull Racing",
+        "displayName": "Red Bull Racing",
+        "shortDisplayName": "Red Bull",
+        "abbreviation": "GL",
+        "color": "00327D",
+        "alternateColor": "",
+        "logo": ""
+      },
       "points": {
         "value": 332,
         "displayValue": "332"
@@ -744,7 +780,16 @@
     },
     {
       "rank": 5,
-      "team": "Racing Bulls",
+      "team": {
+        "id": "123988",
+        "name": "Racing Bulls",
+        "displayName": "Racing Bulls",
+        "shortDisplayName": "Racing Bulls",
+        "abbreviation": "RB",
+        "color": "6692FF",
+        "alternateColor": "",
+        "logo": ""
+      },
       "points": {
         "value": 100,
         "displayValue": "100"
@@ -929,7 +974,16 @@
     },
     {
       "rank": 6,
-      "team": "Alpine",
+      "team": {
+        "id": "106922",
+        "name": "Alpine",
+        "displayName": "Alpine",
+        "shortDisplayName": "Alpine",
+        "abbreviation": "SCS",
+        "color": "FFF500",
+        "alternateColor": "",
+        "logo": ""
+      },
       "points": {
         "value": 68,
         "displayValue": "68"
@@ -1114,7 +1168,16 @@
     },
     {
       "rank": 7,
-      "team": "Haas F1 Team",
+      "team": {
+        "id": "111427",
+        "name": "Haas F1 Team",
+        "displayName": "Haas F1 Team",
+        "shortDisplayName": "Haas",
+        "abbreviation": "JH",
+        "color": "5A5A5A",
+        "alternateColor": "",
+        "logo": ""
+      },
       "points": {
         "value": 30,
         "displayValue": "30"
@@ -1299,7 +1362,16 @@
     },
     {
       "rank": 8,
-      "team": "Audi",
+      "team": {
+        "id": "132212",
+        "name": "Audi",
+        "displayName": "Audi",
+        "shortDisplayName": "Audi",
+        "abbreviation": "",
+        "color": "FF2D00",
+        "alternateColor": "",
+        "logo": ""
+      },
       "points": {
         "value": 23,
         "displayValue": "23"
@@ -1484,7 +1556,16 @@
     },
     {
       "rank": 9,
-      "team": "Williams",
+      "team": {
+        "id": "106967",
+        "name": "Williams",
+        "displayName": "Williams",
+        "shortDisplayName": "Williams",
+        "abbreviation": "RM",
+        "color": "FFFFFF",
+        "alternateColor": "",
+        "logo": ""
+      },
       "points": {
         "value": 12,
         "displayValue": "12"
@@ -1669,7 +1750,16 @@
     },
     {
       "rank": 10,
-      "team": "Aston Martin",
+      "team": {
+        "id": "123986",
+        "name": "Aston Martin",
+        "displayName": "Aston Martin",
+        "shortDisplayName": "Aston Martin",
+        "abbreviation": "ASTM",
+        "color": "006F62",
+        "alternateColor": "",
+        "logo": ""
+      },
       "points": {
         "value": 7,
         "displayValue": "7"
@@ -1854,7 +1944,16 @@
     },
     {
       "rank": 11,
-      "team": "Cadillac",
+      "team": {
+        "id": "132211",
+        "name": "Cadillac",
+        "displayName": "Cadillac",
+        "shortDisplayName": "Cadillac",
+        "abbreviation": "",
+        "color": "A2AAAD",
+        "alternateColor": "",
+        "logo": ""
+      },
       "points": {
         "value": 0,
         "displayValue": "0"

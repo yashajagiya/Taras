@@ -1,17 +1,21 @@
 {
+  "api": "https://f1api.dev",
+  "url": "https://f1api.dev/api/current",
+  "limit": 30,
+  "offset": 0,
+  "total": 23,
   "season": 2026,
   "championship": {
     "championshipId": "f1_2026",
     "championshipName": "2026 Formula 1 World Championship",
+    "url": "https://en.wikipedia.org/wiki/2026_Formula_One_World_Championship",
     "year": 2026
   },
-  "totalRaces": 23,
   "races": [
     {
       "raceId": "australian_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Qatar Airways Australian Grand Prix",
-      "round": 1,
-      "laps": 58,
       "schedule": {
         "race": {
           "date": "2026-03-08",
@@ -32,7 +36,23 @@
         "fp3": {
           "date": "2026-03-07",
           "time": "01:30:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 58,
+      "round": 1,
+      "url": "https://en.wikipedia.org/wiki/2026_Australian_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:22.091",
+        "fast_lap_driver_id": "max_verstappen",
+        "fast_lap_team_id": "red_bull"
       },
       "circuit": {
         "circuitId": "albert_park",
@@ -46,20 +66,32 @@
         "fastestLapDriverId": "leclerc",
         "fastestLapTeamId": "ferrari",
         "fastestLapYear": 2024,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackmelbournedetailed.webp",
-        "gpName": "Qatar Airways Australian GP"
+        "url": "https://en.wikipedia.org/wiki/Albert_Park_Circuit"
       },
       "winner": {
-        "drivernumber": 63,
-        "fullName": "George Russell",
-        "teamWinner": "Mercedes Formula 1 Team"
+        "driverId": "russell",
+        "name": "George",
+        "surname": "Russell",
+        "country": "Great Britain",
+        "birthday": "15/02/1998",
+        "number": 63,
+        "shortName": "RUS",
+        "url": "https://en.wikipedia.org/wiki/George_Russell_(racing_driver)"
+      },
+      "teamWinner": {
+        "teamId": "mercedes",
+        "teamName": "Mercedes Formula 1 Team",
+        "country": "Germany",
+        "firstAppearance": 1954,
+        "constructorsChampionships": 8,
+        "driversChampionships": 9,
+        "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One"
       }
     },
     {
       "raceId": "chinese_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Heineken Chinese Grand Prix 2026",
-      "round": 2,
-      "laps": 56,
       "schedule": {
         "race": {
           "date": "2026-03-15",
@@ -73,6 +105,14 @@
           "date": "2026-03-13",
           "time": "03:30:00Z"
         },
+        "fp2": {
+          "date": null,
+          "time": null
+        },
+        "fp3": {
+          "date": null,
+          "time": null
+        },
         "sprintQualy": {
           "date": "2026-03-13",
           "time": "07:30:00Z"
@@ -81,6 +121,14 @@
           "date": "2026-03-14",
           "time": "03:00:00Z"
         }
+      },
+      "laps": 56,
+      "round": 2,
+      "url": "https://en.wikipedia.org/wiki/2026_Chinese_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:35.275",
+        "fast_lap_driver_id": "antonelli",
+        "fast_lap_team_id": "mercedes"
       },
       "circuit": {
         "circuitId": "shanghai",
@@ -94,20 +142,32 @@
         "fastestLapDriverId": "michael_schumacher",
         "fastestLapTeamId": "ferrari",
         "fastestLapYear": 2004,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackshanghaidetailed.webp",
-        "gpName": "Heineken Chinese GP"
+        "url": "http://en.wikipedia.org/wiki/Shanghai_International_Circuit"
       },
       "winner": {
-        "drivernumber": 12,
-        "fullName": "Andrea Kimi Antonelli",
-        "teamWinner": "Mercedes Formula 1 Team"
+        "driverId": "antonelli",
+        "name": "Andrea",
+        "surname": "Kimi Antonelli",
+        "country": "Italy",
+        "birthday": "2006-08-25",
+        "number": 12,
+        "shortName": "ANT",
+        "url": "https://en.wikipedia.org/wiki/Andrea_Kimi_Antonelli"
+      },
+      "teamWinner": {
+        "teamId": "mercedes",
+        "teamName": "Mercedes Formula 1 Team",
+        "country": "Germany",
+        "firstAppearance": 1954,
+        "constructorsChampionships": 8,
+        "driversChampionships": 9,
+        "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One"
       }
     },
     {
       "raceId": "japanese_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Aramco Japanese Grand Prix 2026",
-      "round": 3,
-      "laps": 53,
       "schedule": {
         "race": {
           "date": "2026-03-29",
@@ -128,7 +188,23 @@
         "fp3": {
           "date": "2026-03-28",
           "time": "02:30:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 53,
+      "round": 3,
+      "url": "https://en.wikipedia.org/wiki/2026_Japanese_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:32.432",
+        "fast_lap_driver_id": "antonelli",
+        "fast_lap_team_id": "mercedes"
       },
       "circuit": {
         "circuitId": "suzuka",
@@ -142,20 +218,32 @@
         "fastestLapDriverId": "hamilton",
         "fastestLapTeamId": "mercedes",
         "fastestLapYear": 2019,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026tracksuzukadetailed.webp",
-        "gpName": "Aramco Japanese GP"
+        "url": "https://en.wikipedia.org/wiki/Suzuka_International_Racing_Course"
       },
       "winner": {
-        "drivernumber": 12,
-        "fullName": "Andrea Kimi Antonelli",
-        "teamWinner": "Mercedes Formula 1 Team"
+        "driverId": "antonelli",
+        "name": "Andrea",
+        "surname": "Kimi Antonelli",
+        "country": "Italy",
+        "birthday": "2006-08-25",
+        "number": 12,
+        "shortName": "ANT",
+        "url": "https://en.wikipedia.org/wiki/Andrea_Kimi_Antonelli"
+      },
+      "teamWinner": {
+        "teamId": "mercedes",
+        "teamName": "Mercedes Formula 1 Team",
+        "country": "Germany",
+        "firstAppearance": 1954,
+        "constructorsChampionships": 8,
+        "driversChampionships": 9,
+        "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One"
       }
     },
     {
       "raceId": "miami_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Crypto.com Miami Grand Prix 2026",
-      "round": 4,
-      "laps": 57,
       "schedule": {
         "race": {
           "date": "2026-05-03",
@@ -169,6 +257,14 @@
           "date": "2026-05-01",
           "time": "16:30:00Z"
         },
+        "fp2": {
+          "date": null,
+          "time": null
+        },
+        "fp3": {
+          "date": null,
+          "time": null
+        },
         "sprintQualy": {
           "date": "2026-05-01",
           "time": "20:30:00Z"
@@ -177,6 +273,14 @@
           "date": "2026-05-02",
           "time": "16:00:00Z"
         }
+      },
+      "laps": 57,
+      "round": 4,
+      "url": "https://en.wikipedia.org/wiki/Miami_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:31.869",
+        "fast_lap_driver_id": "norris",
+        "fast_lap_team_id": "mclaren"
       },
       "circuit": {
         "circuitId": "miami",
@@ -190,20 +294,32 @@
         "fastestLapDriverId": "max_verstappen",
         "fastestLapTeamId": "red_bull",
         "fastestLapYear": 2023,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackmiamidetailed.webp",
-        "gpName": "Crypto.com Miami GP"
+        "url": "https://en.wikipedia.org/wiki/Miami_International_Autodrome"
       },
       "winner": {
-        "drivernumber": 12,
-        "fullName": "Andrea Kimi Antonelli",
-        "teamWinner": "Mercedes Formula 1 Team"
+        "driverId": "antonelli",
+        "name": "Andrea",
+        "surname": "Kimi Antonelli",
+        "country": "Italy",
+        "birthday": "2006-08-25",
+        "number": 12,
+        "shortName": "ANT",
+        "url": "https://en.wikipedia.org/wiki/Andrea_Kimi_Antonelli"
+      },
+      "teamWinner": {
+        "teamId": "mercedes",
+        "teamName": "Mercedes Formula 1 Team",
+        "country": "Germany",
+        "firstAppearance": 1954,
+        "constructorsChampionships": 8,
+        "driversChampionships": 9,
+        "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One"
       }
     },
     {
       "raceId": "canadian_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Lenovo Grand Prix Du Canada 2026",
-      "round": 5,
-      "laps": 70,
       "schedule": {
         "race": {
           "date": "2026-05-24",
@@ -217,6 +333,14 @@
           "date": "2026-05-22",
           "time": "17:30:00Z"
         },
+        "fp2": {
+          "date": null,
+          "time": null
+        },
+        "fp3": {
+          "date": null,
+          "time": null
+        },
         "sprintQualy": {
           "date": "2026-05-22",
           "time": "21:00:00Z"
@@ -225,6 +349,14 @@
           "date": "2026-05-23",
           "time": "16:30:00Z"
         }
+      },
+      "laps": 70,
+      "round": 5,
+      "url": "https://en.wikipedia.org/wiki/2026_Canadian_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:14.210",
+        "fast_lap_driver_id": "antonelli",
+        "fast_lap_team_id": "mercedes"
       },
       "circuit": {
         "circuitId": "gilles_villeneuve",
@@ -238,20 +370,32 @@
         "fastestLapDriverId": "bottas",
         "fastestLapTeamId": "mercedes",
         "fastestLapYear": 2019,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackmontrealdetailed.webp",
-        "gpName": "Lenovo Canadian GP"
+        "url": "https://en.wikipedia.org/wiki/Circuit_Gilles_Villeneuve"
       },
       "winner": {
-        "drivernumber": 12,
-        "fullName": "Andrea Kimi Antonelli",
-        "teamWinner": "Mercedes Formula 1 Team"
+        "driverId": "antonelli",
+        "name": "Andrea",
+        "surname": "Kimi Antonelli",
+        "country": "Italy",
+        "birthday": "2006-08-25",
+        "number": 12,
+        "shortName": "ANT",
+        "url": "https://en.wikipedia.org/wiki/Andrea_Kimi_Antonelli"
+      },
+      "teamWinner": {
+        "teamId": "mercedes",
+        "teamName": "Mercedes Formula 1 Team",
+        "country": "Germany",
+        "firstAppearance": 1954,
+        "constructorsChampionships": 8,
+        "driversChampionships": 9,
+        "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One"
       }
     },
     {
       "raceId": "monaco_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Louis Vuitton Grand Prix de Monaco 2026",
-      "round": 6,
-      "laps": 78,
       "schedule": {
         "race": {
           "date": "2026-06-07",
@@ -272,7 +416,23 @@
         "fp3": {
           "date": "2026-06-06",
           "time": "10:30:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 78,
+      "round": 6,
+      "url": "https://en.wikipedia.org/wiki/2026_Monaco_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:13.481",
+        "fast_lap_driver_id": "antonelli",
+        "fast_lap_team_id": "mercedes"
       },
       "circuit": {
         "circuitId": "monaco",
@@ -286,20 +446,32 @@
         "fastestLapDriverId": "hamilton",
         "fastestLapTeamId": "mercedes",
         "fastestLapYear": 2021,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackmontecarlodetailed.webp",
-        "gpName": "Monaco GP"
+        "url": "https://en.wikipedia.org/wiki/Circuit_de_Monaco"
       },
       "winner": {
-        "drivernumber": 12,
-        "fullName": "Andrea Kimi Antonelli",
-        "teamWinner": "Mercedes Formula 1 Team"
+        "driverId": "antonelli",
+        "name": "Andrea",
+        "surname": "Kimi Antonelli",
+        "country": "Italy",
+        "birthday": "2006-08-25",
+        "number": 12,
+        "shortName": "ANT",
+        "url": "https://en.wikipedia.org/wiki/Andrea_Kimi_Antonelli"
+      },
+      "teamWinner": {
+        "teamId": "mercedes",
+        "teamName": "Mercedes Formula 1 Team",
+        "country": "Germany",
+        "firstAppearance": 1954,
+        "constructorsChampionships": 8,
+        "driversChampionships": 9,
+        "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One"
       }
     },
     {
       "raceId": "catalunya_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 MSC Cruises Gran Premio de Barcelona-Catalunya 2026",
-      "round": 7,
-      "laps": 66,
       "schedule": {
         "race": {
           "date": "2026-06-14",
@@ -320,7 +492,23 @@
         "fp3": {
           "date": "2026-06-13",
           "time": "10:30:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 66,
+      "round": 7,
+      "url": "https://en.wikipedia.org/wiki/2026_Spanish_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:20.122",
+        "fast_lap_driver_id": "hamilton",
+        "fast_lap_team_id": "ferrari"
       },
       "circuit": {
         "circuitId": "montmelo",
@@ -334,20 +522,32 @@
         "fastestLapDriverId": "max_verstappen",
         "fastestLapTeamId": "red_bull",
         "fastestLapYear": 2023,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackcatalunyadetailed.webp",
-        "gpName": "MSC Cruises Barcelona-Catalunya GP"
+        "url": "https://en.wikipedia.org/wiki/Circuit_de_Barcelona-Catalunya"
       },
       "winner": {
-        "drivernumber": 44,
-        "fullName": "Lewis Hamilton",
-        "teamWinner": "Scuderia Ferrari"
+        "driverId": "hamilton",
+        "name": "Lewis",
+        "surname": "Hamilton",
+        "country": "Great Britain",
+        "birthday": "07/01/1985",
+        "number": 44,
+        "shortName": "HAM",
+        "url": "https://en.wikipedia.org/wiki/Lewis_Hamilton"
+      },
+      "teamWinner": {
+        "teamId": "ferrari",
+        "teamName": "Scuderia Ferrari",
+        "country": "Italy",
+        "firstAppearance": 1950,
+        "constructorsChampionships": 16,
+        "driversChampionships": 15,
+        "url": "https://en.wikipedia.org/wiki/Scuderia_Ferrari"
       }
     },
     {
       "raceId": "austrian_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Lenovo Austrian Grand Prix 2026",
-      "round": 8,
-      "laps": 71,
       "schedule": {
         "race": {
           "date": "2026-06-28",
@@ -368,7 +568,23 @@
         "fp3": {
           "date": "2026-06-27",
           "time": "10:30:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 71,
+      "round": 8,
+      "url": "https://en.wikipedia.org/wiki/2026_Austrian_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:10.374",
+        "fast_lap_driver_id": "antonelli",
+        "fast_lap_team_id": "mercedes"
       },
       "circuit": {
         "circuitId": "red_bull_ring",
@@ -382,20 +598,32 @@
         "fastestLapDriverId": "sainz",
         "fastestLapTeamId": "mclaren",
         "fastestLapYear": 2020,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackspielbergdetailed.webp",
-        "gpName": "Lenovo Austrian GP"
+        "url": "https://en.wikipedia.org/wiki/Red_Bull_Ring"
       },
       "winner": {
-        "drivernumber": 63,
-        "fullName": "George Russell",
-        "teamWinner": "Mercedes Formula 1 Team"
+        "driverId": "russell",
+        "name": "George",
+        "surname": "Russell",
+        "country": "Great Britain",
+        "birthday": "15/02/1998",
+        "number": 63,
+        "shortName": "RUS",
+        "url": "https://en.wikipedia.org/wiki/George_Russell_(racing_driver)"
+      },
+      "teamWinner": {
+        "teamId": "mercedes",
+        "teamName": "Mercedes Formula 1 Team",
+        "country": "Germany",
+        "firstAppearance": 1954,
+        "constructorsChampionships": 8,
+        "driversChampionships": 9,
+        "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One"
       }
     },
     {
       "raceId": "british_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Pirelli British Grand Prix 2026",
-      "round": 9,
-      "laps": 52,
       "schedule": {
         "race": {
           "date": "2026-07-05",
@@ -409,6 +637,14 @@
           "date": "2026-07-03",
           "time": "11:30:00Z"
         },
+        "fp2": {
+          "date": null,
+          "time": null
+        },
+        "fp3": {
+          "date": null,
+          "time": null
+        },
         "sprintQualy": {
           "date": "2026-07-03",
           "time": "15:30:00Z"
@@ -417,6 +653,14 @@
           "date": "2026-07-04",
           "time": "10:30:00Z"
         }
+      },
+      "laps": 52,
+      "round": 9,
+      "url": "https://en.wikipedia.org/wiki/2026_British_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:31.777",
+        "fast_lap_driver_id": "antonelli",
+        "fast_lap_team_id": "mercedes"
       },
       "circuit": {
         "circuitId": "silverstone",
@@ -430,20 +674,32 @@
         "fastestLapDriverId": "max_verstappen",
         "fastestLapTeamId": "red_bull",
         "fastestLapYear": 2020,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026tracksilverstonedetailed.webp",
-        "gpName": "Pirelli British GP"
+        "url": "https://en.wikipedia.org/wiki/Silverstone_Circuit"
       },
       "winner": {
-        "drivernumber": 16,
-        "fullName": "Charles Leclerc",
-        "teamWinner": "Scuderia Ferrari"
+        "driverId": "leclerc",
+        "name": "Charles",
+        "surname": "Leclerc",
+        "country": "Monaco",
+        "birthday": "16/10/1997",
+        "number": 16,
+        "shortName": "LEC",
+        "url": "https://en.wikipedia.org/wiki/Charles_Leclerc"
+      },
+      "teamWinner": {
+        "teamId": "ferrari",
+        "teamName": "Scuderia Ferrari",
+        "country": "Italy",
+        "firstAppearance": 1950,
+        "constructorsChampionships": 16,
+        "driversChampionships": 15,
+        "url": "https://en.wikipedia.org/wiki/Scuderia_Ferrari"
       }
     },
     {
       "raceId": "belgian_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Belgian Grand Prix 2026",
-      "round": 10,
-      "laps": 44,
       "schedule": {
         "race": {
           "date": "2026-07-19",
@@ -464,7 +720,23 @@
         "fp3": {
           "date": "2026-07-18",
           "time": "10:00:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 44,
+      "round": 10,
+      "url": "https://en.wikipedia.org/wiki/2026_Belgian_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:48.890",
+        "fast_lap_driver_id": "norris",
+        "fast_lap_team_id": "mclaren"
       },
       "circuit": {
         "circuitId": "spa",
@@ -478,20 +750,32 @@
         "fastestLapDriverId": "bottas",
         "fastestLapTeamId": "mercedes",
         "fastestLapYear": 2018,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackspafrancorchampsdetailed.webp",
-        "gpName": "Moët & Chandon Belgian GP"
+        "url": "https://en.wikipedia.org/wiki/Circuit_de_Spa-Francorchamps"
       },
       "winner": {
-        "drivernumber": 12,
-        "fullName": "Andrea Kimi Antonelli",
-        "teamWinner": "Mercedes Formula 1 Team"
+        "driverId": "antonelli",
+        "name": "Andrea",
+        "surname": "Kimi Antonelli",
+        "country": "Italy",
+        "birthday": "2006-08-25",
+        "number": 12,
+        "shortName": "ANT",
+        "url": "https://en.wikipedia.org/wiki/Andrea_Kimi_Antonelli"
+      },
+      "teamWinner": {
+        "teamId": "mercedes",
+        "teamName": "Mercedes Formula 1 Team",
+        "country": "Germany",
+        "firstAppearance": 1954,
+        "constructorsChampionships": 8,
+        "driversChampionships": 9,
+        "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One"
       }
     },
     {
       "raceId": "hungarian_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 AWS Hungarian Grand Prix 2026",
-      "round": 11,
-      "laps": 70,
       "schedule": {
         "race": {
           "date": "2026-07-26",
@@ -512,7 +796,23 @@
         "fp3": {
           "date": "2026-07-25",
           "time": "10:30:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 70,
+      "round": 11,
+      "url": "https://en.wikipedia.org/wiki/2026_Hungarian_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:22.000",
+        "fast_lap_driver_id": "leclerc",
+        "fast_lap_team_id": "ferrari"
       },
       "circuit": {
         "circuitId": "hungaroring",
@@ -526,20 +826,32 @@
         "fastestLapDriverId": "hamilton",
         "fastestLapTeamId": "mercedes",
         "fastestLapYear": 2020,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackhungaroringdetailed.webp",
-        "gpName": "AWS Hungarian GP"
+        "url": "https://en.wikipedia.org/wiki/Hungaroring"
       },
       "winner": {
-        "drivernumber": 4,
-        "fullName": "Lando Norris",
-        "teamWinner": "McLaren Formula 1 Team"
+        "driverId": "norris",
+        "name": "Lando",
+        "surname": "Norris",
+        "country": "Great Britain",
+        "birthday": "13/11/1999",
+        "number": 4,
+        "shortName": "NOR",
+        "url": "https://en.wikipedia.org/wiki/Lando_Norris"
+      },
+      "teamWinner": {
+        "teamId": "mclaren",
+        "teamName": "McLaren Formula 1 Team",
+        "country": "Great Britain",
+        "firstAppearance": 1966,
+        "constructorsChampionships": 10,
+        "driversChampionships": 13,
+        "url": "https://en.wikipedia.org/wiki/McLaren"
       }
     },
     {
       "raceId": "dutch_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Heineken Dutch Grand Prix 2026",
-      "round": 12,
-      "laps": 72,
       "schedule": {
         "race": {
           "date": "2026-08-23",
@@ -553,6 +865,14 @@
           "date": "2026-08-21",
           "time": "10:30:00Z"
         },
+        "fp2": {
+          "date": null,
+          "time": null
+        },
+        "fp3": {
+          "date": null,
+          "time": null
+        },
         "sprintQualy": {
           "date": "2026-08-21",
           "time": "13:30:00Z"
@@ -561,6 +881,14 @@
           "date": "2026-08-22",
           "time": "09:00:00Z"
         }
+      },
+      "laps": 72,
+      "round": 12,
+      "url": "https://en.wikipedia.org/wiki/2026_Dutch_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:14.230",
+        "fast_lap_driver_id": "leclerc",
+        "fast_lap_team_id": "ferrari"
       },
       "circuit": {
         "circuitId": "zandvoort",
@@ -574,20 +902,32 @@
         "fastestLapDriverId": "hamilton",
         "fastestLapTeamId": "mercedes",
         "fastestLapYear": 2021,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackzandvoortdetailed.webp",
-        "gpName": "Heineken Dutch GP"
+        "url": "https://en.wikipedia.org/wiki/Circuit_Zandvoort"
       },
       "winner": {
-        "drivernumber": 4,
-        "fullName": "Lando Norris",
-        "teamWinner": "McLaren Formula 1 Team"
+        "driverId": "norris",
+        "name": "Lando",
+        "surname": "Norris",
+        "country": "Great Britain",
+        "birthday": "13/11/1999",
+        "number": 4,
+        "shortName": "NOR",
+        "url": "https://en.wikipedia.org/wiki/Lando_Norris"
+      },
+      "teamWinner": {
+        "teamId": "mclaren",
+        "teamName": "McLaren Formula 1 Team",
+        "country": "Great Britain",
+        "firstAppearance": 1966,
+        "constructorsChampionships": 10,
+        "driversChampionships": 13,
+        "url": "https://en.wikipedia.org/wiki/McLaren"
       }
     },
     {
       "raceId": "italian_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Pirelli Gran D'Italia 2026",
-      "round": 13,
-      "laps": 53,
       "schedule": {
         "race": {
           "date": "2026-09-06",
@@ -608,7 +948,23 @@
         "fp3": {
           "date": "2026-09-05",
           "time": "10:30:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 53,
+      "round": 13,
+      "url": "https://en.wikipedia.org/wiki/2026_Italian_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:23.504",
+        "fast_lap_driver_id": "antonelli",
+        "fast_lap_team_id": "mercedes"
       },
       "circuit": {
         "circuitId": "monza",
@@ -622,20 +978,32 @@
         "fastestLapDriverId": "barrichelo",
         "fastestLapTeamId": "ferrari",
         "fastestLapYear": 2004,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackmonzadetailed.webp",
-        "gpName": "Pirelli Italian GP"
+        "url": "https://en.wikipedia.org/wiki/Monza_Circuit"
       },
       "winner": {
-        "drivernumber": 12,
-        "fullName": "Andrea Kimi Antonelli",
-        "teamWinner": "Mercedes Formula 1 Team"
+        "driverId": "antonelli",
+        "name": "Andrea",
+        "surname": "Kimi Antonelli",
+        "country": "Italy",
+        "birthday": "2006-08-25",
+        "number": 12,
+        "shortName": "ANT",
+        "url": "https://en.wikipedia.org/wiki/Andrea_Kimi_Antonelli"
+      },
+      "teamWinner": {
+        "teamId": "mercedes",
+        "teamName": "Mercedes Formula 1 Team",
+        "country": "Germany",
+        "firstAppearance": 1954,
+        "constructorsChampionships": 8,
+        "driversChampionships": 9,
+        "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One"
       }
     },
     {
       "raceId": "spanish_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Tag Heuer Gran Premio de España 2026",
-      "round": 14,
-      "laps": null,
       "schedule": {
         "race": {
           "date": "2026-09-13",
@@ -656,7 +1024,23 @@
         "fp3": {
           "date": "2026-09-12",
           "time": "10:30:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": null,
+      "round": 14,
+      "url": "https://en.wikipedia.org/wiki/2026_Spanish_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:35.587",
+        "fast_lap_driver_id": "russell",
+        "fast_lap_team_id": "mercedes"
       },
       "circuit": {
         "circuitId": "madring",
@@ -670,20 +1054,32 @@
         "fastestLapDriverId": null,
         "fastestLapTeamId": null,
         "fastestLapYear": null,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackmadringdetailed.webp",
-        "gpName": "Tag Heuer Spanish GP"
+        "url": "https://en.wikipedia.org/wiki/Madring"
       },
       "winner": {
-        "drivernumber": 12,
-        "fullName": "Andrea Kimi Antonelli",
-        "teamWinner": "Mercedes Formula 1 Team"
+        "driverId": "antonelli",
+        "name": "Andrea",
+        "surname": "Kimi Antonelli",
+        "country": "Italy",
+        "birthday": "2006-08-25",
+        "number": 12,
+        "shortName": "ANT",
+        "url": "https://en.wikipedia.org/wiki/Andrea_Kimi_Antonelli"
+      },
+      "teamWinner": {
+        "teamId": "mercedes",
+        "teamName": "Mercedes Formula 1 Team",
+        "country": "Germany",
+        "firstAppearance": 1954,
+        "constructorsChampionships": 8,
+        "driversChampionships": 9,
+        "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One"
       }
     },
     {
       "raceId": "azerbaijan_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Qatar Airways Azerbaijan Grand Prix 2026",
-      "round": 15,
-      "laps": 51,
       "schedule": {
         "race": {
           "date": "2026-09-26",
@@ -704,7 +1100,23 @@
         "fp3": {
           "date": "2026-09-25",
           "time": "08:30:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 51,
+      "round": 15,
+      "url": "https://en.wikipedia.org/wiki/2026_Azerbaijan_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:44.916",
+        "fast_lap_driver_id": "russell",
+        "fast_lap_team_id": "mercedes"
       },
       "circuit": {
         "circuitId": "baku",
@@ -718,68 +1130,108 @@
         "fastestLapDriverId": "leclerc",
         "fastestLapTeamId": "ferrari",
         "fastestLapYear": 2019,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackbakudetailed.webp",
-        "gpName": "Qatar Airways Azerbaijan GP"
+        "url": "https://en.wikipedia.org/wiki/Baku_City_Circuit"
       },
       "winner": {
-        "drivernumber": 63,
-        "fullName": "George Russell",
-        "teamWinner": "Mercedes Formula 1 Team"
+        "driverId": "russell",
+        "name": "George",
+        "surname": "Russell",
+        "country": "Great Britain",
+        "birthday": "15/02/1998",
+        "number": 63,
+        "shortName": "RUS",
+        "url": "https://en.wikipedia.org/wiki/George_Russell_(racing_driver)"
+      },
+      "teamWinner": {
+        "teamId": "mercedes",
+        "teamName": "Mercedes Formula 1 Team",
+        "country": "Germany",
+        "firstAppearance": 1954,
+        "constructorsChampionships": 8,
+        "driversChampionships": 9,
+        "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One"
       }
     },
     {
       "raceId": "bahrain_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Gulf Air Bahrain Grand Prix in Malaysia 2026",
-      "round": 16,
-      "laps": 56,
       "schedule": {
         "race": {
           "date": "2026-10-04",
-          "time": "07:00:00Z"
+          "time": null
         },
         "qualy": {
           "date": "2026-10-03",
-          "time": "08:00:00Z"
+          "time": null
         },
         "fp1": {
           "date": "2026-10-02",
-          "time": "04:30:00Z"
+          "time": null
         },
         "fp2": {
           "date": "2026-10-02",
-          "time": "08:00:00Z"
+          "time": null
         },
         "fp3": {
           "date": "2026-10-03",
-          "time": "04:30:00Z"
+          "time": null
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 56,
+      "round": 16,
+      "url": null,
+      "fast_lap": {
+        "fast_lap": "1:38.220",
+        "fast_lap_driver_id": "max_verstappen",
+        "fast_lap_team_id": "red_bull"
       },
       "circuit": {
         "circuitId": "sepang",
         "circuitName": "Sepang International Circuit",
         "country": "Malaysia",
         "city": "Kuala Lumpur",
-        "circuitLength": "5.543km",
-        "lapRecord": "1:34.080",
-        "firstParticipationYear": 1999,
+        "circuitLength": "nullkm",
+        "lapRecord": null,
+        "firstParticipationYear": null,
         "corners": null,
         "fastestLapDriverId": null,
         "fastestLapTeamId": null,
         "fastestLapYear": null,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackkualalumpurdetailed.webp",
-        "gpName": "Gulf Air Bahrain GP In Malaysia"
+        "url": "http://en.wikipedia.org/wiki/Sepang_International_Circuit"
       },
       "winner": {
-        "drivernumber": 3,
-        "fullName": "Max Verstappen",
-        "teamWinner": "Red Bull Racing"
+        "driverId": "max_verstappen",
+        "name": "Max",
+        "surname": "Verstappen",
+        "country": "Netherlands",
+        "birthday": "1997-09-30",
+        "number": 33,
+        "shortName": "VER",
+        "url": "https://en.wikipedia.org/wiki/Max_Verstappen"
+      },
+      "teamWinner": {
+        "teamId": "red_bull",
+        "teamName": "Red Bull Racing",
+        "country": "Austria",
+        "firstAppearance": 2005,
+        "constructorsChampionships": 6,
+        "driversChampionships": 8,
+        "url": "https://en.wikipedia.org/wiki/Red_Bull_Racing"
       }
     },
     {
       "raceId": "singapore_2026",
-      "raceName": "Formula 1 Singapore Airlines Singapore Grand Prix 2026",
-      "round": 17,
-      "laps": 62,
+      "championshipId": "f1_2026",
+      "raceName": "Formula 1 Singapore Airlanes Singapore Grand Prix 2026",
       "schedule": {
         "race": {
           "date": "2026-10-11",
@@ -791,7 +1243,15 @@
         },
         "fp1": {
           "date": "2026-10-09",
-          "time": "08:30:00Z"
+          "time": "09:30:00Z"
+        },
+        "fp2": {
+          "date": null,
+          "time": null
+        },
+        "fp3": {
+          "date": null,
+          "time": null
         },
         "sprintQualy": {
           "date": "2026-10-09",
@@ -799,31 +1259,55 @@
         },
         "sprintRace": {
           "date": "2026-10-10",
-          "time": "09:00:00Z"
+          "time": "09:30:00Z"
         }
+      },
+      "laps": 62,
+      "round": 17,
+      "url": "https://en.wikipedia.org/wiki/2026_Singapore_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": "1:35.202",
+        "fast_lap_driver_id": "leclerc",
+        "fast_lap_team_id": "ferrari"
       },
       "circuit": {
         "circuitId": "marina_bay",
         "circuitName": "Marina Bay Street Circuit",
         "country": "Singapore",
         "city": "Singapore",
-        "circuitLength": "4.927km",
-        "lapRecord": "1:33.808",
+        "circuitLength": "4940km",
+        "lapRecord": "1:35:867",
         "firstParticipationYear": 2008,
         "corners": 19,
         "fastestLapDriverId": "hamilton",
-        "fastestLapTeamId": "ferrari",
-        "fastestLapYear": 2025,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026tracksingaporedetailed.webp",
-        "gpName": "Singapore Airlines Singapore GP"
+        "fastestLapTeamId": "mercedes",
+        "fastestLapYear": 2023,
+        "url": "https://en.wikipedia.org/wiki/Marina_Bay_Street_Circuit"
       },
-      "winner": null
+      "winner": {
+        "driverId": "max_verstappen",
+        "name": "Max",
+        "surname": "Verstappen",
+        "country": "Netherlands",
+        "birthday": "1997-09-30",
+        "number": 33,
+        "shortName": "VER",
+        "url": "https://en.wikipedia.org/wiki/Max_Verstappen"
+      },
+      "teamWinner": {
+        "teamId": "red_bull",
+        "teamName": "Red Bull Racing",
+        "country": "Austria",
+        "firstAppearance": 2005,
+        "constructorsChampionships": 6,
+        "driversChampionships": 8,
+        "url": "https://en.wikipedia.org/wiki/Red_Bull_Racing"
+      }
     },
     {
       "raceId": "united_states_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 MSC Cruises United States Grand Prix 2026",
-      "round": 18,
-      "laps": 56,
       "schedule": {
         "race": {
           "date": "2026-10-25",
@@ -844,7 +1328,23 @@
         "fp3": {
           "date": "2026-10-24",
           "time": "17:00:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 56,
+      "round": 18,
+      "url": "https://en.wikipedia.org/wiki/2026_United_States_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": null,
+        "fast_lap_driver_id": null,
+        "fast_lap_team_id": null
       },
       "circuit": {
         "circuitId": "austin",
@@ -858,16 +1358,15 @@
         "fastestLapDriverId": "leclerc",
         "fastestLapTeamId": "ferrari",
         "fastestLapYear": 2019,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackaustindetailed.webp",
-        "gpName": "MSC Cruises United States GP"
+        "url": "https://en.wikipedia.org/wiki/Circuit_of_the_Americas"
       },
-      "winner": null
+      "winner": null,
+      "teamWinner": null
     },
     {
       "raceId": "mexican_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Gran Premio de La Ciudad de México 2026",
-      "round": 19,
-      "laps": 71,
       "schedule": {
         "race": {
           "date": "2026-11-01",
@@ -888,7 +1387,23 @@
         "fp3": {
           "date": "2026-10-31",
           "time": "17:30:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 71,
+      "round": 19,
+      "url": "https://en.wikipedia.org/wiki/2026_Mexican_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": null,
+        "fast_lap_driver_id": null,
+        "fast_lap_team_id": null
       },
       "circuit": {
         "circuitId": "hermanos_rodriguez",
@@ -902,16 +1417,15 @@
         "fastestLapDriverId": "bottas",
         "fastestLapTeamId": "mercedes",
         "fastestLapYear": 2021,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackmexicocitydetailed.webp",
-        "gpName": "Mexico City GP"
+        "url": "https://en.wikipedia.org/wiki/Aut%C3%B3dromo_Hermanos_Rodr%C3%ADguez"
       },
-      "winner": null
+      "winner": null,
+      "teamWinner": null
     },
     {
       "raceId": "brazilian_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 MSC Cruises Grande Premio de Sao Paulo 2026",
-      "round": 20,
-      "laps": 71,
       "schedule": {
         "race": {
           "date": "2026-11-08",
@@ -932,7 +1446,23 @@
         "fp3": {
           "date": "2026-11-07",
           "time": "14:00:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 71,
+      "round": 20,
+      "url": "https://en.wikipedia.org/wiki/2026_Brazilian_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": null,
+        "fast_lap_driver_id": null,
+        "fast_lap_team_id": null
       },
       "circuit": {
         "circuitId": "interlagos",
@@ -946,16 +1476,15 @@
         "fastestLapDriverId": "bottas",
         "fastestLapTeamId": "mercedes",
         "fastestLapYear": 2018,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackinterlagosdetailed.webp",
-        "gpName": "MSC Cruises São Paulo GP"
+        "url": "https://en.wikipedia.org/wiki/Interlagos_Circuit"
       },
-      "winner": null
+      "winner": null,
+      "teamWinner": null
     },
     {
       "raceId": "las_vegas_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Heineken Las Vegas Grand Prix 2026",
-      "round": 21,
-      "laps": 50,
       "schedule": {
         "race": {
           "date": "2026-11-22",
@@ -976,7 +1505,23 @@
         "fp3": {
           "date": "2026-11-21",
           "time": "00:30:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 50,
+      "round": 21,
+      "url": "https://en.wikipedia.org/wiki/2026_Las_Vegas_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": null,
+        "fast_lap_driver_id": null,
+        "fast_lap_team_id": null
       },
       "circuit": {
         "circuitId": "vegas",
@@ -990,16 +1535,15 @@
         "fastestLapDriverId": "piastri",
         "fastestLapTeamId": "mclaren",
         "fastestLapYear": 2023,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026tracklasvegasdetailed.webp",
-        "gpName": "Heineken Las Vegas GP"
+        "url": "https://en.wikipedia.org/wiki/Las_Vegas_Strip_Circuit"
       },
-      "winner": null
+      "winner": null,
+      "teamWinner": null
     },
     {
       "raceId": "qatar_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Qatar Airways Qatar Grand Prix 2026",
-      "round": 22,
-      "laps": 57,
       "schedule": {
         "race": {
           "date": "2026-11-29",
@@ -1020,7 +1564,23 @@
         "fp3": {
           "date": "2026-11-28",
           "time": "14:00:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 57,
+      "round": 22,
+      "url": "https://en.wikipedia.org/wiki/2026_Qatar_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": null,
+        "fast_lap_driver_id": null,
+        "fast_lap_team_id": null
       },
       "circuit": {
         "circuitId": "lusail",
@@ -1034,16 +1594,15 @@
         "fastestLapDriverId": "max_verstappen",
         "fastestLapTeamId": "red_bull",
         "fastestLapYear": 2023,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026tracklusaildetailed.webp",
-        "gpName": "Qatar Airways Qatar GP"
+        "url": "https://en.wikipedia.org/wiki/Lusail_International_Circuit"
       },
-      "winner": null
+      "winner": null,
+      "teamWinner": null
     },
     {
       "raceId": "abu_dhabi_2026",
+      "championshipId": "f1_2026",
       "raceName": "Formula 1 Etihad Airways Abu Dhabi Grand Prix 2026",
-      "round": 23,
-      "laps": 58,
       "schedule": {
         "race": {
           "date": "2026-12-06",
@@ -1064,7 +1623,23 @@
         "fp3": {
           "date": "2026-12-05",
           "time": "10:30:00Z"
+        },
+        "sprintQualy": {
+          "date": null,
+          "time": null
+        },
+        "sprintRace": {
+          "date": null,
+          "time": null
         }
+      },
+      "laps": 58,
+      "round": 23,
+      "url": "https://en.wikipedia.org/wiki/2026_Abu_Dhabi_Grand_Prix",
+      "fast_lap": {
+        "fast_lap": null,
+        "fast_lap_driver_id": null,
+        "fast_lap_team_id": null
       },
       "circuit": {
         "circuitId": "yas_marina",
@@ -1078,10 +1653,10 @@
         "fastestLapDriverId": "max_verstappen",
         "fastestLapTeamId": "red_bull",
         "fastestLapYear": 2021,
-        "trackImage": "https://media.formula1.com/image/upload/c_fit,h_704/q_auto/v1740000001/common/f1/2026/track/2026trackyasmarinacircuitdetailed.webp",
-        "gpName": "Etihad Airways Abu Dhabi GP"
+        "url": "https://en.wikipedia.org/wiki/Yas_Marina_Circuit"
       },
-      "winner": null
+      "winner": null,
+      "teamWinner": null
     }
   ]
 }

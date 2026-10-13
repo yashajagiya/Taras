@@ -351,6 +351,8 @@ TarasAPIstatic/
 │   ├── F1_DATA_SOURCES.md       ← External data sources catalog
 │   ├── PROJECT.md               ← Ecosystem background & product role
 │   └── mobile_app_specs/        ← Android TARAS app UI specifications
+├── run_v1.py                    ← Master Async Anti-Ban Runner for V1
+├── run_v2.py                    ← Master Async Anti-Ban Runner for V2
 ├── update_v2.py                 ← Root CLI shortcut delegating to v2/update.py
 ├── extract_rounds.py            ← Root CLI shortcut delegating to v2/extract_rounds.py
 └── README.md                    ← You are here!
@@ -364,13 +366,48 @@ TarasAPIstatic/
 - Python 3.9+
 - `pip install requests beautifulsoup4`
 
-### 2. Regenerate the V2 API
+### 2. Single-File Asynchronous Anti-Ban Runners (`run_v1.py` & `run_v2.py`)
+Both **V1** and **V2** include single-file asynchronous runners engineered with industrial anti-ban defenses to ensure continuous scraping does not get blocked or IP banned:
+
+- **🛡️ Anti-Ban Architecture:**
+  - **Rotating Browser Fingerprints:** Modern Chrome 125/126, Edge 125, macOS Safari, and Firefox 126 profiles with full `sec-ch-ua` and `Sec-Fetch-*` headers.
+  - **Per-Domain Rate Limits:** Independent `asyncio.Lock` per domain (`formula1.com`, `espn.com`, `f1api.dev`) so parallel scraping never hammers a single host.
+  - **Polite Jittered Delays:** Randomized human pauses (`1.8s - 3.8s` standard, `3.5s - 6.5s` in `--stealth`).
+  - **Smart Cache Bypass:** Historical and finalized sessions skip network calls completely via cache-hit guards (`⚡ Cache Hit`).
+  - **Automatic Backoff & Circuit Breaker:** Exponential backoff on HTTP 429/403, and automatic 5–10 minute safety cooldown on consecutive blocks.
+
+#### V2 Modern REST API Runner:
 ```bash
-python v2/build.py
-# or from root:
-python update_v2.py --skip-scrape
+# Run safely once (auto-detects active weekend & builds endpoints)
+python run_v2.py
+
+# Continuous scraping loop with polite jitter (every 5 minutes)
+python run_v2.py --loop --interval 300
+
+# Stealth mode (maximum safety delays 3.5s - 6.5s)
+python run_v2.py --stealth
+
+# Scrape specific round and push to GitHub if verified
+python run_v2.py --round 17 --push
+
+# Build endpoints without network requests
+python run_v2.py --skip-scrape
 ```
-This runs all collectors, merges encyclopedias, consolidates sessions, and writes standardized endpoints directly into `v2/`.
+
+#### V1 Legacy API Runner:
+```bash
+# Run all V1 pipelines once (standings, calendar, active sessions)
+python run_v1.py
+
+# Continuous scraping loop with polite jitter
+python run_v1.py --loop --interval 300
+
+# Stealth mode (maximum safety delays)
+python run_v1.py --stealth
+
+# Only update standings without touching sessions
+python run_v1.py --skip-sessions
+```
 
 ### 3. Verify Data Integrity
 ```bash

@@ -4,15 +4,15 @@
   "entries": [
     {
       "rank": 1,
-      "driver_number": 12,
+      "driver_number": null,
       "name": "Kimi Antonelli",
       "shortName": "K. Antonelli",
       "abbreviation": "ANT",
-      "team_name": "Mercedes",
+      "team_name": "",
       "nationality": "Italy",
       "championshipPts": {
-        "value": 320,
-        "displayValue": "320"
+        "value": 340,
+        "displayValue": "340"
       },
       "races": [
         {
@@ -144,9 +144,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
+          "played": true,
+          "value": 20,
+          "displayValue": "20"
         },
         {
           "name": "USA",
@@ -194,15 +194,15 @@
     },
     {
       "rank": 2,
-      "driver_number": 63,
+      "driver_number": null,
       "name": "George Russell",
       "shortName": "G. Russell",
       "abbreviation": "RUS",
-      "team_name": "Mercedes",
+      "team_name": "",
       "nationality": "Britain",
       "championshipPts": {
-        "value": 236,
-        "displayValue": "236"
+        "value": 238,
+        "displayValue": "238"
       },
       "races": [
         {
@@ -334,9 +334,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
+          "played": true,
+          "value": 2,
+          "displayValue": "2"
         },
         {
           "name": "USA",
@@ -384,15 +384,15 @@
     },
     {
       "rank": 3,
-      "driver_number": 44,
+      "driver_number": null,
       "name": "Lewis Hamilton",
       "shortName": "L. Hamilton",
       "abbreviation": "HAM",
-      "team_name": "Ferrari",
+      "team_name": "",
       "nationality": "Britain",
       "championshipPts": {
-        "value": 214,
-        "displayValue": "214"
+        "value": 229,
+        "displayValue": "229"
       },
       "races": [
         {
@@ -524,9 +524,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
+          "played": true,
+          "value": 15,
+          "displayValue": "15"
         },
         {
           "name": "USA",
@@ -574,15 +574,205 @@
     },
     {
       "rank": 4,
-      "driver_number": 16,
+      "driver_number": null,
+      "name": "Max Verstappen",
+      "shortName": "M. Verstappen",
+      "abbreviation": "VER",
+      "team_name": "",
+      "nationality": "Netherlands",
+      "championshipPts": {
+        "value": 221,
+        "displayValue": "221"
+      },
+      "races": [
+        {
+          "name": "AUS",
+          "displayName": "Qatar Airways Australian Grand Prix",
+          "played": true,
+          "value": 8,
+          "displayValue": "8"
+        },
+        {
+          "name": "CHN",
+          "displayName": "Heineken Chinese Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "JPN",
+          "displayName": "Aramco Japanese Grand Prix",
+          "played": true,
+          "value": 4,
+          "displayValue": "4"
+        },
+        {
+          "name": "BRN",
+          "displayName": "Gulf Air Bahrain Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "SAU",
+          "displayName": "STC Saudi Arabian Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "MIA",
+          "displayName": "Crypto.com Miami Grand Prix",
+          "played": true,
+          "value": 14,
+          "displayValue": "14"
+        },
+        {
+          "name": "CAN",
+          "displayName": "Lenovo Canadian Grand Prix",
+          "played": true,
+          "value": 17,
+          "displayValue": "17"
+        },
+        {
+          "name": "MCO",
+          "displayName": "Monaco Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "BAR",
+          "displayName": "MSC Cruises Barcelona-Catalunya Grand Prix",
+          "played": true,
+          "value": 12,
+          "displayValue": "12"
+        },
+        {
+          "name": "AUT",
+          "displayName": "Lenovo Austrian Grand Prix",
+          "played": true,
+          "value": 18,
+          "displayValue": "18"
+        },
+        {
+          "name": "GBR",
+          "displayName": "Pirelli British Grand Prix",
+          "played": true,
+          "value": 3,
+          "displayValue": "3"
+        },
+        {
+          "name": "BEL",
+          "displayName": "Moët & Chandon Belgian Grand Prix",
+          "played": true,
+          "value": 15,
+          "displayValue": "15"
+        },
+        {
+          "name": "HUN",
+          "displayName": "AWS Hungarian Grand Prix",
+          "played": true,
+          "value": 18,
+          "displayValue": "18"
+        },
+        {
+          "name": "NLD",
+          "displayName": "Heineken Dutch Grand Prix",
+          "played": true,
+          "value": 3,
+          "displayValue": "3"
+        },
+        {
+          "name": "ITA",
+          "displayName": "Pirelli Italian Grand Prix",
+          "played": true,
+          "value": 15,
+          "displayValue": "15"
+        },
+        {
+          "name": "ESP",
+          "displayName": "Tag Heuer Spanish Grand Prix",
+          "played": true,
+          "value": 18,
+          "displayValue": "18"
+        },
+        {
+          "name": "AZE",
+          "displayName": "Qatar Airways Azerbaijan Grand Prix",
+          "played": true,
+          "value": 18,
+          "displayValue": "18"
+        },
+        {
+          "name": "MYS",
+          "displayName": "Gulf Air Bahrain Grand Prix in Malaysia",
+          "played": true,
+          "value": 25,
+          "displayValue": "25"
+        },
+        {
+          "name": "SGP",
+          "displayName": "Singapore Airlines Singapore Grand Prix",
+          "played": true,
+          "value": 33,
+          "displayValue": "33"
+        },
+        {
+          "name": "USA",
+          "displayName": "MSC Cruises United States Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "MEX",
+          "displayName": "Mexico City Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "BRA",
+          "displayName": "MSC Cruises São Paulo Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "LAS",
+          "displayName": "Heineken Las Vegas Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "QAT",
+          "displayName": "Qatar Airways Qatar Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "UAE",
+          "displayName": "Etihad Airways Abu Dhabi Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        }
+      ]
+    },
+    {
+      "rank": 5,
+      "driver_number": null,
       "name": "Charles Leclerc",
       "shortName": "C. Leclerc",
       "abbreviation": "LEC",
-      "team_name": "Ferrari",
+      "team_name": "",
       "nationality": "Monaco",
       "championshipPts": {
-        "value": 191,
-        "displayValue": "191"
+        "value": 215,
+        "displayValue": "215"
       },
       "races": [
         {
@@ -714,9 +904,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
+          "played": true,
+          "value": 24,
+          "displayValue": "24"
         },
         {
           "name": "USA",
@@ -763,16 +953,16 @@
       ]
     },
     {
-      "rank": 5,
-      "driver_number": 1,
+      "rank": 6,
+      "driver_number": null,
       "name": "Lando Norris",
       "shortName": "L. Norris",
       "abbreviation": "NOR",
-      "team_name": "McLaren",
+      "team_name": "",
       "nationality": "Britain",
       "championshipPts": {
-        "value": 188,
-        "displayValue": "188"
+        "value": 201,
+        "displayValue": "201"
       },
       "races": [
         {
@@ -904,199 +1094,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "USA",
-          "displayName": "MSC Cruises United States Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "MEX",
-          "displayName": "Mexico City Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "BRA",
-          "displayName": "MSC Cruises São Paulo Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "LAS",
-          "displayName": "Heineken Las Vegas Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "QAT",
-          "displayName": "Qatar Airways Qatar Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "UAE",
-          "displayName": "Etihad Airways Abu Dhabi Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        }
-      ]
-    },
-    {
-      "rank": 6,
-      "driver_number": 3,
-      "name": "Max Verstappen",
-      "shortName": "M. Verstappen",
-      "abbreviation": "VER",
-      "team_name": "Red Bull Racing",
-      "nationality": "Netherlands",
-      "championshipPts": {
-        "value": 188,
-        "displayValue": "188"
-      },
-      "races": [
-        {
-          "name": "AUS",
-          "displayName": "Qatar Airways Australian Grand Prix",
           "played": true,
-          "value": 8,
-          "displayValue": "8"
-        },
-        {
-          "name": "CHN",
-          "displayName": "Heineken Chinese Grand Prix",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "JPN",
-          "displayName": "Aramco Japanese Grand Prix",
-          "played": true,
-          "value": 4,
-          "displayValue": "4"
-        },
-        {
-          "name": "BRN",
-          "displayName": "Gulf Air Bahrain Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "SAU",
-          "displayName": "STC Saudi Arabian Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "MIA",
-          "displayName": "Crypto.com Miami Grand Prix",
-          "played": true,
-          "value": 14,
-          "displayValue": "14"
-        },
-        {
-          "name": "CAN",
-          "displayName": "Lenovo Canadian Grand Prix",
-          "played": true,
-          "value": 17,
-          "displayValue": "17"
-        },
-        {
-          "name": "MCO",
-          "displayName": "Monaco Grand Prix",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "BAR",
-          "displayName": "MSC Cruises Barcelona-Catalunya Grand Prix",
-          "played": true,
-          "value": 12,
-          "displayValue": "12"
-        },
-        {
-          "name": "AUT",
-          "displayName": "Lenovo Austrian Grand Prix",
-          "played": true,
-          "value": 18,
-          "displayValue": "18"
-        },
-        {
-          "name": "GBR",
-          "displayName": "Pirelli British Grand Prix",
-          "played": true,
-          "value": 3,
-          "displayValue": "3"
-        },
-        {
-          "name": "BEL",
-          "displayName": "Moët & Chandon Belgian Grand Prix",
-          "played": true,
-          "value": 15,
-          "displayValue": "15"
-        },
-        {
-          "name": "HUN",
-          "displayName": "AWS Hungarian Grand Prix",
-          "played": true,
-          "value": 18,
-          "displayValue": "18"
-        },
-        {
-          "name": "NLD",
-          "displayName": "Heineken Dutch Grand Prix",
-          "played": true,
-          "value": 3,
-          "displayValue": "3"
-        },
-        {
-          "name": "ITA",
-          "displayName": "Pirelli Italian Grand Prix",
-          "played": true,
-          "value": 15,
-          "displayValue": "15"
-        },
-        {
-          "name": "ESP",
-          "displayName": "Tag Heuer Spanish Grand Prix",
-          "played": true,
-          "value": 18,
-          "displayValue": "18"
-        },
-        {
-          "name": "AZE",
-          "displayName": "Qatar Airways Azerbaijan Grand Prix",
-          "played": true,
-          "value": 18,
-          "displayValue": "18"
-        },
-        {
-          "name": "MYS",
-          "displayName": "Gulf Air Bahrain Grand Prix in Malaysia",
-          "played": true,
-          "value": 25,
-          "displayValue": "25"
-        },
-        {
-          "name": "SGP",
-          "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
+          "value": 13,
+          "displayValue": "13"
         },
         {
           "name": "USA",
@@ -1144,15 +1144,15 @@
     },
     {
       "rank": 7,
-      "driver_number": 81,
+      "driver_number": null,
       "name": "Oscar Piastri",
       "shortName": "O. Piastri",
       "abbreviation": "PIA",
-      "team_name": "McLaren",
+      "team_name": "",
       "nationality": "Australia",
       "championshipPts": {
-        "value": 128,
-        "displayValue": "128"
+        "value": 138,
+        "displayValue": "138"
       },
       "races": [
         {
@@ -1284,9 +1284,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
+          "played": true,
+          "value": 10,
+          "displayValue": "10"
         },
         {
           "name": "USA",
@@ -1334,15 +1334,15 @@
     },
     {
       "rank": 8,
-      "driver_number": 6,
+      "driver_number": null,
       "name": "Isack Hadjar",
       "shortName": "I. Hadjar",
       "abbreviation": "HAD",
-      "team_name": "Red Bull Racing",
+      "team_name": "",
       "nationality": "France",
       "championshipPts": {
-        "value": 96,
-        "displayValue": "96"
+        "value": 97,
+        "displayValue": "97"
       },
       "races": [
         {
@@ -1474,9 +1474,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
+          "played": true,
+          "value": 1,
+          "displayValue": "1"
         },
         {
           "name": "USA",
@@ -1524,15 +1524,15 @@
     },
     {
       "rank": 9,
-      "driver_number": 30,
+      "driver_number": null,
       "name": "Liam Lawson",
       "shortName": "L. Lawson",
       "abbreviation": "LAW",
-      "team_name": "Racing Bulls",
+      "team_name": "",
       "nationality": "New Zealand",
       "championshipPts": {
-        "value": 65,
-        "displayValue": "65"
+        "value": 75,
+        "displayValue": "75"
       },
       "races": [
         {
@@ -1664,9 +1664,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
+          "played": true,
+          "value": 10,
+          "displayValue": "10"
         },
         {
           "name": "USA",
@@ -1714,11 +1714,11 @@
     },
     {
       "rank": 10,
-      "driver_number": 10,
+      "driver_number": null,
       "name": "Pierre Gasly",
       "shortName": "P. Gasly",
       "abbreviation": "GAS",
-      "team_name": "Alpine",
+      "team_name": "",
       "nationality": "France",
       "championshipPts": {
         "value": 41,
@@ -1854,9 +1854,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "value": 0,
-          "displayValue": ""
+          "displayValue": "-"
         },
         {
           "name": "USA",
@@ -1904,11 +1904,11 @@
     },
     {
       "rank": 11,
-      "driver_number": 41,
+      "driver_number": null,
       "name": "Arvid Lindblad",
       "shortName": "A. Lindblad",
       "abbreviation": "LIN",
-      "team_name": "Racing Bulls",
+      "team_name": "",
       "nationality": "Britain",
       "championshipPts": {
         "value": 38,
@@ -2044,9 +2044,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "value": 0,
-          "displayValue": ""
+          "displayValue": "-"
         },
         {
           "name": "USA",
@@ -2094,11 +2094,11 @@
     },
     {
       "rank": 12,
-      "driver_number": 43,
+      "driver_number": null,
       "name": "Franco Colapinto",
       "shortName": "F. Colapinto",
       "abbreviation": "COL",
-      "team_name": "Alpine",
+      "team_name": "",
       "nationality": "Argentina",
       "championshipPts": {
         "value": 27,
@@ -2234,9 +2234,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "value": 0,
-          "displayValue": ""
+          "displayValue": "-"
         },
         {
           "name": "USA",
@@ -2284,15 +2284,15 @@
     },
     {
       "rank": 13,
-      "driver_number": 87,
+      "driver_number": null,
       "name": "Oliver Bearman",
       "shortName": "O. Bearman",
       "abbreviation": "BEA",
-      "team_name": "Haas F1 Team",
+      "team_name": "",
       "nationality": "Britain",
       "championshipPts": {
-        "value": 20,
-        "displayValue": "20"
+        "value": 23,
+        "displayValue": "23"
       },
       "races": [
         {
@@ -2424,9 +2424,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
+          "played": true,
+          "value": 3,
+          "displayValue": "3"
         },
         {
           "name": "USA",
@@ -2474,11 +2474,201 @@
     },
     {
       "rank": 14,
-      "driver_number": 5,
+      "driver_number": null,
+      "name": "Nico Hülkenberg",
+      "shortName": "N. Hülkenberg",
+      "abbreviation": "HUL",
+      "team_name": "",
+      "nationality": "Germany",
+      "championshipPts": {
+        "value": 13,
+        "displayValue": "13"
+      },
+      "races": [
+        {
+          "name": "AUS",
+          "displayName": "Qatar Airways Australian Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "CHN",
+          "displayName": "Heineken Chinese Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "JPN",
+          "displayName": "Aramco Japanese Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "BRN",
+          "displayName": "Gulf Air Bahrain Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "SAU",
+          "displayName": "STC Saudi Arabian Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "MIA",
+          "displayName": "Crypto.com Miami Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "CAN",
+          "displayName": "Lenovo Canadian Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "MCO",
+          "displayName": "Monaco Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "BAR",
+          "displayName": "MSC Cruises Barcelona-Catalunya Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "AUT",
+          "displayName": "Lenovo Austrian Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "GBR",
+          "displayName": "Pirelli British Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "BEL",
+          "displayName": "Moët & Chandon Belgian Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "HUN",
+          "displayName": "AWS Hungarian Grand Prix",
+          "played": true,
+          "value": 2,
+          "displayValue": "2"
+        },
+        {
+          "name": "NLD",
+          "displayName": "Heineken Dutch Grand Prix",
+          "played": true,
+          "value": 4,
+          "displayValue": "4"
+        },
+        {
+          "name": "ITA",
+          "displayName": "Pirelli Italian Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "ESP",
+          "displayName": "Tag Heuer Spanish Grand Prix",
+          "played": true,
+          "value": 1,
+          "displayValue": "1"
+        },
+        {
+          "name": "AZE",
+          "displayName": "Qatar Airways Azerbaijan Grand Prix",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "MYS",
+          "displayName": "Gulf Air Bahrain Grand Prix in Malaysia",
+          "played": true,
+          "value": 0,
+          "displayValue": "-"
+        },
+        {
+          "name": "SGP",
+          "displayName": "Singapore Airlines Singapore Grand Prix",
+          "played": true,
+          "value": 6,
+          "displayValue": "6"
+        },
+        {
+          "name": "USA",
+          "displayName": "MSC Cruises United States Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "MEX",
+          "displayName": "Mexico City Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "BRA",
+          "displayName": "MSC Cruises São Paulo Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "LAS",
+          "displayName": "Heineken Las Vegas Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "QAT",
+          "displayName": "Qatar Airways Qatar Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        },
+        {
+          "name": "UAE",
+          "displayName": "Etihad Airways Abu Dhabi Grand Prix",
+          "played": false,
+          "value": 0,
+          "displayValue": ""
+        }
+      ]
+    },
+    {
+      "rank": 15,
+      "driver_number": null,
       "name": "Gabriel Bortoleto",
       "shortName": "G. Bortoleto",
       "abbreviation": "BOR",
-      "team_name": "Audi",
+      "team_name": "",
       "nationality": "Brazil",
       "championshipPts": {
         "value": 10,
@@ -2614,199 +2804,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "USA",
-          "displayName": "MSC Cruises United States Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "MEX",
-          "displayName": "Mexico City Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "BRA",
-          "displayName": "MSC Cruises São Paulo Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "LAS",
-          "displayName": "Heineken Las Vegas Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "QAT",
-          "displayName": "Qatar Airways Qatar Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "UAE",
-          "displayName": "Etihad Airways Abu Dhabi Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        }
-      ]
-    },
-    {
-      "rank": 15,
-      "driver_number": 27,
-      "name": "Nico Hülkenberg",
-      "shortName": "N. Hülkenberg",
-      "abbreviation": "HUL",
-      "team_name": "Audi",
-      "nationality": "Germany",
-      "championshipPts": {
-        "value": 7,
-        "displayValue": "7"
-      },
-      "races": [
-        {
-          "name": "AUS",
-          "displayName": "Qatar Airways Australian Grand Prix",
           "played": true,
           "value": 0,
           "displayValue": "-"
-        },
-        {
-          "name": "CHN",
-          "displayName": "Heineken Chinese Grand Prix",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "JPN",
-          "displayName": "Aramco Japanese Grand Prix",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "BRN",
-          "displayName": "Gulf Air Bahrain Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "SAU",
-          "displayName": "STC Saudi Arabian Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
-        },
-        {
-          "name": "MIA",
-          "displayName": "Crypto.com Miami Grand Prix",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "CAN",
-          "displayName": "Lenovo Canadian Grand Prix",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "MCO",
-          "displayName": "Monaco Grand Prix",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "BAR",
-          "displayName": "MSC Cruises Barcelona-Catalunya Grand Prix",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "AUT",
-          "displayName": "Lenovo Austrian Grand Prix",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "GBR",
-          "displayName": "Pirelli British Grand Prix",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "BEL",
-          "displayName": "Moët & Chandon Belgian Grand Prix",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "HUN",
-          "displayName": "AWS Hungarian Grand Prix",
-          "played": true,
-          "value": 2,
-          "displayValue": "2"
-        },
-        {
-          "name": "NLD",
-          "displayName": "Heineken Dutch Grand Prix",
-          "played": true,
-          "value": 4,
-          "displayValue": "4"
-        },
-        {
-          "name": "ITA",
-          "displayName": "Pirelli Italian Grand Prix",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "ESP",
-          "displayName": "Tag Heuer Spanish Grand Prix",
-          "played": true,
-          "value": 1,
-          "displayValue": "1"
-        },
-        {
-          "name": "AZE",
-          "displayName": "Qatar Airways Azerbaijan Grand Prix",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "MYS",
-          "displayName": "Gulf Air Bahrain Grand Prix in Malaysia",
-          "played": true,
-          "value": 0,
-          "displayValue": "-"
-        },
-        {
-          "name": "SGP",
-          "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
-          "value": 0,
-          "displayValue": ""
         },
         {
           "name": "USA",
@@ -2854,11 +2854,11 @@
     },
     {
       "rank": 16,
-      "driver_number": 31,
+      "driver_number": null,
       "name": "Esteban Ocon",
       "shortName": "E. Ocon",
       "abbreviation": "OCO",
-      "team_name": "Haas F1 Team",
+      "team_name": "",
       "nationality": "France",
       "championshipPts": {
         "value": 7,
@@ -2994,9 +2994,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "value": 0,
-          "displayValue": ""
+          "displayValue": "-"
         },
         {
           "name": "USA",
@@ -3044,11 +3044,11 @@
     },
     {
       "rank": 17,
-      "driver_number": 14,
+      "driver_number": null,
       "name": "Fernando Alonso",
       "shortName": "F. Alonso",
       "abbreviation": "ALO",
-      "team_name": "Aston Martin",
+      "team_name": "",
       "nationality": "Spain",
       "championshipPts": {
         "value": 7,
@@ -3184,9 +3184,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "value": 0,
-          "displayValue": ""
+          "displayValue": "-"
         },
         {
           "name": "USA",
@@ -3234,11 +3234,11 @@
     },
     {
       "rank": 18,
-      "driver_number": 55,
+      "driver_number": null,
       "name": "Carlos Sainz",
       "shortName": "C. Sainz",
       "abbreviation": "SAI",
-      "team_name": "Williams",
+      "team_name": "",
       "nationality": "Spain",
       "championshipPts": {
         "value": 7,
@@ -3374,9 +3374,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "value": 0,
-          "displayValue": ""
+          "displayValue": "-"
         },
         {
           "name": "USA",
@@ -3424,11 +3424,11 @@
     },
     {
       "rank": 19,
-      "driver_number": 23,
+      "driver_number": null,
       "name": "Alexander Albon",
       "shortName": "A. Albon",
       "abbreviation": "ALB",
-      "team_name": "Williams",
+      "team_name": "",
       "nationality": "Thailand",
       "championshipPts": {
         "value": 5,
@@ -3564,9 +3564,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "value": 0,
-          "displayValue": ""
+          "displayValue": "-"
         },
         {
           "name": "USA",
@@ -3614,11 +3614,11 @@
     },
     {
       "rank": 20,
-      "driver_number": 22,
+      "driver_number": null,
       "name": "Yuki Tsunoda",
       "shortName": "Y. Tsunoda",
       "abbreviation": "TSU",
-      "team_name": "Racing Bulls",
+      "team_name": "",
       "nationality": "Japan",
       "championshipPts": {
         "value": 1,
@@ -3804,11 +3804,11 @@
     },
     {
       "rank": 21,
-      "driver_number": 18,
+      "driver_number": null,
       "name": "Lance Stroll",
       "shortName": "L. Stroll",
       "abbreviation": "STR",
-      "team_name": "Aston Martin",
+      "team_name": "",
       "nationality": "Canada",
       "championshipPts": {
         "value": 0,
@@ -3944,9 +3944,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "value": 0,
-          "displayValue": ""
+          "displayValue": "-"
         },
         {
           "name": "USA",
@@ -3994,11 +3994,11 @@
     },
     {
       "rank": 22,
-      "driver_number": 77,
+      "driver_number": null,
       "name": "Valtteri Bottas",
       "shortName": "V. Bottas",
       "abbreviation": "BOT",
-      "team_name": "Cadillac",
+      "team_name": "",
       "nationality": "Finland",
       "championshipPts": {
         "value": 0,
@@ -4134,9 +4134,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "value": 0,
-          "displayValue": ""
+          "displayValue": "-"
         },
         {
           "name": "USA",
@@ -4184,11 +4184,11 @@
     },
     {
       "rank": 23,
-      "driver_number": 11,
+      "driver_number": null,
       "name": "Sergio Pérez",
       "shortName": "S. Pérez",
       "abbreviation": "PER",
-      "team_name": "Cadillac",
+      "team_name": "",
       "nationality": "Mexico",
       "championshipPts": {
         "value": 0,
@@ -4324,9 +4324,9 @@
         {
           "name": "SGP",
           "displayName": "Singapore Airlines Singapore Grand Prix",
-          "played": false,
+          "played": true,
           "value": 0,
-          "displayValue": ""
+          "displayValue": "-"
         },
         {
           "name": "USA",

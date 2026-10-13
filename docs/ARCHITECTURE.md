@@ -28,11 +28,14 @@ TarasAPIstatic/
 │       └── update-f1.yml        # Weekly automated GitHub Actions scraper & deployer
 ├── index.html                   # Interactive Developer Portal & REST API Explorer for GitHub Pages
 ├── README.md                    # Primary repository overview and developer guide
+├── run_v1.py                    # Root CLI shortcut: Asynchronous anti-ban runner for V1
+├── run_v2.py                    # Root CLI shortcut: Asynchronous anti-ban runner for V2
 ├── update_v2.py                 # Root CLI shortcut delegating to v2/update.py
 ├── extract_rounds.py            # Root CLI shortcut delegating to v2/extract_rounds.py
 │
 ├── v1/                          # 100% Self-Contained Legacy API Module
 │   ├── README.md
+│   ├── run_v1.py                # Standalone async anti-ban runner with AntiBanClient
 │   ├── peerracepointdriver.py   # Legacy driver standings scraper & generator
 │   ├── peerracepointcar.py      # Legacy constructor standings scraper & generator
 │   ├── f1Info/                  # Historical driver & race metadata scrapers
@@ -41,20 +44,42 @@ TarasAPIstatic/
 │
 ├── v2/                          # 100% Self-Contained Modern REST API Module
 │   ├── README.md
+│   │
+│   ├── 🌐 PUBLIC REST ENDPOINTS (GitHub Pages CDN)
+│   ├── overview.json            # Home screen in 1 request
+│   ├── drivers.json             # All 23 drivers with portraits & stats
+│   ├── teams.json               # All 11 constructors with cars & logos
+│   ├── standings.json           # Championship tables & round progression
+│   ├── calendar.json            # 24-race schedule & track maps
+│   ├── live.json                # Live session status metadata
+│   ├── results/                 # Public session endpoints: latest.json & round_{1..18}.json
+│   │
+│   ├── ⚙️ PIPELINE LAUNCHERS & RUNNERS
+│   ├── run_v2.py                # Standalone async anti-ban runner with AntiBanClient
 │   ├── build.py                 # Master endpoint builder & aggregator
 │   ├── update.py                # Pipeline orchestrator (scrape -> build -> verify -> git)
 │   ├── extract_rounds.py        # Historical round extraction & normalization
 │   ├── test_v2_integrity.py     # 8-suite automated integrity verification
 │   ├── collectors/              # Data adapters (ESPN, Encyclopedia, Sessions)
 │   ├── scrapers/                # Official Formula 1 session HTML parsers
-│   ├── data/                    # Authoritative registries (teams, calendar, sessions)
-│   ├── results/                 # Session classifications (latest & round_{1..18}.json)
-│   ├── overview.json            # Public endpoint: Home screen in 1 request
-│   ├── drivers.json             # Public endpoint: All 23 drivers with portraits & stats
-│   ├── teams.json               # Public endpoint: All 11 constructors with cars & logos
-│   ├── standings.json           # Public endpoint: Championship tables & round progression
-│   ├── calendar.json            # Public endpoint: 24-race schedule & track maps
-│   └── live.json                # Public endpoint: Live session status metadata
+│   │
+│   └── 📦 INTERNAL DATA REPOSITORY (`v2/data/`)
+│       ├── registries/          # Authoritative base schemas & catalogs
+│       │   ├── calendar_master.json
+│       │   ├── teams_registry.json
+│       │   └── drivers_data.json
+│       ├── images/              # Image & media lookup maps
+│       │   ├── driverimg.json
+│       │   ├── teamsimgdata.json
+│       │   └── racesimg.json
+│       ├── standings/           # Championship point tracking & car-per-race tables
+│       │   ├── driversperrace.json
+│       │   └── carperrace.json
+│       ├── sessions/            # Raw session cache & extracted weekend packages
+│       │   ├── current/         # Raw session extractions (fp1_extracted.json, etc.)
+│       │   └── rounds/          # Historical round raw packages (round_1.json .. round_18.json)
+│       └── notifications/       # Push notifications & telemetry alerts
+│           └── live.json
 │
 └── docs/                        # Complete technical documentation
     ├── API_REFERENCE.md         # Full REST API endpoint reference & schemas
@@ -66,18 +91,38 @@ TarasAPIstatic/
 
 ---
 
+## 📂 Session Data Architecture: Where Does Session Data Live?
+
+A common question is: **Where does session data live? Should it be in `data/`?**
+
+In Taras F1 API v2, there is a clean separation of concerns:
+
+1. **Internal Raw Session Data (`v2/data/sessions/`)**:
+   - **`v2/data/sessions/current/`**: Stores temporary raw session extractions (e.g., `fp1_extracted.json`, `qualifying_raw.json`) actively parsed by scrapers during a race weekend.
+   - **`v2/data/sessions/rounds/`**: Stores offline raw weekend packages (`round_1.json` through `round_18.json`). The anti-ban runner inspects these to determine cache hits (`⚡ Cache Hit`) and prevent redundant network requests.
+
+2. **Public REST Endpoints (`v2/results/`)**:
+   - **`v2/results/latest.json`**: The public REST endpoint served to client applications representing the most recent race weekend (Practice 1, Practice 2, Practice 3, Qualifying, Sprint, Race).
+   - **`v2/results/round_{1..18}.json`**: Standardized, edge-cached public REST endpoints served to mobile apps and websites via GitHub Pages (`https://<username>.github.io/<repo>/v2/results/round_17.json`).
+
+This separation keeps the `v2/` root clean:
+- **`v2/` root**: Only contains public endpoints, launchers, and core subdirectories.
+- **`v2/data/`**: Houses all internal registries, image dictionaries, standings tables, and session archives organized by category.
+
+---
+
 ## 🔄 Data Pipeline Flow
 
 ```mermaid
 graph TD
-    A[Official F1 Web / ESPN / Ergast] -->|Scrapers| B[tarasF1DataV2/scrapers/]
-    B -->|Normalized Sessions| C[tarasF1DataV2/data/sessions/]
-    D[Authoritative Registries<br/>data/teams_registry.json<br/>data/calendar_master.json] --> E[tarasF1DataV2/build.py]
+    A[Official F1 Web / ESPN / Ergast] -->|Async Anti-Ban Scrapers| B[v2/scrapers/]
+    B -->|Normalized Raw Sessions| C[v2/data/sessions/current/<br/>v2/data/sessions/rounds/]
+    D[Master Registries<br/>v2/data/registries/<br/>calendar_master.json, teams_registry.json] --> E[v2/build.py]
     C --> E
-    E -->|Generates JSON| F[tarasF1DataV2/output/]
-    F -->|Validation| G[test_v2_integrity.py]
-    G -->|All 8 Tests Pass| H[Synchronize to public v2/]
-    H -->|Git Push| I[GitHub Pages Edge CDN<br/>yashajagiya.github.io/Taras/v2/]
+    E -->|Generates Public Endpoints| F[v2/ Root & v2/results/]
+    F -->|Validation| G[v2/test_v2_integrity.py]
+    G -->|All 8 Tests Pass| H[Git Commit & Push]
+    H -->|Deploy| I[GitHub Pages Edge CDN<br/>yashajagiya.github.io/Taras/v2/]
 ```
 
 ---
@@ -85,30 +130,33 @@ graph TD
 ## 🛠️ How to Extend & Maintain
 
 ### 1. Adding a New Driver or Mid-Season Driver Swap
-1. Open `tarasF1DataV2/data/teams_registry.json`.
+1. Open [`v2/data/registries/teams_registry.json`](file:///M:/TarasAPIstatic/v2/data/registries/teams_registry.json).
 2. Locate the team (e.g. `racing-bulls`).
 3. Add or update the driver entry with `id`, `name`, `code`, `number`, and `portrait_url`.
-4. Run `python update_v2.py --skip-scrape`.
+4. Run `python run_v2.py --skip-scrape`.
 5. The build engine automatically updates `v2/drivers.json`, `v2/teams.json`, and `v2/overview.json`.
 
 ### 2. Updating Constructor Renders or Colors
-1. Open `tarasF1DataV2/build.py`.
+1. Open [`v2/build.py`](file:///M:/TarasAPIstatic/v2/build.py).
 2. Update the `OFFICIAL_TEAM_ASSETS` dictionary with new high-resolution URLs or ARGB hex color codes.
-3. Run `python update_v2.py --skip-scrape`.
+3. Run `python run_v2.py --skip-scrape`.
 
-### 3. Scraping & Archiving a New Race Weekend
+### 3. Scraping & Archiving a Race Weekend (Anti-Ban Protected)
 ```bash
-# Scrape specific round (e.g. Round 18 United States GP):
-python update_v2.py --round 18
+# Scrape specific round with anti-ban protections:
+python run_v2.py --round 18
 
-# Or extract all past rounds:
-python tarasF1DataV2/extract_rounds.py --round 18 --build
+# Continuous background loop mode (every 5 minutes with jitter & safety circuit breaker):
+python run_v2.py --loop --interval 300
+
+# Stealth mode with extra conservative delays:
+python run_v2.py --stealth --round 18
 ```
-This automatically scrapes FP1, FP2, FP3, Qualifying, Sprint, and Race classifications, writes `v2/results/round_18.json`, updates `v2/results/latest.json`, updates championship points in `v2/standings.json`, and runs the integrity verification suite.
+This automatically checks local cache in `v2/data/sessions/rounds/`, scrapes any missing sessions safely, writes `v2/results/round_18.json`, updates `v2/results/latest.json`, recalculates `v2/standings.json`, and runs the integrity verification suite.
 
 ### 4. Running Data Integrity Tests
 ```bash
-python tarasF1DataV2/test_v2_integrity.py
+python v2/test_v2_integrity.py
 ```
 Tests verified:
 - [x] `overview.json` schema and leadership presence

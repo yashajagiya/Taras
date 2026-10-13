@@ -287,7 +287,12 @@ async def scrape_round_async(
     """
     data_dir = os.path.join(V2_DIR, "data")
     sessions_dir = os.path.join(data_dir, "sessions")
-    target_cache_file = os.path.join(sessions_dir, f"round_{round_num}.json")
+    rounds_dir = os.path.join(sessions_dir, "rounds")
+    target_cache_candidates = [
+        os.path.join(rounds_dir, f"round_{round_num}.json"),
+        os.path.join(sessions_dir, f"round_{round_num}.json"),
+    ]
+    target_cache_file = next((p for p in target_cache_candidates if os.path.exists(p)), target_cache_candidates[0])
 
     # Anti-Ban Cache Guard: If round is completed and not forced, skip network scraping!
     if not force and os.path.exists(target_cache_file):
@@ -309,7 +314,11 @@ async def scrape_round_async(
     base_url = f"https://www.formula1.com/en/results/2026/races/{race_id}/{slug}"
 
     # Determine sprint vs conventional weekend
-    cal_file = os.path.join(data_dir, "calendar_master.json")
+    cal_candidates = [
+        os.path.join(data_dir, "registries", "calendar_master.json"),
+        os.path.join(data_dir, "calendar_master.json"),
+    ]
+    cal_file = next((p for p in cal_candidates if os.path.exists(p)), cal_candidates[0])
     is_sprint = False
     if os.path.exists(cal_file):
         try:
@@ -382,7 +391,10 @@ async def scrape_round_async(
     }
 
     os.makedirs(sessions_dir, exist_ok=True)
-    with open(target_cache_file, "w", encoding="utf-8") as f:
+    os.makedirs(rounds_dir, exist_ok=True)
+    with open(os.path.join(rounds_dir, f"round_{round_num}.json"), "w", encoding="utf-8") as f:
+        json.dump(round_payload, f, indent=2, ensure_ascii=False)
+    with open(os.path.join(sessions_dir, f"round_{round_num}.json"), "w", encoding="utf-8") as f:
         json.dump(round_payload, f, indent=2, ensure_ascii=False)
 
     # Save to public v2 results directly
@@ -391,7 +403,7 @@ async def scrape_round_async(
     with open(os.path.join(results_dir, f"round_{round_num}.json"), "w", encoding="utf-8") as f:
         json.dump(round_payload, f, indent=2, ensure_ascii=False)
 
-    print(f"  🎉 Round {round_num} saved successfully to data/sessions/ and results/round_{round_num}.json")
+    print(f"  🎉 Round {round_num} saved successfully to data/sessions/rounds/ and results/round_{round_num}.json")
     return True
 
 

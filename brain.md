@@ -654,10 +654,34 @@ TarasAPIstatic/
     - [`v1/run_v1.py`](v1/run_v1.py): Self-contained async runner orchestrating driver standings (`driversperrace.json`, `f1_standings.json`), constructor standings (`carperrace.json`, `f1_constructor_standings.json`), calendar (`races_data.json`), and active weekend sessions (`practice1/`, `practice2/`, `practice3/`, `qualifying/`, `sprint-quly/`, `sprint-race/`, `race-result/`). Supports `--loop`, `--interval`, `--stealth`, `--force`, `--push`.
     - [`v2/run_v2.py`](v2/run_v2.py): Self-contained async runner orchestrating F1 session extraction, master build engine (`v2/build.py`), and 8-suite integrity verification (`v2/test_v2_integrity.py`). Supports `--loop`, `--interval`, `--round`, `--all`, `--stealth`, `--skip-scrape`, `--push`.
     - Root Launchers: [`run_v1.py`](run_v1.py) and [`run_v2.py`](run_v2.py) convenience wrappers in workspace root forwarding all CLI arguments.
+- **Session 48: V2 Architecture & Data Directory Organization:**
+  - **User Directive:** "v2 loo messy i want more organized and clean architecher , can be easy to understand who understand , and seesion is data like ? it shodu be in data ? and other json file organzed to make it clena and organie accoding to the thye can be find any hting t=with like it cna be organized more better way"
+  - **Core Problem Solved:**
+    - `v2/` root was cluttered with loose legacy files (`carperrace.json`, `driverimg.json`, `drivers_data.json`, `driversperrace.json`, `racesimg.json`, `teamsimgdata.json`) that belonged inside internal data directories.
+    - Session data lacked clear structure: raw session files were scattered, and 17 empty/redundant session subfolders (`data/sessions/round_1` .. `round_17`) created confusing folder sprawl.
+  - **Clean Reorganization Implemented:**
+    1. **Public REST Endpoints (`v2/` root & `v2/results/`):**
+       - The root of `v2/` now strictly contains public endpoints served directly by GitHub Pages CDN: `overview.json`, `drivers.json`, `teams.json`, `standings.json`, `calendar.json`, `live.json`, `notification/`, and `results/` (`latest.json` & `round_{1..18}.json`).
+    2. **Internal Data Categorization (`v2/data/`):**
+       - `registries/`: Master schemas & catalogs (`calendar_master.json`, `teams_registry.json`, `drivers_data.json`).
+       - `images/`: High-resolution asset maps (`driverimg.json`, `teamsimgdata.json`, `racesimg.json`).
+       - `standings/`: Internal championship tables (`driversperrace.json`, `carperrace.json`).
+       - `sessions/`: Cleanly divided into:
+         - `current/`: Temporary active weekend raw extractions (`fp1_extracted.json`, etc.).
+         - `rounds/`: Offline raw weekend archives (`round_1.json` through `round_18.json`) used by the anti-ban runner for instant cache hits.
+       - `notifications/`: Push & live telemetry tracking (`live.json`).
+    3. **Purged Clutter & Empty Sprawl:**
+       - Deleted duplicate JSON files from `v2/` root.
+       - Purged 17 empty session subdirectories in `v2/data/sessions/`.
+    4. **Module & Collector Synchronization:**
+       - Updated `v2/build.py`, `v2/collectors/espn_standings.py`, `v2/collectors/f1_encyclopedia.py`, `v2/collectors/f1_sessions.py`, `v2/extract_rounds.py`, and `v2/run_v2.py` with multi-path resolution and seamless fallback guarantees.
+    5. **Comprehensive Documentation:**
+       - Created [`v2/data/README.md`](v2/data/README.md) documenting every category and file.
+       - Updated [`v2/README.md`](v2/README.md), root [`README.md`](README.md), and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
   - **Verification:**
-    - Ran `python run_v1.py`: All standings, calendar, and active sessions verified in 4.53s with 0 blocks.
-    - Ran `python run_v2.py --round 17`: Round 17 cache hit verified, built, and passed all 8 integrity suites in 1.06s with 0 blocks.
-    - Ran `python run_v2.py --skip-scrape`: All endpoints built directly in `v2/`, 8/8 suites passed with 100% data retention.
+    - `python v2/test_v2_integrity.py`: 100% data retention confirmed (all 8 integrity suites passed).
+    - `python run_v2.py --round 17`: Successfully verified cache hit, build, and validation in 1.07s with 0 blocks.
+
 
 
 

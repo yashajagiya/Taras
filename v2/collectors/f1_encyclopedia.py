@@ -13,6 +13,8 @@ def load_driver_encyclopedia(path=None):
     if path is None:
         base_dir = os.path.dirname(os.path.abspath(__file__))
         candidates = [
+            os.path.abspath(os.path.join(base_dir, "..", "data", "registries", "drivers_data.json")),
+            os.path.abspath(os.path.join(base_dir, "..", "data", "registries", "drivers_registry.json")),
             os.path.abspath(os.path.join(base_dir, "..", "data", "drivers_data.json")),
             os.path.abspath(os.path.join(base_dir, "..", "data", "drivers_registry.json")),
             os.path.abspath(os.path.join(base_dir, "..", "f1Info", "drivers_data.json")),
@@ -35,7 +37,11 @@ def load_team_encyclopedia(path=None):
     """Load all constructor profiles with 100% data preservation."""
     if path is None:
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        path = os.path.join(base_dir, "..", "data", "teams_registry.json")
+        candidates = [
+            os.path.join(base_dir, "..", "data", "registries", "teams_registry.json"),
+            os.path.join(base_dir, "..", "data", "teams_registry.json"),
+        ]
+        path = next((p for p in candidates if os.path.exists(p)), candidates[0])
 
     with open(path, "r", encoding="utf-8") as f:
         teams = json.load(f)

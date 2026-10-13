@@ -332,7 +332,11 @@ TarasAPIstatic/
 │   ├── test_v2_integrity.py     ← 8-suite zero data loss verification tests
 │   ├── collectors/              ← Data adapters (ESPN, F1 Encyclopedia, Sessions)
 │   ├── scrapers/                ← Official F1 session scrapers
-│   ├── data/                    ← Master registries (teams, calendar, sessions)
+│   ├── data/                    ← Organized Master Data Store:
+│   │   ├── registries/          ← Drivers, teams, and calendar registries
+│   │   ├── images/              ← Driver portraits, car cutouts, track maps
+│   │   ├── standings/           ← Standings caches & points progression
+│   │   └── sessions/            ← Raw session classifications (current/ & rounds/)
 │   └── README.md
 ├── v1/                          ← 100% Self-Contained Legacy API Module
 │   ├── driversperrace.json

@@ -118,12 +118,18 @@ def build_v2_api():
 
     # 1. Load Master Registries
     print("\n[1/5] Loading master registries...")
-    with open(os.path.join(data_dir, "drivers_registry.json"), "r", encoding="utf-8") as f:
-        drivers_registry = json.load(f)
-    with open(os.path.join(data_dir, "teams_registry.json"), "r", encoding="utf-8") as f:
-        teams_registry = json.load(f)
-    with open(os.path.join(data_dir, "calendar_master.json"), "r", encoding="utf-8") as f:
-        calendar_master = json.load(f)
+    def _load_data_file(filename, subfolder):
+        candidates = [
+            os.path.join(data_dir, subfolder, filename),
+            os.path.join(data_dir, filename),
+        ]
+        chosen = next((p for p in candidates if os.path.exists(p)), candidates[0])
+        with open(chosen, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    drivers_registry = _load_data_file("drivers_registry.json", "registries")
+    teams_registry = _load_data_file("teams_registry.json", "registries")
+    calendar_master = _load_data_file("calendar_master.json", "registries")
 
     print(f"  • Drivers registered: {len(drivers_registry)}")
     print(f"  • Teams registered: {len(teams_registry)}")
@@ -135,37 +141,43 @@ def build_v2_api():
         raw_espn = fetch_espn_raw_data()
         standings_data = parse_standings(raw_espn)
         print("  • Successfully fetched live ESPN data.")
-        try:
-            with open(os.path.join(data_dir, "standings_cache.json"), "w", encoding="utf-8") as f:
-                json.dump(standings_data, f, indent=2, ensure_ascii=False)
-        except Exception:
-            pass
+        for cache_path in [os.path.join(data_dir, "standings", "standings_cache.json"), os.path.join(data_dir, "standings_cache.json")]:
+            try:
+                os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+                with open(cache_path, "w", encoding="utf-8") as f:
+                    json.dump(standings_data, f, indent=2, ensure_ascii=False)
+            except Exception:
+                pass
     except Exception as e:
         print(f"  ⚠️ Live fetch failed ({e}). Checking local V2 standings cache...")
-        local_cache = os.path.join(data_dir, "standings_cache.json")
+        local_cache_candidates = [
+            os.path.join(data_dir, "standings", "standings_cache.json"),
+            os.path.join(data_dir, "standings_cache.json"),
+        ]
+        local_cache = next((p for p in local_cache_candidates if os.path.exists(p)), local_cache_candidates[0])
         local_out = os.path.join(output_dir, "standings.json")
         if os.path.exists(local_cache):
             standings_data = json.load(open(local_cache, encoding="utf-8"))
-            print("  • Successfully loaded cached standings from tarasF1DataV2/data/standings_cache.json")
+            print("  • Successfully loaded cached standings from data/standings/standings_cache.json")
         elif os.path.exists(local_out):
             standings_data = json.load(open(local_out, encoding="utf-8"))
-            print("  • Successfully loaded cached standings from tarasF1DataV2/output/standings.json")
+            print("  • Successfully loaded cached standings from output/standings.json")
         else:
             cached_d_candidates = [
+                os.path.join(data_dir, "standings", "driversperrace.json"),
                 os.path.join(data_dir, "driversperrace.json"),
+                os.path.join(data_dir, "standings", "f1_standings.json"),
                 os.path.join(data_dir, "f1_standings.json"),
                 os.path.join(BASE_DIR, "..", "v1", "driversperrace.json"),
                 os.path.join(BASE_DIR, "..", "v1", "f1_standings.json"),
-                os.path.join(BASE_DIR, "..", "tarasF1Data", "driversperrace.json"),
-                os.path.join(BASE_DIR, "..", "driversperrace.json"),
             ]
             cached_t_candidates = [
+                os.path.join(data_dir, "standings", "carperrace.json"),
                 os.path.join(data_dir, "carperrace.json"),
+                os.path.join(data_dir, "standings", "f1_constructor_standings.json"),
                 os.path.join(data_dir, "f1_constructor_standings.json"),
                 os.path.join(BASE_DIR, "..", "v1", "carperrace.json"),
                 os.path.join(BASE_DIR, "..", "v1", "f1_constructor_standings.json"),
-                os.path.join(BASE_DIR, "..", "tarasF1Data", "carperrace.json"),
-                os.path.join(BASE_DIR, "..", "carperrace.json"),
             ]
             cached_d_path = next((p for p in cached_d_candidates if os.path.exists(p)), cached_d_candidates[0])
             cached_t_path = next((p for p in cached_t_candidates if os.path.exists(p)), cached_t_candidates[0])

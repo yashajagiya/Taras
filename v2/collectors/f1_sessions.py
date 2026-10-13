@@ -127,6 +127,7 @@ def _load_calendar(base_dir=None):
     if base_dir is None:
         base_dir = os.path.dirname(os.path.abspath(__file__))
     candidates = [
+        os.path.join(base_dir, "..", "data", "registries", "calendar_master.json"),
         os.path.join(base_dir, "..", "data", "calendar_master.json"),
         os.path.join(base_dir, "data", "calendar_master.json"),
         os.path.join(base_dir, "..", "..", "tarasF1DataV2", "data", "calendar_master.json"),
@@ -192,7 +193,11 @@ def load_all_known_sessions(repo_dir=None):
     Never leaks stale data from previous races into the active weekend.
     """
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    current_dir = os.path.abspath(os.path.join(base_dir, "..", "data", "current"))
+    candidates_current = [
+        os.path.abspath(os.path.join(base_dir, "..", "data", "sessions", "current")),
+        os.path.abspath(os.path.join(base_dir, "..", "data", "current")),
+    ]
+    current_dir = next((p for p in candidates_current if os.path.exists(p)), candidates_current[0])
     if repo_dir is None:
         candidates = [
             os.path.abspath(os.path.join(base_dir, "..", "v1")),
@@ -255,10 +260,12 @@ def load_all_known_sessions(repo_dir=None):
 
     events = {}
 
-    # 1. Load pre-extracted historical rounds from data/sessions/
+    # 1. Load pre-extracted historical rounds from data/sessions/rounds/ or data/sessions/
     base_dir = os.path.dirname(os.path.abspath(__file__))
     candidates_sessions = [
+        os.path.join(base_dir, "..", "data", "sessions", "rounds"),
         os.path.join(base_dir, "..", "data", "sessions"),
+        os.path.join(base_dir, "data", "sessions", "rounds"),
         os.path.join(base_dir, "data", "sessions"),
         os.path.join(repo_dir, "tarasF1DataV2", "data", "sessions"),
     ]

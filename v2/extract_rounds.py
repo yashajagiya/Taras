@@ -65,7 +65,11 @@ F1_WEB_ROUNDS = {
 
 
 def load_calendar_master():
-    cal_path = os.path.join(DATA_DIR, "calendar_master.json")
+    candidates = [
+        os.path.join(DATA_DIR, "registries", "calendar_master.json"),
+        os.path.join(DATA_DIR, "calendar_master.json"),
+    ]
+    cal_path = next((p for p in candidates if os.path.exists(p)), candidates[0])
     if os.path.exists(cal_path):
         try:
             with open(cal_path, "r", encoding="utf-8") as f:
@@ -76,7 +80,11 @@ def load_calendar_master():
 
 
 def load_drivers_lookup():
-    reg_path = os.path.join(DATA_DIR, "drivers_registry.json")
+    candidates = [
+        os.path.join(DATA_DIR, "registries", "drivers_registry.json"),
+        os.path.join(DATA_DIR, "drivers_registry.json"),
+    ]
+    reg_path = next((p for p in candidates if os.path.exists(p)), candidates[0])
     lookup_by_num = {}
     lookup_by_name = {}
     if os.path.exists(reg_path):

@@ -48,7 +48,11 @@ def load_drivers_lookup(registry_path=None):
     """Load driver registry lookup dictionary keyed by normalized name and acronym."""
     if registry_path is None:
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        registry_path = os.path.join(base_dir, "..", "data", "drivers_registry.json")
+        candidates = [
+            os.path.join(base_dir, "..", "data", "registries", "drivers_registry.json"),
+            os.path.join(base_dir, "..", "data", "drivers_registry.json"),
+        ]
+        registry_path = next((p for p in candidates if os.path.exists(p)), candidates[0])
 
     lookup = {}
     if os.path.exists(registry_path):

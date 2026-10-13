@@ -5,38 +5,55 @@ This file stores project context, user preferences, architectural decisions, and
 ---
 
 ## 1. Project Overview
-- **Project Name:** `tarasf1data`
-- **Description:** Formula 1 (F1) data API / backend service built with Kotlin and Ktor.
-- **Build System:** JetBrains **Amper** (`module.yaml`, with `./kotlin` / `kotlin.bat` wrapper).
-- **Runtime:** JVM (Netty Engine).
-- **Default Port:** `8080` (configured in `resources/application.yaml`).
+- **Project Name:** `Taras F1 Static API` (`yashajagiya/Taras`)
+- **Description:** Zero-latency, edge-cached Formula 1 (F1) public REST API & dataset hosted on GitHub Pages (`github.io`).
+- **Pipeline:** Python 3.11+ master build engine & collectors (`tarasF1DataV2/`).
+- **CDN Host:** GitHub Pages Edge CDN (`https://yashajagiya.github.io/Taras/v2/`).
+- **Deployment:** Fully automated weekly CI/CD workflow (`.github/workflows/update-f1.yml`).
 
 ---
 
 ## 2. Technical Stack & Dependencies
-- **Language:** Kotlin (`2.4.0`)
-- **Framework:** Ktor Server (Netty engine)
-- **Configuration:** YAML-based (`resources/application.yaml`)
-- **Logging:** Logback classic (`1.5.37`) via `resources/logback.xml`
-- **Testing:** Ktor Test Host (`$ktor.server.testHost`)
+- **Core Pipeline:** Python 3.11+ (`requests`, `beautifulsoup4`)
+- **API Architecture:** Static JSON REST endpoints (`v2/` primary, `v1/` legacy)
+- **Portal & Explorer:** Vanilla HTML5, CSS3, JavaScript (`index.html`) with interactive API client and multi-language code snippets
+- **Integrity Testing:** Automated test suite (`test_v2_integrity.py` with 8 comprehensive integrity suites)
+- **CI/CD:** GitHub Actions (`update-f1.yml`)
 
 ---
 
 ## 3. Project Structure
 ```text
-tarasf1data/
-├── brain.md                 # Persistent AI memory & project context
-├── AGENTS.md                # AI instructions & guidelines (auto-loaded)
-├── module.yaml              # Amper module definition & dependencies
-├── libs.versions.toml       # Version catalog
-├── resources/
-│   ├── application.yaml     # Ktor server config (port, modules)
-│   └── logback.xml          # Logging configuration
-├── src/
-│   ├── main.kt              # EngineMain entry point
-│   └── Routing.kt           # Ktor routing module
-└── test/
-    └── ServerTest.kt        # Ktor testApplication suite
+TarasAPIstatic/
+├── index.html                   # Interactive Developer Portal & REST API Explorer
+├── README.md                    # Primary repository overview and developer guide
+├── update_v2.py                 # Master pipeline launcher CLI
+├── extract_rounds.py            # Historical round extractor CLI
+├── .github/
+│   └── workflows/
+│       └── update-f1.yml        # Automated weekly GitHub Actions pipeline
+├── v2/                          # Unified v2 REST API (Primary)
+│   ├── overview.json            # Home screen in 1 request
+│   ├── drivers.json             # All 23 drivers with portraits & stats
+│   ├── teams.json               # All 11 constructors with car cutouts & logos
+│   ├── standings.json           # Championship tables & round progression
+│   ├── calendar.json            # 24-race schedule & circuit vectors
+│   ├── live.json                # Live session status metadata
+│   └── results/                 # Session classifications (latest & round_{1..18}.json)
+├── v1/                          # Legacy v1 endpoints (isolated backward compatibility)
+├── tarasF1DataV2/               # Master Build Engine & Data Pipeline
+│   ├── build.py                 # Core aggregator
+│   ├── update.py                # Pipeline orchestrator
+│   ├── test_v2_integrity.py     # 8-suite automated integrity verification
+│   ├── collectors/              # Data adapters (ESPN, Encyclopedia, Sessions)
+│   ├── scrapers/                # Official F1 session HTML parsers
+│   └── data/                    # Authoritative registries & session cache
+└── docs/                        # Complete technical documentation
+    ├── API_REFERENCE.md         # Full REST API endpoint reference & schemas
+    ├── ARCHITECTURE.md          # Architecture & extension guide
+    ├── F1_DATA_SOURCES.md       # External data sources catalog
+    ├── PROJECT.md               # Product background & ecosystem role
+    └── mobile_app_specs/        # Specifications for the TARAS Android app
 ```
 
 ---
@@ -582,10 +599,25 @@ tarasf1data/
     - Executed `test_v2_integrity.py`: 100% data retention verified (all 8 test suites passed).
     - Executed `peerracepointdriver.py` and `peerracepointcar.py`: Clean extraction and dual-push verified.
     - Successfully committed and pushed clean tree to both `yashajagiya/tarasF1Data` and `yashajagiya/Taras`.
-
-
-
-
+- **Session 45: Full Purge of Mixed Ktor Files & Static API Architecture Modernization:**
+  - **User Directive:** "i think other file are mizxed up rmeove the file that have ktor file , i need to remove any thing extra and make it clean for api upaload in the github for gitjub.io i need thisfor cna be manintable and clean architechter that can be exependable and can be clean , an be expendable and menatble ,well documentable"
+  - **Diagnosis & Root Cause:**
+    - The repository `TarasAPIstatic` was cluttered with Ktor server artifacts, launchers, and binaries accidentally copied from the backend IntelliJ project (`c:\Users\yash\IdeaProjects\tarasf1data`).
+    - A nested broken directory `tarasF1Data` with a non-existent remote `https://github.com/yashajagiya/tarasF1Data.git` had caused Git confusion.
+  - **Cleanup & Purge Actions Executed:**
+    - Purged all Ktor files and folders: `src/`, `test/`, `build/`, `resources/`, `mobile_example/`, `module.yaml`, `libs.versions.toml`, `kotlin`, `kotlin.bat`, `tarasf1data.iml`, `Dockerfile`, `cloudflared.exe` (52MB), `share.bat`, `share.ps1`, `start.bat`, `start.ps1`, `link.json`, `state_cache.json`, `timeline_cache.json`, `github_token.txt`, `observer.user.js`, `timeline_observer.user.js`, `implement.md`, `implementplan.md`, `remoteserver.md`, `timeline_plan.md`.
+    - Removed redundant root directories: `circitdata/`, `notification/`, `tarasF1Data/`, and legacy `.pyc` bytecode.
+    - Moved mobile app UI specifications into `docs/mobile_app_specs/` (`TARAS_Design_Blueprint_M3.md`, `TARAS_Design_Blueprint_M3_v3.md`, `TARAS_Screen_Specifications.md`, `task.md`, `implementation_plan.md`).
+    - Moved `f1_apis_documentation.md` and `PROJECT.md` into `docs/`.
+  - **Clean Architecture & Docs Established:**
+    - Created `docs/API_REFERENCE.md`: Complete field-by-field REST API reference and schema guide.
+    - Created `docs/ARCHITECTURE.md`: Extension, maintenance, and data pipeline manual.
+    - Created `index.html`: State-of-the-art interactive Developer Portal & REST API Explorer for GitHub Pages.
+    - Created `.github/workflows/update-f1.yml`: Weekly automated GitHub Actions pipeline.
+    - Updated `tarasF1DataV2/build.py` and `tarasF1DataV2/update.py` to cleanly sync only to the root repository.
+    - Modernized `.gitignore`, `AGENTS.md`, and `README.md`.
+  - **Verification:**
+    - Tested pipeline (`python update_v2.py --skip-scrape --no-push`): 100% data retention confirmed (all 8 integrity test suites passed).
 
 
 

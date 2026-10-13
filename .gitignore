@@ -1,22 +1,32 @@
-# Local only — never push to GitHub
-notificationhistory.json
-token.json
-PROJECT.md
-tarasF1Data/
-*token.json
-*notificationhistory.json
-github_token.txt
-*.token*
-*.exe
-cloudflared.exe
-*.cache.json
-state_cache.json
-timeline_cache.json
-link.json
-.idea/
-build/
-*.iml
+# Python bytecode & cache
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
 
+# Environments & virtualenvs
+.env
+.venv
+env/
+venv/
+ENV/
 
+# IDE & OS files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Sensitive credentials & secrets
+*token*.txt
+*token*.json
+secrets/
+*.pem
+*.key
+
+# Temporary files
+*.tmp
+*.log

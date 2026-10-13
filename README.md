@@ -3,18 +3,18 @@
 # 🏎️ Taras F1 API v2
 ### The Free, Zero-Latency, Edge-Cached Formula 1 Public REST API & Dataset
 
-[![Build & Verify](https://github.com/yashajagiya/tarasF1Data/actions/workflows/update-f1.yml/badge.svg)](https://github.com/yashajagiya/tarasF1Data/actions/workflows/update-f1.yml)
-[![Hosted on GitHub Pages](https://img.shields.io/badge/CDN-GitHub%20Pages%20Edge-blue?style=for-the-badge&logo=github)](https://yashajagiya.github.io/tarasF1Data/v2/overview.json)
+[![Build & Verify](https://github.com/yashajagiya/Taras/actions/workflows/update-f1.yml/badge.svg)](https://github.com/yashajagiya/Taras/actions/workflows/update-f1.yml)
+[![Hosted on GitHub Pages](https://img.shields.io/badge/CDN-GitHub%20Pages%20Edge-blue?style=for-the-badge&logo=github)](https://yashajagiya.github.io/Taras/v2/overview.json)
 [![Season](https://img.shields.io/badge/Season-2026-e10600?style=for-the-badge&logo=formula1&logoColor=white)](https://www.formula1.com)
-[![Format](https://img.shields.io/badge/Data-Standardized%20JSON-2ea44f?style=for-the-badge&logo=json&logoColor=white)](https://yashajagiya.github.io/tarasF1Data/v2/overview.json)
-[![Zero Config](https://img.shields.io/badge/Auth-Zero%20API%20Key-9cf?style=for-the-badge&logo=keycdn&logoColor=white)](https://yashajagiya.github.io/tarasF1Data/)
+[![Format](https://img.shields.io/badge/Data-Standardized%20JSON-2ea44f?style=for-the-badge&logo=json&logoColor=white)](https://yashajagiya.github.io/Taras/v2/overview.json)
+[![Zero Config](https://img.shields.io/badge/Auth-Zero%20API%20Key-9cf?style=for-the-badge&logo=keycdn&logoColor=white)](https://yashajagiya.github.io/Taras/)
 [![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](LICENSE)
 
 <p align="center">
   <b>A world-class, 100% free, production-ready static REST API delivering Formula 1 championship standings, driver dossiers, constructor specifications, weekend session telemetry, transparent track maps, and official race results.</b>
 </p>
 
-[📌 Core Features](#-core-features--whats-new-in-v2) • [🌐 The Unified Endpoints](#-the-unified-v2-endpoints) • [💻 Code Samples](#-quickstart-integration--code-samples) • [🏗️ Architecture](#-system-architecture) • [🏎️ Historical Rounds](#-historical-rounds-archive-rounds-1-to-16) • [🔄 Migration from v1](#-migrating-from-v1-to-v2) • [🛠️ How to Run Locally](#-how-to-run--build-locally)
+[🌐 Live API Explorer](https://yashajagiya.github.io/Taras/) • [📑 API Reference](docs/API_REFERENCE.md) • [🏗️ Architecture Guide](docs/ARCHITECTURE.md) • [📌 Core Features](#-core-features--whats-new-in-v2) • [💻 Code Samples](#-quickstart-integration--code-samples) • [🛠️ How to Run Locally](#-how-to-run--build-locally)
 
 ---
 
@@ -27,17 +27,19 @@
     <td width="50%">
       <h3>⚡ Edge-Delivered & Serverless</h3>
       <ul>
-        <li><b>Zero Latency:</b> Edge-cached globally across GitHub's worldwide CDN.</li>
+        <li><b>Zero Latency:</b> Edge-cached globally across GitHub's worldwide Fastly/Cloudflare CDN.</li>
         <li><b>Zero API Keys:</b> 100% open access without rate limits, quotas, or billing.</li>
         <li><b>Home in 1 Request:</b> Complete dashboard (championship leaders, next race countdown, session schedule, latest podium) in a single request.</li>
+        <li><b>Interactive Portal:</b> Built-in web explorer at <a href="index.html"><code>index.html</code></a> to test and copy snippets.</li>
       </ul>
     </td>
     <td width="50%">
       <h3>🎯 100% Data Fidelity & Safety</h3>
       <ul>
-        <li><b>All 23 Drivers:</b> Full profiles and standings for all 23 drivers (including mid-season additions like Yuki Tsunoda #22 at Racing Bulls).</li>
-        <li><b>Non-Destructive Results:</b> Full weekend sessions archived per round (`results/round_{1..16}.json`) without overwriting previous races!</li>
+        <li><b>All 23 Drivers:</b> Full profiles and standings for all 23 drivers (including Yuki Tsunoda #22 at Racing Bulls).</li>
+        <li><b>Non-Destructive Results:</b> Full weekend sessions archived per round (<code>results/round_{1..18}.json</code>) without overwriting previous races!</li>
         <li><b>Deep Analytics:</b> 16-metric 2026 season stats, 8-metric career stats, track vectors, and team specs.</li>
+        <li><b>Automated CI/CD:</b> GitHub Actions workflow updates data every Monday after race weekends.</li>
       </ul>
     </td>
   </tr>
@@ -47,17 +49,18 @@
 
 ## 🌐 The Unified v2 Endpoints
 
-**Base URL:** `https://yashajagiya.github.io/tarasF1Data/v2/`
+**Base URL:** `https://yashajagiya.github.io/Taras/v2/` *(or `https://yashajagiya.github.io/tarasF1Data/v2/`)*
 
 | Endpoint | Method | Path | What It Provides | Sample Size |
 |---|:---:|---|---|:---:|
-| **Overview** | `GET` | [`/v2/overview.json`](https://yashajagiya.github.io/tarasF1Data/v2/overview.json) | **Home screen in 1 request**: leaders, next race countdown, live schedule, latest podium. | `~2.1 KB` |
-| **Drivers** | `GET` | [`/v2/drivers.json`](https://yashajagiya.github.io/tarasF1Data/v2/drivers.json) | **All 23 drivers**: portraits, number vector logos, team colors, bios, 2026 stats, career stats. | `~208 KB` |
-| **Teams** | `GET` | [`/v2/teams.json`](https://yashajagiya.github.io/tarasF1Data/v2/teams.json) | **All 11 constructors**: car cutouts, white logos, leadership, engines, chassis, factory bases. | `~84 KB` |
-| **Standings** | `GET` | [`/v2/standings.json`](https://yashajagiya.github.io/tarasF1Data/v2/standings.json) | Complete leaderboards for both Drivers and Constructors with **round-by-round points**. | `~190 KB` |
-| **Calendar** | `GET` | [`/v2/calendar.json`](https://yashajagiya.github.io/tarasF1Data/v2/calendar.json) | Complete 23-race season with track outline maps, circuit records, corners, and UTC schedules. | `~34 KB` |
-| **Active Weekend** | `GET` | [`/v2/results/latest.json`](https://yashajagiya.github.io/tarasF1Data/v2/results/latest.json) | Complete classifications for active / latest weekend (FP1, FP2, FP3, Qualy, Sprint, Race). | `~26 KB` |
-| **Historical Rounds** | `GET` | [`/v2/results/round_{N}.json`](https://yashajagiya.github.io/tarasF1Data/v2/results/round_15.json) | Full weekend session archives for **Rounds 1 through 16** (e.g. `round_15.json`, `round_14.json`). | `~25 KB` each |
+| **Overview** | `GET` | [`/v2/overview.json`](v2/overview.json) | **Home screen in 1 request**: leaders, next race countdown, live schedule, latest podium. | `~2.1 KB` |
+| **Drivers** | `GET` | [`/v2/drivers.json`](v2/drivers.json) | **All 23 drivers**: portraits, number vector logos, team colors, bios, 2026 stats, career stats. | `~208 KB` |
+| **Teams** | `GET` | [`/v2/teams.json`](v2/teams.json) | **All 11 constructors**: car cutouts, white logos, leadership, engines, chassis, factory bases. | `~84 KB` |
+| **Standings** | `GET` | [`/v2/standings.json`](v2/standings.json) | Complete leaderboards for both Drivers and Constructors with **round-by-round points**. | `~190 KB` |
+| **Calendar** | `GET` | [`/v2/calendar.json`](v2/calendar.json) | Complete 24-race season with track outline maps, circuit records, corners, and UTC schedules. | `~34 KB` |
+| **Active Weekend** | `GET` | [`/v2/results/latest.json`](v2/results/latest.json) | Complete classifications for active / latest weekend (FP1, FP2, FP3, Qualy, Sprint, Race). | `~26 KB` |
+| **Historical Rounds** | `GET` | [`/v2/results/round_{N}.json`](v2/results/round_17.json) | Full weekend session archives for **Rounds 1 through 18** (e.g. `round_17.json`, `round_14.json`). | `~25 KB` each |
+| **Live Telemetry** | `GET` | [`/v2/live.json`](v2/live.json) | Live race state, flags, on-track car count, and leader metadata. | `~0.4 KB` |
 
 ---
 
@@ -310,17 +313,22 @@ The legacy **v1 API** has been cleanly organized into the [`/v1`](v1/) folder. U
 ## 📂 Repository File Structure
 
 ```text
-tarasF1Data/
-├── v2/                          ← Edge-deployed public V2 API (GitHub Pages)
-│   ├── overview.json
-│   ├── drivers.json
-│   ├── teams.json
-│   ├── standings.json
-│   ├── calendar.json
+TarasAPIstatic/
+├── index.html                   ← Interactive Developer Portal & REST API Explorer
+├── .github/
+│   └── workflows/
+│       └── update-f1.yml        ← Weekly automated GitHub Actions scraper & deployer
+├── v2/                          ← Unified Next-Gen REST API (Primary)
+│   ├── overview.json            ← Home dashboard in 1 request
+│   ├── drivers.json             ← All 23 drivers with portraits & stats
+│   ├── teams.json               ← All 11 constructors with car cutouts & logos
+│   ├── standings.json           ← Championship tables & round progression
+│   ├── calendar.json            ← 24-race schedule & track maps
+│   ├── live.json                ← Live race session state
 │   └── results/
 │       ├── latest.json
-│       └── round_1.json ... round_16.json
-├── v1/                          ← Consolidated legacy V1 API & scrapers
+│       └── round_1.json ... round_18.json
+├── v1/                          ← Legacy v1 API endpoints (backward compatibility)
 │   ├── driversperrace.json
 │   ├── carperrace.json
 │   ├── f1Info/
@@ -330,19 +338,23 @@ tarasF1Data/
 │   ├── race-result/
 │   └── README.md
 ├── tarasF1DataV2/               ← Master V2 Build Engine & Registries
-│   ├── data/
-│   │   ├── drivers_registry.json
+│   ├── data/                    ← Authoritative master data registries
 │   │   ├── teams_registry.json
 │   │   ├── calendar_master.json
 │   │   └── sessions/            ← Master round sessions storage
-│   ├── collectors/
-│   │   ├── espn_standings.py
-│   │   ├── f1_encyclopedia.py
-│   │   └── f1_sessions.py
+│   ├── collectors/              ← Data adapters (ESPN, F1 Encyclopedia)
+│   ├── scrapers/                ← Session scrapers
 │   ├── build.py                 ← Master Build Engine
 │   ├── extract_rounds.py        ← Historical Rounds Extractor
 │   └── test_v2_integrity.py     ← Zero Data Loss Automated Tests
-├── extract_rounds.py            ← Root Extractor CLI shortcut
+├── docs/                        ← Complete Documentation Suite
+│   ├── API_REFERENCE.md         ← Full endpoint reference & schemas
+│   ├── ARCHITECTURE.md          ← Clean architecture & extension guide
+│   ├── F1_DATA_SOURCES.md       ← External data sources catalog
+│   ├── PROJECT.md               ← Ecosystem background & product role
+│   └── mobile_app_specs/        ← Android TARAS app UI specifications
+├── update_v2.py                 ← Master Pipeline CLI entry point
+├── extract_rounds.py            ← Root Extractor CLI entry point
 └── README.md                    ← You are here!
 ```
 

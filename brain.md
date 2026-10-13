@@ -1,134 +1,276 @@
 # Project Brain & Memory (`brain.md`)
 
-This file stores project context, user preferences, architectural decisions, and current progress. It ensures continuity across chat sessions.
+This file stores project context, user preferences, architectural decisions, and session logs.
+
+> 🛑 **CRITICAL ISOLATION DIRECTIVE FOR ALL AGENTS & SESSIONS:**
+> This repository is **`TarasAPIstatic`** (`yashajagiya/Taras`), a **100% Static Formula 1 REST API** served on GitHub Pages edge CDN (`github.io`).
+>
+> - **SECTION 1:** Contains all information, architecture, roadmaps, and session logs for **THIS REPOSITORY (`TarasAPIstatic`)**.
+>   **➡️ ALL AGENTS MUST READ AND UPDATE EXCLUSIVELY INSIDE SECTION 1.**
+> - **SECTION 2:** Contains historical reference material from external companion projects (Ktor Live Timing Server, Mobile App).
+>   **➡️ NEVER UPDATE SECTION 2. NEVER MIX KTOR, KOTLIN, WEBSOCKET, OR MOBILE LOGS INTO SECTION 1.**
 
 ---
 
-## 1. Project Overview
+# ==============================================================================
+# 🏎️ SECTION 1: TARAS F1 STATIC API (PRIMARY / ACTIVE PROJECT)
+# ==============================================================================
+*(THIS REPOSITORY: `M:\TarasAPIstatic` / `yashajagiya/Taras`)*
+*(ALL ACTIVE TASKS, PREFERENCES, ROADMAPS, AND SESSION LOGS ARE MAINTAINED HERE)*
+
+## 1.1 Project Overview
 - **Project Name:** `Taras F1 Static API` (`yashajagiya/Taras`)
 - **Description:** Zero-latency, edge-cached Formula 1 (F1) public REST API & dataset hosted on GitHub Pages (`github.io`).
-- **Pipeline:** Python 3.11+ master build engine & collectors (`tarasF1DataV2/`).
+- **Core Pipeline:** Python 3.11+ master build engine & collectors (`v2/build.py`, `v2/collectors/`, `v2/scrapers/`).
 - **CDN Host:** GitHub Pages Edge CDN (`https://yashajagiya.github.io/Taras/v2/`).
 - **Deployment:** Fully automated weekly CI/CD workflow (`.github/workflows/update-f1.yml`).
 
 ---
 
-## 2. Technical Stack & Dependencies
-- **Core Pipeline:** Python 3.11+ (`requests`, `beautifulsoup4`)
-- **API Architecture:** Static JSON REST endpoints (`v2/` primary, `v1/` legacy)
+## 1.2 Technical Stack & Dependencies
+- **Core Pipeline:** Python 3.11+ (`requests`, `beautifulsoup4`, `asyncio`)
+- **API Architecture:** 100% Static JSON REST endpoints (`v2/` primary, `v1/` legacy)
 - **Portal & Explorer:** Vanilla HTML5, CSS3, JavaScript (`index.html`) with interactive API client and multi-language code snippets
-- **Integrity Testing:** Automated test suite (`test_v2_integrity.py` with 8 comprehensive integrity suites)
-- **CI/CD:** GitHub Actions (`update-f1.yml`)
+- **Anti-Ban Architecture:** Asynchronous anti-ban runner (`AntiBanClient`) with browser fingerprint rotation, per-domain concurrency locks, polite human jitter, cache bypass, and automatic backoff
+- **Integrity Testing:** Automated test suite (`v2/test_v2_integrity.py` with 8 comprehensive integrity suites)
+- **CI/CD:** GitHub Actions (`.github/workflows/update-f1.yml`)
 
 ---
 
-## 3. Project Structure
+## 1.3 Repository Directory Structure
 ```text
 TarasAPIstatic/
-├── index.html                   # Interactive Developer Portal & REST API Explorer
-├── README.md                    # Primary repository overview and developer guide
-├── update_v2.py                 # Master pipeline launcher CLI
-├── extract_rounds.py            # Historical round extractor CLI
 ├── .github/
 │   └── workflows/
-│       └── update-f1.yml        # Automated weekly GitHub Actions pipeline
+│       └── update-f1.yml        # Weekly automated GitHub Actions scraper & deployer
+├── index.html                   # Interactive Developer Portal & REST API Explorer for GitHub Pages
+├── README.md                    # Primary repository overview and developer guide
+├── run_v1.py                    # Root CLI shortcut: Asynchronous anti-ban runner for V1
+├── run_v2.py                    # Root CLI shortcut: Asynchronous anti-ban runner for V2
+├── update_v2.py                 # Root CLI shortcut delegating to v2/update.py
+├── extract_rounds.py            # Root CLI shortcut delegating to v2/extract_rounds.py
+│
+├── v1/                          # 100% Self-Contained Legacy API Module
+│   ├── README.md
+│   ├── run_v1.py                # Standalone async anti-ban runner with AntiBanClient
+│   ├── peerracepointdriver.py   # Legacy driver standings scraper & generator
+│   ├── peerracepointcar.py      # Legacy constructor standings scraper & generator
+│   ├── f1Info/                  # Historical driver & race metadata scrapers
+│   ├── practice1/ ...           # Session-specific legacy folders & outputs
+│   └── *.json                   # Legacy public JSON datasets
+│
 ├── v2/                          # 100% Self-Contained Modern REST API Module
+│   ├── README.md
+│   │
+│   ├── 🌐 PUBLIC REST ENDPOINTS (GitHub Pages CDN)
 │   ├── overview.json            # Home screen in 1 request
 │   ├── drivers.json             # All 23 drivers with portraits & stats
-│   ├── teams.json               # All 11 constructors with car cutouts & logos
+│   ├── teams.json               # All 11 constructors with cars & logos
 │   ├── standings.json           # Championship tables & round progression
-│   ├── calendar.json            # 24-race schedule & circuit vectors
+│   ├── calendar.json            # 24-race schedule & track maps
 │   ├── live.json                # Live session status metadata
-│   ├── results/                 # Session classifications (latest & round_{1..18}.json)
+│   ├── results/                 # Public session endpoints: latest.json & round_{1..18}.json
+│   ├── notification/            # Mobile push notifications
+│   │
+│   ├── ⚙️ PIPELINE LAUNCHERS & RUNNERS
+│   ├── run_v2.py                # Standalone async anti-ban runner with AntiBanClient
 │   ├── build.py                 # Master endpoint builder & aggregator
 │   ├── update.py                # Pipeline orchestrator (scrape -> build -> verify -> git)
 │   ├── extract_rounds.py        # Historical round extraction & normalization
 │   ├── test_v2_integrity.py     # 8-suite automated integrity verification
 │   ├── collectors/              # Data adapters (ESPN, Encyclopedia, Sessions)
 │   ├── scrapers/                # Official Formula 1 session HTML parsers
-│   └── data/                    # Authoritative registries (teams, calendar, sessions)
-├── v1/                          # 100% Self-Contained Legacy API Module
-│   ├── peerracepointdriver.py   # Driver standings scraper & generator
-│   ├── peerracepointcar.py      # Constructor standings scraper & generator
-│   ├── f1Info/                  # Driver & race metadata scrapers
-│   ├── practice1/ ...           # Session-specific legacy folders & outputs
-│   └── *.json                   # Legacy public JSON datasets
+│   │
+│   └── 📦 INTERNAL DATA REPOSITORY (`v2/data/`)
+│       ├── registries/          # Authoritative base schemas & catalogs
+│       │   ├── calendar_master.json
+│       │   ├── teams_registry.json
+│       │   └── drivers_data.json
+│       ├── images/              # Image & media lookup maps
+│       │   ├── driverimg.json
+│       │   ├── teamsimgdata.json
+│       │   └── racesimg.json
+│       ├── standings/           # Championship point tracking & car-per-race tables
+│       │   ├── driversperrace.json
+│       │   └── carperrace.json
+│       ├── sessions/            # Raw session cache & extracted weekend packages
+│       │   ├── current/         # Raw session extractions (fp1_extracted.json, etc.)
+│       │   └── rounds/          # Historical round raw packages (round_1.json .. round_18.json)
+│       └── notifications/       # Push notifications & telemetry alerts
+│           └── live.json
+│
 └── docs/                        # Complete technical documentation
     ├── API_REFERENCE.md         # Full REST API endpoint reference & schemas
     ├── ARCHITECTURE.md          # Architecture & extension guide
-    ├── F1_DATA_SOURCES.md       # External data sources catalog
-    ├── PROJECT.md               # Product background & ecosystem role
-    └── mobile_app_specs/        # Specifications for the TARAS Android app
+    ├── F1_DATA_SOURCES.md       # External data source catalog
+    ├── PROJECT.md               # Product background & Taras ecosystem role
+    └── mobile_app_specs/        # Specifications for the TARAS Jetpack Compose mobile app
 ```
 
 ---
 
-## 4. User Preferences & Guidelines
-- **Communication:** Concise, clear, practical explanations.
-- **Code Style:** Idiomatic Kotlin, clean architecture, clean separation of concerns.
-- **Memory Continuity:** Always consult this file (`brain.md`) at the start of any conversation.
-- **Updates:** Keep `brain.md` updated when major changes, preferences, or new modules are introduced.
+## 1.4 User Preferences & Code Standards
+- **Communication:** Concise, clear, practical explanations with clickable file links formatted as `[filename](file:///M:/TarasAPIstatic/path)` with forward slashes.
+- **Code Style:** Clean, modular Python scripts; strictly validated JSON schemas; zero data loss; zero application runtime servers.
+- **Memory Continuity:** Always consult Section 1 of this file (`brain.md`) at the start of any conversation.
+- **Updates:** Keep Section 1 of `brain.md` continuously updated when completing tasks or introducing architectural improvements.
 
 ---
 
-## 5. Current Status & Roadmap
-- [x] Initial Ktor + Amper project scaffolded.
-- [x] Basic routing (`GET /` -> `"Hello, World!"`) and unit tests verified.
-- [x] Brain / Memory documentation established (`brain.md` + `AGENTS.md`).
-- [x] Master implementation blueprint updated with 2026 22-car grid, HTML selectors, and failure defenses (`implement.md`).
-- [x] Updated `module.yaml` with Ktor WebSockets, ContentNegotiation, and Kotlinx Serialization.
-- [x] Implemented F1 data models with 2026 22-car grid schemas (`F1DataModels.kt`).
-- [x] Implemented thread-safe, disk-backed `RaceStateManager.kt` with admin logging flow.
-- [x] Built professional F1 Mission Control & Live Timing UI (`resources/static/index.html`).
-- [x] Implemented `/ingest`, `/timing`, `/api/admin/logs`, and REST routes in `Routing.kt`.
-- [x] Created stealth browser observer script (`observer.user.js`) with WakeLock and debouncing.
-- [x] Admin PIN protection (`16331245`) verified exclusively on backend with temporary UUID session tokens; frontend never stores PIN.
-- [x] Implemented dynamic `link.json` and `share.ps1` / `share.bat` tunnel automation that updates the link on every launch.
-- [x] Added `GET /api/link` endpoint for mobile and programmatic consumers.
-- [x] Implemented Kotlin + OkHttp3 WebSocket client reference (`mobile_example/F1OkHttpTimingClient.kt`).
-- [x] Dynamic `v2/live.json` telemetry engine: live race name, session name, flags, driver count, leader, and auto-emptying URLs on session conclude.
-- [x] End-of-session automated trigger for GitHub Actions scraper (`update-f1.yml`).
-- [x] Implemented F1 Live Multimedia Timeline models (`F1TimelineModels.kt`).
-- [x] Implemented thread-safe `TimelineStateManager.kt` with disk persistence (`timeline_cache.json`).
-- [x] Implemented `GET /api/timeline`, `POST /api/ingest/timeline`, `POST /api/ingest/timeline/bulk`, and `/timeline` WebSocket in `Routing.kt`.
-- [x] Built `timeline_observer.user.js` for stealth live lap-by-lap commentary & media streaming from Monterosa Interaction Cloud iframe.
-- [x] Built `mobile_example/F1TimelineClient.kt` for Android OkHttp3 clients.
-- [x] Fully integrated Live Lap-by-Lap Multimedia Feed, Lightbox image zoom, Team Radio audio players, category filter pills, and admin actions into Mission Control (`resources/static/index.html`).
-- [x] Synchronized `start.bat`, `share.bat`, `share.ps1`, `link.json`, and `v2/live.json` with multimedia timeline endpoints and auto-emptying URL contracts.
-- [x] Implemented GitHub auto-discovery in mobile client references (`F1TimelineClient.kt` and `F1OkHttpTimingClient.kt`).
-- [x] Implemented intelligent `FlagDetectionEngine.kt` for automated Safety Car, VSC, Red Flag, Yellow Flag, and Green Flag extraction from live commentary feeds.
-- [x] Built Bi-Directional Cross-Synchronization between Live Timing Leaderboard and Live Multimedia Feed with Admin toggle and UI indicators.
-- [x] Fixed Reverse Order timeline bug with strict monotonic timestamps and comparator sorting.
-- [x] Added QUOTE type, pundit/expert commentary support (e.g. Jolyon Palmer on Hadjar) in models, observer, and UI.
-- [x] Fixed Team Radio audio playback with local audio fallback, origin resolution, and Web Audio API synthesized squelch fallback.
-- [x] Implemented accessible `audioUrl` links in REST API and one-click copy buttons in Mission Control UI.
-- [x] Designed authentic F1 live lap-by-lap aesthetic (gradient timeline spine, category pills, driver badges, animated waveform).
-- [x] Implemented explicit message kind categorization (`kind`: "radio" | "quote" | "general" | "incident" | "flag" | "photo"), `uiType`, and direct boolean helpers (`isRadio`, `isQuote`, `isGeneral`) across API, WebSocket, and webhook responses for effortless client UI development.
-- [x] Strict Big Editorial Photo Filtering: Only large Cloudinary article banners (e.g. Driver of the Day, hero shots) are shared; all small icons, logos, avatars, and thumbnails are discarded across scraper, backend, UI, and cache.
-- [x] Separated Admin Controls for Inbound Webhooks and Real-Time WebSockets: Independent stop/pause/resume toggles in UI and API (`POST /api/admin/command`), real-time service status (`GET /api/admin/services`), HTTP 503 rejection for webhooks, and `CloseReason.Codes.GOING_AWAY` for WebSockets.
-- [x] Full Lap-by-Lap Historical Ingestion & Deep Sweep: Guaranteed complete race timeline ingestion (from Lap 1 / Pre-Session to checkered flag) even when joining mid-race.
-- [x] Dedicated Direct Items Endpoint (`GET /api/timeline/items`) and query parameter support (`order=desc|asc`, `limit`, `lap`, `kind`, `afterId`).
-- [x] Deep Historical Sweep in `timeline_observer.user.js` overcoming Monterosa virtual DOM lazy-loading by progressively paginating and accumulating cards in memory.
-- [x] 100% test coverage passing in `ServerTest.kt` (43/43 tests).
-- [x] Executed Taras F1 API v2 Master Pipeline (`update_v2.py`): Scraped, built all V2 REST endpoints (all 18 rounds, 23 drivers, 11 teams), validated 100% data retention (8/8 integrity tests passed), resolved git sync and deployed live to GitHub repositories.
+## 1.5 Active Status & Current Roadmap
+- [x] Full purge of foreign Ktor server files, IntelliJ binaries, and large binaries (`cloudflared.exe`).
+- [x] 100% standalone `v1/` and `v2/` modules with zero cross-module dependency.
+- [x] Single-file async anti-ban runners (`run_v1.py` & `run_v2.py` with `AntiBanClient`, per-domain locks, polite jitter, and circuit breaker).
+- [x] Clean V2 data architecture: internal data categorized into `v2/data/` (`registries/`, `images/`, `standings/`, `sessions/current/`, `sessions/rounds/`, `notifications/`).
+- [x] Purged duplicate loose JSON files from `v2/` root.
+- [x] Purged 17 empty/redundant session subdirectories in `v2/data/sessions/`.
+- [x] All 8 integrity test suites passing (100% data retention verified).
+- [x] Interactive Developer Portal & REST API Explorer live on GitHub Pages (`index.html`).
+- [x] Strict project boundary isolation implemented in `AGENTS.md` and `brain.md`.
+- [ ] Maintain 2026 race calendar and update upcoming rounds as FIA releases session timetables.
+- [ ] Push notification dispatch integration for mobile clients on round completion.
 
 ---
 
-## 6. Important Notes & Commands
-- Run server: `kotlin.bat run` (Windows) or `./kotlin run` (Unix)
-- Run tests: `kotlin.bat test` or `./kotlin test`
-- Build: `kotlin.bat build` or `./kotlin build`
-- Configuration format: YAML (`resources/application.yaml`)
-- Mission Control Web UI: `http://localhost:8080/`
-- Protected Ingest Socket: `ws://localhost:8080/ingest?token=F1_SECRET_TOKEN_2026`
-- Public Timing Socket: `ws://localhost:8080/timing`
-- Admin Secret PIN: `16331245` (validated on backend via `POST /api/admin/verify`)
-- Share Tunnel Launcher: `share.bat` (automatically updates `link.json` on launch)
+## 1.6 Execution & Test Commands
+- **Run V2 Async Anti-Ban Runner:** `python run_v2.py` (or `python v2/run_v2.py`)
+- **Run V1 Async Anti-Ban Runner:** `python run_v1.py` (or `python v1/run_v1.py`)
+- **Continuous Scraping (No IP Ban):** `python run_v2.py --loop --interval 300`
+- **Stealth Mode Scraping:** `python run_v2.py --stealth`
+- **Direct V2 Endpoint Build:** `python v2/build.py` (or `python run_v2.py --skip-scrape`)
+- **Scrape Specific Round:** `python run_v2.py --round <round_num>`
+- **Run Data Integrity Verification:** `python v2/test_v2_integrity.py`
+- **Extract/Sync Specific Round:** `python v2/extract_rounds.py --round <round_num>`
 
 ---
 
-## 7. Session History & Activity Log
-*(Continuously updated on every interaction to maintain memory and context)*
+## 1.7 Static API Session History & Activity Log
+*(Continuously updated on every interaction in this repository)*
+
+- **Session 44: Simplified GitHub API Repository Structure (`v1`, `v2`, `extra`):**
+  - **User Directive:** "simple fied the api in the github only 3 folder in the github extra , v1 and v2 no other folder , in both folder what fille thay need , remove any ohter file , but move that any extra file in to extra folder, in the the v1 and v2 folder make sure all file it need do not remove or sahre any file give person file by copying the file it need"
+  - **Isolated 3-Folder Architecture (`yashajagiya/tarasF1Data`):**
+    - The repository root now contains exclusively 3 content folders:
+      1. `v1/`: Complete, self-contained legacy API dataset with all 7 session folders (`practice1`-`practice3`, `qualifying`, `race-result`, `sprint-quly`, `sprint-race`), `f1Info/`, `notification/`, `carperrace.json`, `driversperrace.json`, `f1_standings.json`, `f1_constructor_standings.json`, `drivers_data.json`, `driverimg.json`, `racesimg.json`, `teamsimgdata.json`, `live.json`, and generator scripts.
+      2. `v2/`: Complete, self-contained next-gen REST API dataset with `overview.json`, `drivers.json`, `teams.json`, `standings.json`, `calendar.json`, `live.json`, `results/` (`latest.json`, `round_1.json` through `round_18.json`), `notification/`, `README.md`, and dedicated copies of all lookup and asset files (`driverimg.json`, `teamsimgdata.json`, `racesimg.json`, `carperrace.json`, `driversperrace.json`, `drivers_data.json`).
+      3. `extra/`: Contains all underlying pipelines, builders, and legacy tooling moved from root (`tarasF1DataV2/`, `f1Info/`, `practice1`-`practice3/`, `qualifying/`, `race-result/`, `sprint-quly/`, `sprint-race/`, `peerracepointdriver.py`, `peerracepointcar.py`, `update_v2.py`, `extract_rounds.py`, `carperrace.json`, `driverimg.json`, `driversperrace.json`, `racesimg.json`, `teamsimgdata.json`).
+    - Zero cross-sharing/symlinking: Every folder owns its personal copies.
+  - **Automated Workflow & Build Engine Alignment:**
+    - Updated `.github/workflows/update-f1.yml` to run scripts inside `extra/` (`extra/peerracepointdriver.py`, `extra/peerracepointcar.py`, `extra/f1Info/code/scrape_races.py`, `extra/tarasF1DataV2/build.py`) and stage `v1/ v2/ extra/`.
+    - Hardened `extra/tarasF1DataV2/build.py` and `extra/tarasF1DataV2/update.py` to correctly resolve repository roots and write directly to root `v2/` without creating unwanted nested folders.
+    - Updated `peerracepointdriver.py` and `peerracepointcar.py` to synchronize standings into `extra/`, `v1/`, and `v2/` simultaneously.
+  - **Verification:**
+    - Executed `test_v2_integrity.py`: 100% data retention verified (all 8 test suites passed).
+    - Executed `peerracepointdriver.py` and `peerracepointcar.py`: Clean extraction and dual-push verified.
+    - Successfully committed and pushed clean tree to both `yashajagiya/tarasF1Data` and `yashajagiya/Taras`.
+- **Session 45: Full Purge of Mixed Ktor Files & Static API Architecture Modernization:**
+  - **User Directive:** "i think other file are mizxed up rmeove the file that have ktor file , i need to remove any thing extra and make it clean for api upaload in the github for gitjub.io i need thisfor cna be manintable and clean architechter that can be exependable and can be clean , an be expendable and menatble ,well documentable"
+  - **Diagnosis & Root Cause:**
+    - The repository `TarasAPIstatic` was cluttered with Ktor server artifacts, launchers, and binaries accidentally copied from the backend IntelliJ project (`c:\Users\yash\IdeaProjects\tarasf1data`).
+    - A nested broken directory `tarasF1Data` with a non-existent remote `https://github.com/yashajagiya/tarasF1Data.git` had caused Git confusion.
+  - **Cleanup & Purge Actions Executed:**
+    - Purged all Ktor files and folders: `src/`, `test/`, `build/`, `resources/`, `mobile_example/`, `module.yaml`, `libs.versions.toml`, `kotlin`, `kotlin.bat`, `tarasf1data.iml`, `Dockerfile`, `cloudflared.exe` (52MB), `share.bat`, `share.ps1`, `start.bat`, `start.ps1`, `link.json`, `state_cache.json`, `timeline_cache.json`, `github_token.txt`, `observer.user.js`, `timeline_observer.user.js`, `implement.md`, `implementplan.md`, `remoteserver.md`, `timeline_plan.md`.
+    - Removed redundant root directories: `circitdata/`, `notification/`, `tarasF1Data/`, and legacy `.pyc` bytecode.
+    - Moved mobile app UI specifications into `docs/mobile_app_specs/` (`TARAS_Design_Blueprint_M3.md`, `TARAS_Design_Blueprint_M3_v3.md`, `TARAS_Screen_Specifications.md`, `task.md`, `implementation_plan.md`).
+    - Moved `f1_apis_documentation.md` and `PROJECT.md` into `docs/`.
+  - **Clean Architecture & Docs Established:**
+    - Created `docs/API_REFERENCE.md`: Complete field-by-field REST API reference and schema guide.
+    - Created `docs/ARCHITECTURE.md`: Extension, maintenance, and data pipeline manual.
+    - Created `index.html`: State-of-the-art interactive Developer Portal & REST API Explorer for GitHub Pages.
+    - Created `.github/workflows/update-f1.yml`: Weekly automated GitHub Actions pipeline.
+    - Updated `tarasF1DataV2/build.py` and `tarasF1DataV2/update.py` to cleanly sync only to the root repository.
+    - Modernized `.gitignore`, `AGENTS.md`, and `README.md`.
+  - **Verification:**
+    - Tested pipeline (`python update_v2.py --skip-scrape --no-push`): 100% data retention confirmed (all 8 integrity test suites passed).
+- **Session 46: 100% Standalone V1 & V2 Modular Architecture:**
+  - **User Directive:** "make the v1 and v2 satnd alone like if any scraper or any file need for the v2 so it have all that in it so it shoudeb be clena so it can uplad in to the github"
+  - **Actions Executed:**
+    - Fully consolidated all scrapers, collectors, build engine, data registries, and test suites directly into `v2/`:
+      - Moved `collectors/`, `scrapers/`, `data/`, `build.py`, `update.py`, `extract_rounds.py`, `test_v2_integrity.py` into `v2/`.
+      - Updated `v2/build.py` to write endpoints directly to `v2/` (`output_dir = BASE_DIR`), removing redundant copy steps.
+      - Updated `v2/test_v2_integrity.py` to validate `v2/` endpoints directly.
+      - Updated `v2/extract_rounds.py` to save session results directly to `v2/results/`.
+    - Removed redundant root `tarasF1DataV2/` folder entirely.
+    - Updated root `update_v2.py` and `extract_rounds.py` shortcuts to delegate to `v2/update.py` and `v2/extract_rounds.py`.
+    - Verified `v1/` is 100% self-contained with its own scrapers (`peerracepointdriver.py`, `peerracepointcar.py`, `f1Info/`) and JSON endpoints.
+    - Updated `.github/workflows/update-f1.yml`, `docs/ARCHITECTURE.md`, `README.md`, and `AGENTS.md`.
+  - **Session 47: Standalone Asynchronous Anti-Ban Runners (`run_v1.py` & `run_v2.py`):**
+  - **User Directive:** "make the runv1 and run v2 filr that single file can run asyncrosness sccraper file but make that way i dont get ban becuse of the continu scraping"
+  - **Identified Anti-Ban Threat Vectors During Continuous Scraping:**
+    1. *Burst Requests to Same Host:* Concurrent scraping without domain locks hammers `formula1.com` or `espn.com` at the exact same millisecond, triggering IP rate limits.
+    2. *Fixed Bot Fingerprints:* Fixed headers, missing `sec-ch-ua` browser hints, or missing navigation headers trigger Cloudflare/Akamai bot detection.
+    3. *Periodic Rhythm Detection:* Constant clockwork scraping intervals (e.g. exactly every 60s) are easily detected by traffic analysis firewalls.
+    4. *Redundant Scraping of Finalized Sessions:* Repeatedly re-requesting historical or completed races over the network creates unnecessary traffic and increases ban risk.
+    5. *Ignoring HTTP 429/403 Warnings:* Continuing to hammer after a rate-limit leads to long-term IP blacklisting.
+  - **Anti-Ban Architecture Implemented (`AntiBanClient`):**
+    - **Rotating Modern Browser Fingerprints:** Chrome 125/126 on Windows 11, Edge 125, macOS Sonoma Safari, and Firefox 126 with realistic `sec-ch-ua`, `sec-ch-ua-mobile`, `sec-ch-ua-platform`, and `Sec-Fetch-*` navigation headers.
+    - **Per-Domain Asynchronous Concurrency Caps:** Independent `asyncio.Lock` per domain (`formula1.com`, `site.api.espn.com`, `f1api.dev`) ensuring parallel scraping never hammers a single host.
+    - **Polite Human Jitter:** Randomized sleep delays (`1.8s - 3.8s` standard, `3.5s - 6.5s` in `--stealth`).
+    - **Smart Cache Bypass:** Fully archived and finalized sessions skip network calls completely via cache-hit guards (`⚡ Cache Hit`).
+    - **Brotli Decompression Fix:** Enforced native `gzip, deflate` in `BASE_NAV_HEADERS` to prevent corrupt Brotli binary payloads without requiring external C libraries.
+    - **Exponential Backoff & Circuit Breaker:** Exponential backoff on HTTP 429/403 with `Retry-After` header inspection. In continuous loop mode, detects blocks and enters an extended 5–10 minute safety cooldown to safeguard the user's IP.
+  - **Single-File Runners Delivered:**
+    - [`v1/run_v1.py`](v1/run_v1.py): Self-contained async runner orchestrating driver standings (`driversperrace.json`, `f1_standings.json`), constructor standings (`carperrace.json`, `f1_constructor_standings.json`), calendar (`races_data.json`), and active weekend sessions (`practice1/`, `practice2/`, `practice3/`, `qualifying/`, `sprint-quly/`, `sprint-race/`, `race-result/`). Supports `--loop`, `--interval`, `--stealth`, `--force`, `--push`.
+    - [`v2/run_v2.py`](v2/run_v2.py): Self-contained async runner orchestrating F1 session extraction, master build engine (`v2/build.py`), and 8-suite integrity verification (`v2/test_v2_integrity.py`). Supports `--loop`, `--interval`, `--round`, `--all`, `--stealth`, `--skip-scrape`, `--push`.
+    - Root Launchers: [`run_v1.py`](run_v1.py) and [`run_v2.py`](run_v2.py) convenience wrappers in workspace root forwarding all CLI arguments.
+- **Session 48: V2 Architecture & Data Directory Organization:**
+  - **User Directive:** "v2 loo messy i want more organized and clean architecher , can be easy to understand who understand , and seesion is data like ? it shodu be in data ? and other json file organzed to make it clena and organie accoding to the thye can be find any hting t=with like it cna be organized more better way"
+  - **Core Problem Solved:**
+    - `v2/` root was cluttered with loose legacy files (`carperrace.json`, `driverimg.json`, `drivers_data.json`, `driversperrace.json`, `racesimg.json`, `teamsimgdata.json`) that belonged inside internal data directories.
+    - Session data lacked clear structure: raw session files were scattered, and 17 empty/redundant session subfolders (`data/sessions/round_1` .. `round_17`) created confusing folder sprawl.
+  - **Clean Reorganization Implemented:**
+    1. **Public REST Endpoints (`v2/` root & `v2/results/`):**
+       - The root of `v2/` now strictly contains public endpoints served directly by GitHub Pages CDN: `overview.json`, `drivers.json`, `teams.json`, `standings.json`, `calendar.json`, `live.json`, `notification/`, and `results/` (`latest.json` & `round_{1..18}.json`).
+    2. **Internal Data Categorization (`v2/data/`):**
+       - `registries/`: Master schemas & catalogs (`calendar_master.json`, `teams_registry.json`, `drivers_data.json`).
+       - `images/`: High-resolution asset maps (`driverimg.json`, `teamsimgdata.json`, `racesimg.json`).
+       - `standings/`: Internal championship tables (`driversperrace.json`, `carperrace.json`).
+       - `sessions/`: Cleanly divided into:
+         - `current/`: Temporary active weekend raw extractions (`fp1_extracted.json`, etc.).
+         - `rounds/`: Offline raw weekend archives (`round_1.json` through `round_18.json`) used by the anti-ban runner for instant cache hits.
+       - `notifications/`: Push & live telemetry tracking (`live.json`).
+    3. **Purged Clutter & Empty Sprawl:**
+       - Deleted duplicate JSON files from `v2/` root.
+       - Purged 17 empty session subdirectories in `v2/data/sessions/`.
+    4. **Module & Collector Synchronization:**
+       - Updated `v2/build.py`, `v2/collectors/espn_standings.py`, `v2/collectors/f1_encyclopedia.py`, `v2/collectors/f1_sessions.py`, `v2/extract_rounds.py`, and `v2/run_v2.py` with multi-path resolution and seamless fallback guarantees.
+    5. **Comprehensive Documentation:**
+       - Created [`v2/data/README.md`](v2/data/README.md) documenting every category and file.
+       - Updated [`v2/README.md`](v2/README.md), root [`README.md`](README.md), and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+  - **Verification:**
+    - `python v2/test_v2_integrity.py`: 100% data retention confirmed (all 8 integrity suites passed).
+    - `python run_v2.py --round 17`: Successfully verified cache hit, build, and validation in 1.07s with 0 blocks.
+- **Session 49: Strict Project Boundary Isolation in `brain.md` & `AGENTS.md`:**
+  - **User Directive:** "brain.md and agent.md is mixein the other project so in thgat make section that can only upaddte it in to that section and dont mix the other thing with other"
+  - **Problem Identified:**
+    - `brain.md` had Kotlin/Ktor server instructions (`kotlin.bat run`, WebSockets, PIN `16331245`, Amper, etc.) and companion project logs mixed into its active overview and roadmap.
+    - An agent could mistakenly update or reference the wrong project stack during static API work.
+  - **Actions Executed:**
+    1. **Divided `brain.md` into Strict Sections:**
+       - **SECTION 1 (Primary / Active Project):** Strictly contains `Taras F1 Static API` (`TarasAPIstatic`) architecture, Python 3.11+ stack, verified commands, current roadmap, and Sessions 44 to 49. **All active updates occur exclusively in this section.**
+       - **SECTION 2 (External Companion Projects - Archived Reference):** Quarantines historical material from companion projects (`tarasf1data` Ktor server, Sessions 1 to 43, mobile app specs). Marked with strict read-only warning banners.
+    2. **Updated `AGENTS.md` Directives:**
+       - Added explicit project boundary rules preventing any foreign stack code (Kotlin, Ktor, Gradle) or companion project mixing.
+       - Enforced rule: Agents must ONLY update Section 1 of `brain.md`.
+    3. **Verification:**
+       - Tested all static API commands and verified clean separation.
+
+---
+
+# ==============================================================================
+# 📦 SECTION 2: EXTERNAL COMPANION PROJECTS (ARCHIVED / READ-ONLY REFERENCE)
+# ==============================================================================
+> ⚠️ **ARCHIVE WARNING:** This section documents external companion projects that operate in SEPARATE repositories or workspaces.
+> **DO NOT UPDATE THIS SECTION during work on `TarasAPIstatic`.**
+> **DO NOT MIX THESE COMMANDS, FRAMEWORKS, OR CODES INTO SECTION 1.**
+
+## 2.1 Companion Project A: Taras F1 Live Timing Server (`tarasf1data`)
+- **Repository / Location:** External project (`c:\Users\yash\IdeaProjects\tarasf1data`)
+- **Stack:** Kotlin, Ktor, Netty, WebSockets, Amper
+- **Role:** High-speed real-time lap-by-lap WebSocket relay, Tampermonkey live observer, Cloudflare Quick Tunnels
+- **Admin PIN:** `16331245`
+- **Commands (Run only in `tarasf1data`, NOT in this repo):** `kotlin.bat run`, `kotlin.bat test`, `start.bat`, `share.bat`
+- **Historical Session Log (Sessions 1 to 43 - Preserved for Reference):**
 
 ### [2026-10-09]
 - **Session 1: Initialized project memory system:**
@@ -588,119 +730,9 @@ TarasAPIstatic/
   - **Verification:**
     - Ran `update_v2.py --skip-scrape`: 100% data integrity verified (8/8 tests passed).
     - Automatically committed and pushed clean updates to both `yashajagiya/Taras` and `yashajagiya/tarasF1Data`.
-- **Session 44: Simplified GitHub API Repository Structure (`v1`, `v2`, `extra`):**
-  - **User Directive:** "simple fied the api in the github only 3 folder in the github extra , v1 and v2 no other folder , in both folder what fille thay need , remove any ohter file , but move that any extra file in to extra folder, in the the v1 and v2 folder make sure all file it need do not remove or sahre any file give person file by copying the file it need"
-  - **Isolated 3-Folder Architecture (`yashajagiya/tarasF1Data`):**
-    - The repository root now contains exclusively 3 content folders:
-      1. `v1/`: Complete, self-contained legacy API dataset with all 7 session folders (`practice1`-`practice3`, `qualifying`, `race-result`, `sprint-quly`, `sprint-race`), `f1Info/`, `notification/`, `carperrace.json`, `driversperrace.json`, `f1_standings.json`, `f1_constructor_standings.json`, `drivers_data.json`, `driverimg.json`, `racesimg.json`, `teamsimgdata.json`, `live.json`, and generator scripts.
-      2. `v2/`: Complete, self-contained next-gen REST API dataset with `overview.json`, `drivers.json`, `teams.json`, `standings.json`, `calendar.json`, `live.json`, `results/` (`latest.json`, `round_1.json` through `round_18.json`), `notification/`, `README.md`, and dedicated copies of all lookup and asset files (`driverimg.json`, `teamsimgdata.json`, `racesimg.json`, `carperrace.json`, `driversperrace.json`, `drivers_data.json`).
-      3. `extra/`: Contains all underlying pipelines, builders, and legacy tooling moved from root (`tarasF1DataV2/`, `f1Info/`, `practice1`-`practice3/`, `qualifying/`, `race-result/`, `sprint-quly/`, `sprint-race/`, `peerracepointdriver.py`, `peerracepointcar.py`, `update_v2.py`, `extract_rounds.py`, `carperrace.json`, `driverimg.json`, `driversperrace.json`, `racesimg.json`, `teamsimgdata.json`).
-    - Zero cross-sharing/symlinking: Every folder owns its personal copies.
-  - **Automated Workflow & Build Engine Alignment:**
-    - Updated `.github/workflows/update-f1.yml` to run scripts inside `extra/` (`extra/peerracepointdriver.py`, `extra/peerracepointcar.py`, `extra/f1Info/code/scrape_races.py`, `extra/tarasF1DataV2/build.py`) and stage `v1/ v2/ extra/`.
-    - Hardened `extra/tarasF1DataV2/build.py` and `extra/tarasF1DataV2/update.py` to correctly resolve repository roots and write directly to root `v2/` without creating unwanted nested folders.
-    - Updated `peerracepointdriver.py` and `peerracepointcar.py` to synchronize standings into `extra/`, `v1/`, and `v2/` simultaneously.
-  - **Verification:**
-    - Executed `test_v2_integrity.py`: 100% data retention verified (all 8 test suites passed).
-    - Executed `peerracepointdriver.py` and `peerracepointcar.py`: Clean extraction and dual-push verified.
-    - Successfully committed and pushed clean tree to both `yashajagiya/tarasF1Data` and `yashajagiya/Taras`.
-- **Session 45: Full Purge of Mixed Ktor Files & Static API Architecture Modernization:**
-  - **User Directive:** "i think other file are mizxed up rmeove the file that have ktor file , i need to remove any thing extra and make it clean for api upaload in the github for gitjub.io i need thisfor cna be manintable and clean architechter that can be exependable and can be clean , an be expendable and menatble ,well documentable"
-  - **Diagnosis & Root Cause:**
-    - The repository `TarasAPIstatic` was cluttered with Ktor server artifacts, launchers, and binaries accidentally copied from the backend IntelliJ project (`c:\Users\yash\IdeaProjects\tarasf1data`).
-    - A nested broken directory `tarasF1Data` with a non-existent remote `https://github.com/yashajagiya/tarasF1Data.git` had caused Git confusion.
-  - **Cleanup & Purge Actions Executed:**
-    - Purged all Ktor files and folders: `src/`, `test/`, `build/`, `resources/`, `mobile_example/`, `module.yaml`, `libs.versions.toml`, `kotlin`, `kotlin.bat`, `tarasf1data.iml`, `Dockerfile`, `cloudflared.exe` (52MB), `share.bat`, `share.ps1`, `start.bat`, `start.ps1`, `link.json`, `state_cache.json`, `timeline_cache.json`, `github_token.txt`, `observer.user.js`, `timeline_observer.user.js`, `implement.md`, `implementplan.md`, `remoteserver.md`, `timeline_plan.md`.
-    - Removed redundant root directories: `circitdata/`, `notification/`, `tarasF1Data/`, and legacy `.pyc` bytecode.
-    - Moved mobile app UI specifications into `docs/mobile_app_specs/` (`TARAS_Design_Blueprint_M3.md`, `TARAS_Design_Blueprint_M3_v3.md`, `TARAS_Screen_Specifications.md`, `task.md`, `implementation_plan.md`).
-    - Moved `f1_apis_documentation.md` and `PROJECT.md` into `docs/`.
-  - **Clean Architecture & Docs Established:**
-    - Created `docs/API_REFERENCE.md`: Complete field-by-field REST API reference and schema guide.
-    - Created `docs/ARCHITECTURE.md`: Extension, maintenance, and data pipeline manual.
-    - Created `index.html`: State-of-the-art interactive Developer Portal & REST API Explorer for GitHub Pages.
-    - Created `.github/workflows/update-f1.yml`: Weekly automated GitHub Actions pipeline.
-    - Updated `tarasF1DataV2/build.py` and `tarasF1DataV2/update.py` to cleanly sync only to the root repository.
-    - Modernized `.gitignore`, `AGENTS.md`, and `README.md`.
-  - **Verification:**
-    - Tested pipeline (`python update_v2.py --skip-scrape --no-push`): 100% data retention confirmed (all 8 integrity test suites passed).
-- **Session 46: 100% Standalone V1 & V2 Modular Architecture:**
-  - **User Directive:** "make the v1 and v2 satnd alone like if any scraper or any file need for the v2 so it have all that in it so it shoudeb be clena so it can uplad in to the github"
-  - **Actions Executed:**
-    - Fully consolidated all scrapers, collectors, build engine, data registries, and test suites directly into `v2/`:
-      - Moved `collectors/`, `scrapers/`, `data/`, `build.py`, `update.py`, `extract_rounds.py`, `test_v2_integrity.py` into `v2/`.
-      - Updated `v2/build.py` to write endpoints directly to `v2/` (`output_dir = BASE_DIR`), removing redundant copy steps.
-      - Updated `v2/test_v2_integrity.py` to validate `v2/` endpoints directly.
-      - Updated `v2/extract_rounds.py` to save session results directly to `v2/results/`.
-    - Removed redundant root `tarasF1DataV2/` folder entirely.
-    - Updated root `update_v2.py` and `extract_rounds.py` shortcuts to delegate to `v2/update.py` and `v2/extract_rounds.py`.
-    - Verified `v1/` is 100% self-contained with its own scrapers (`peerracepointdriver.py`, `peerracepointcar.py`, `f1Info/`) and JSON endpoints.
-    - Updated `.github/workflows/update-f1.yml`, `docs/ARCHITECTURE.md`, `README.md`, and `AGENTS.md`.
-  - **Session 47: Standalone Asynchronous Anti-Ban Runners (`run_v1.py` & `run_v2.py`):**
-  - **User Directive:** "make the runv1 and run v2 filr that single file can run asyncrosness sccraper file but make that way i dont get ban becuse of the continu scraping"
-  - **Identified Anti-Ban Threat Vectors During Continuous Scraping:**
-    1. *Burst Requests to Same Host:* Concurrent scraping without domain locks hammers `formula1.com` or `espn.com` at the exact same millisecond, triggering IP rate limits.
-    2. *Fixed Bot Fingerprints:* Fixed headers, missing `sec-ch-ua` browser hints, or missing navigation headers trigger Cloudflare/Akamai bot detection.
-    3. *Periodic Rhythm Detection:* Constant clockwork scraping intervals (e.g. exactly every 60s) are easily detected by traffic analysis firewalls.
-    4. *Redundant Scraping of Finalized Sessions:* Repeatedly re-requesting historical or completed races over the network creates unnecessary traffic and increases ban risk.
-    5. *Ignoring HTTP 429/403 Warnings:* Continuing to hammer after a rate-limit leads to long-term IP blacklisting.
-  - **Anti-Ban Architecture Implemented (`AntiBanClient`):**
-    - **Rotating Modern Browser Fingerprints:** Chrome 125/126 on Windows 11, Edge 125, macOS Sonoma Safari, and Firefox 126 with realistic `sec-ch-ua`, `sec-ch-ua-mobile`, `sec-ch-ua-platform`, and `Sec-Fetch-*` navigation headers.
-    - **Per-Domain Asynchronous Concurrency Caps:** Independent `asyncio.Lock` per domain (`formula1.com`, `site.api.espn.com`, `f1api.dev`) ensuring parallel scraping never hammers a single host.
-    - **Polite Human Jitter:** Randomized sleep delays (`1.8s - 3.8s` standard, `3.5s - 6.5s` in `--stealth`).
-    - **Smart Cache Bypass:** Fully archived and finalized sessions skip network calls completely via cache-hit guards (`⚡ Cache Hit`).
-    - **Brotli Decompression Fix:** Enforced native `gzip, deflate` in `BASE_NAV_HEADERS` to prevent corrupt Brotli binary payloads without requiring external C libraries.
-    - **Exponential Backoff & Circuit Breaker:** Exponential backoff on HTTP 429/403 with `Retry-After` header inspection. In continuous loop mode, detects blocks and enters an extended 5–10 minute safety cooldown to safeguard the user's IP.
-  - **Single-File Runners Delivered:**
-    - [`v1/run_v1.py`](v1/run_v1.py): Self-contained async runner orchestrating driver standings (`driversperrace.json`, `f1_standings.json`), constructor standings (`carperrace.json`, `f1_constructor_standings.json`), calendar (`races_data.json`), and active weekend sessions (`practice1/`, `practice2/`, `practice3/`, `qualifying/`, `sprint-quly/`, `sprint-race/`, `race-result/`). Supports `--loop`, `--interval`, `--stealth`, `--force`, `--push`.
-    - [`v2/run_v2.py`](v2/run_v2.py): Self-contained async runner orchestrating F1 session extraction, master build engine (`v2/build.py`), and 8-suite integrity verification (`v2/test_v2_integrity.py`). Supports `--loop`, `--interval`, `--round`, `--all`, `--stealth`, `--skip-scrape`, `--push`.
-    - Root Launchers: [`run_v1.py`](run_v1.py) and [`run_v2.py`](run_v2.py) convenience wrappers in workspace root forwarding all CLI arguments.
-- **Session 48: V2 Architecture & Data Directory Organization:**
-  - **User Directive:** "v2 loo messy i want more organized and clean architecher , can be easy to understand who understand , and seesion is data like ? it shodu be in data ? and other json file organzed to make it clena and organie accoding to the thye can be find any hting t=with like it cna be organized more better way"
-  - **Core Problem Solved:**
-    - `v2/` root was cluttered with loose legacy files (`carperrace.json`, `driverimg.json`, `drivers_data.json`, `driversperrace.json`, `racesimg.json`, `teamsimgdata.json`) that belonged inside internal data directories.
-    - Session data lacked clear structure: raw session files were scattered, and 17 empty/redundant session subfolders (`data/sessions/round_1` .. `round_17`) created confusing folder sprawl.
-  - **Clean Reorganization Implemented:**
-    1. **Public REST Endpoints (`v2/` root & `v2/results/`):**
-       - The root of `v2/` now strictly contains public endpoints served directly by GitHub Pages CDN: `overview.json`, `drivers.json`, `teams.json`, `standings.json`, `calendar.json`, `live.json`, `notification/`, and `results/` (`latest.json` & `round_{1..18}.json`).
-    2. **Internal Data Categorization (`v2/data/`):**
-       - `registries/`: Master schemas & catalogs (`calendar_master.json`, `teams_registry.json`, `drivers_data.json`).
-       - `images/`: High-resolution asset maps (`driverimg.json`, `teamsimgdata.json`, `racesimg.json`).
-       - `standings/`: Internal championship tables (`driversperrace.json`, `carperrace.json`).
-       - `sessions/`: Cleanly divided into:
-         - `current/`: Temporary active weekend raw extractions (`fp1_extracted.json`, etc.).
-         - `rounds/`: Offline raw weekend archives (`round_1.json` through `round_18.json`) used by the anti-ban runner for instant cache hits.
-       - `notifications/`: Push & live telemetry tracking (`live.json`).
-    3. **Purged Clutter & Empty Sprawl:**
-       - Deleted duplicate JSON files from `v2/` root.
-       - Purged 17 empty session subdirectories in `v2/data/sessions/`.
-    4. **Module & Collector Synchronization:**
-       - Updated `v2/build.py`, `v2/collectors/espn_standings.py`, `v2/collectors/f1_encyclopedia.py`, `v2/collectors/f1_sessions.py`, `v2/extract_rounds.py`, and `v2/run_v2.py` with multi-path resolution and seamless fallback guarantees.
-    5. **Comprehensive Documentation:**
-       - Created [`v2/data/README.md`](v2/data/README.md) documenting every category and file.
-       - Updated [`v2/README.md`](v2/README.md), root [`README.md`](README.md), and [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
-  - **Verification:**
-    - `python v2/test_v2_integrity.py`: 100% data retention confirmed (all 8 integrity suites passed).
-    - `python run_v2.py --round 17`: Successfully verified cache hit, build, and validation in 1.07s with 0 blocks.
+---
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+## 2.2 Companion Project B: TARAS Mobile App (Android / Jetpack Compose)
+- **Repository / Location:** Mobile client workspace
+- **Role:** Native Android mobile client consuming both the Static REST API (`v2/`) and the Live Timing WebSocket server
+- **Design Specifications:** Preserved in `docs/mobile_app_specs/` (`TARAS_Design_Blueprint_M3.md`, `TARAS_Screen_Specifications.md`)

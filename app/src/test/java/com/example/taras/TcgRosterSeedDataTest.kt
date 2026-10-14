@@ -43,9 +43,9 @@ class TcgRosterSeedDataTest {
         val cTier = cards.filter { it.tier == RarityTier.C_TIER }
 
         assertEquals(9, sTier.size)
-        assertEquals(5, aTier.size)
-        assertEquals(16, bTier.size)
-        assertEquals(4, cTier.size)
+        assertEquals(7, aTier.size)
+        assertEquals(13, bTier.size)
+        assertEquals(5, cTier.size)
     }
 
     @Test

@@ -89,5 +89,6 @@ class F1InfoRepositoryTest {
 
         override suspend fun getLatestResults(): WeekendResultsResponse = throw UnsupportedOperationException()
         override suspend fun getResultsByRound(round: Int): WeekendResultsResponse = throw UnsupportedOperationException()
+        override suspend fun getLive(): com.example.taras.network_calls.taras.model.live.LiveDiscoveryResponse = throw UnsupportedOperationException()
     }
 }

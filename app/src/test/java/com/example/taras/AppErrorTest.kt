@@ -7,7 +7,7 @@ import kotlinx.serialization.SerializationException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.io.IOException
+import okio.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
@@ -31,8 +31,48 @@ class AppErrorTest {
     }
 
     @Test
+    fun ktorSocketTimeoutException_mapsTo_networkError() {
+        val exception = io.ktor.client.network.sockets.SocketTimeoutException("Ktor socket timed out")
+        val error = exception.toAppError()
+
+        assertTrue(error is AppError.Network)
+    }
+
+    @Test
+    fun ktorHttpRequestTimeoutException_mapsTo_networkError() {
+        val exception = io.ktor.client.plugins.HttpRequestTimeoutException("https://example.com", 5000L)
+        val error = exception.toAppError()
+
+        assertTrue(error is AppError.Network)
+    }
+
+    @Test
+    fun ktorConnectTimeoutException_mapsTo_networkError() {
+        val exception = io.ktor.client.network.sockets.ConnectTimeoutException("Connect timed out")
+        val error = exception.toAppError()
+
+        assertTrue(error is AppError.Network)
+    }
+
+    @Test
+    fun ktorUnresolvedAddressException_mapsTo_networkError() {
+        val exception = io.ktor.util.network.UnresolvedAddressException()
+        val error = exception.toAppError()
+
+        assertTrue(error is AppError.Network)
+    }
+
+    @Test
+    fun okioIOException_mapsTo_networkError() {
+        val exception = okio.IOException("Okio stream error")
+        val error = exception.toAppError()
+
+        assertTrue(error is AppError.Network)
+    }
+
+    @Test
     fun ioException_mapsTo_networkError() {
-        val exception = IOException("Stream closed")
+        val exception = java.io.IOException("Stream closed")
         val error = exception.toAppError()
 
         assertTrue(error is AppError.Network)

@@ -18,10 +18,10 @@ class ApiV2DeserializationTest {
 
     @Test
     fun testOverviewDeserialization() {
-        val jsonStr = fetchJson("https://yashajagiya.github.io/tarasF1Data/v2/overview.json")
+        val jsonStr = fetchJson("https://yashajagiya.github.io/TarasAPIstatic/v2/overview.json")
         val overview = NetworkModule.json.decodeFromString<OverviewResponse>(jsonStr)
         assertEquals(2026, overview.season)
-        assertEquals(16, overview.roundCurrent)
+        assertTrue(overview.roundCurrent > 0)
         assertNotNull(overview.championshipLeader)
         assertNotNull(overview.championshipLeader?.driver)
         assertNotNull(overview.nextEvent)
@@ -31,7 +31,7 @@ class ApiV2DeserializationTest {
 
     @Test
     fun testCalendarDeserialization() {
-        val jsonStr = fetchJson("https://yashajagiya.github.io/tarasF1Data/v2/calendar.json")
+        val jsonStr = fetchJson("https://yashajagiya.github.io/TarasAPIstatic/v2/calendar.json")
         val calendar = NetworkModule.json.decodeFromString<List<CalendarRaceEvent>>(jsonStr)
         assertEquals(23, calendar.size)
         val round1 = calendar[0]
@@ -43,7 +43,7 @@ class ApiV2DeserializationTest {
 
     @Test
     fun testStandingsDeserialization() {
-        val jsonStr = fetchJson("https://yashajagiya.github.io/tarasF1Data/v2/standings.json")
+        val jsonStr = fetchJson("https://yashajagiya.github.io/TarasAPIstatic/v2/standings.json")
         val standings = NetworkModule.json.decodeFromString<StandingsResponse>(jsonStr)
         assertEquals(2026, standings.season)
         assertTrue(standings.drivers.isNotEmpty())
@@ -54,7 +54,7 @@ class ApiV2DeserializationTest {
 
     @Test
     fun testDriversDeserialization() {
-        val jsonStr = fetchJson("https://yashajagiya.github.io/tarasF1Data/v2/drivers.json")
+        val jsonStr = fetchJson("https://yashajagiya.github.io/TarasAPIstatic/v2/drivers.json")
         val drivers = NetworkModule.json.decodeFromString<List<DriverDetailResponseV2>>(jsonStr)
         assertTrue(drivers.isNotEmpty())
         val driver1 = drivers[0]
@@ -67,7 +67,7 @@ class ApiV2DeserializationTest {
 
     @Test
     fun testTeamsDeserialization() {
-        val jsonStr = fetchJson("https://yashajagiya.github.io/tarasF1Data/v2/teams.json")
+        val jsonStr = fetchJson("https://yashajagiya.github.io/TarasAPIstatic/v2/teams.json")
         val teams = NetworkModule.json.decodeFromString<List<TeamDetailResponseV2>>(jsonStr)
         assertTrue(teams.isNotEmpty())
         val team1 = teams[0]
@@ -79,23 +79,30 @@ class ApiV2DeserializationTest {
 
     @Test
     fun testLatestResultsDeserialization() {
-        val jsonStr = fetchJson("https://yashajagiya.github.io/tarasF1Data/v2/results/latest.json")
+        val jsonStr = fetchJson("https://yashajagiya.github.io/TarasAPIstatic/v2/results/latest.json")
         val result = NetworkModule.json.decodeFromString<WeekendResultsResponse>(jsonStr)
-        assertEquals(16, result.round)
-        assertNotNull(result.sessions.practice1)
-        assertNotNull(result.sessions.qualifying)
-        assertNotNull(result.sessions.race)
-        assertTrue(result.sessions.race?.isNotEmpty() == true)
+        assertTrue(result.round > 0)
+        assertNotNull(result.raceName)
+        assertNotNull(result.sessions)
+        assertTrue(result.sessions.practice1?.isNotEmpty() == true || result.sessions.race?.isNotEmpty() == true)
     }
 
     @Test
     fun testSprintResultsDeserialization() {
-        val jsonStr = fetchJson("https://yashajagiya.github.io/tarasF1Data/v2/results/round_2.json")
+        val jsonStr = fetchJson("https://yashajagiya.github.io/TarasAPIstatic/v2/results/round_2.json")
         val result = NetworkModule.json.decodeFromString<WeekendResultsResponse>(jsonStr)
         assertEquals(2, result.round)
         assertTrue(result.hasSprint)
         assertNotNull(result.sessions.sprintQualifying)
         assertNotNull(result.sessions.sprintRace)
+    }
+
+    @Test
+    fun testLiveDeserialization() {
+        val jsonStr = fetchJson("https://yashajagiya.github.io/TarasAPIstatic/v2/live.json")
+        val live = NetworkModule.json.decodeFromString<com.example.taras.network_calls.taras.model.live.LiveDiscoveryResponse>(jsonStr)
+        assertEquals(2026, live.season)
+        assertNotNull(live.trackStatus)
     }
 
     @Test

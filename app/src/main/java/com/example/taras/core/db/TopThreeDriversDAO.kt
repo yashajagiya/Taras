@@ -56,7 +56,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "taras_database"
                 )
                     .fallbackToDestructiveMigration(true)
-                    .addCallback(object : RoomDatabase.Callback() {
+                    .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
                             // Pre-populate cards and starter inventory on DB creation

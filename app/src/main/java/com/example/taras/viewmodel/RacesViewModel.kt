@@ -16,8 +16,9 @@ import com.example.taras.core.common.UiState
 import com.example.taras.core.common.toAppError
 import com.example.taras.core.engine.RaceStateEngine
 import com.example.taras.core.engine.RaceWeekendState
+import com.example.taras.data.repository.RaceRepositoryImpl
+import com.example.taras.domain.repository.RaceRepository
 import com.example.taras.network_calls.NetworkModule
-import com.example.taras.network_calls.taras.TarasDataService
 import com.example.taras.network_calls.taras.model.v2.CalendarRaceEvent
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -29,11 +30,16 @@ import kotlin.time.Instant
 
 @Stable
 class RacesViewModel(
-    private val currentData: CurrentData
+    private val raceRepository: RaceRepository = TarasApplication.instance.appContainer.raceRepository,
+    private val currentData: CurrentData = TarasApplication.instance.appContainer.currentData
 ) : ViewModel() {
     private val logTag = "RacesViewModel"
 
-    private val racesDataService = NetworkModule.tarasDataService
+    // Backwards-compatible constructor
+    constructor(currentData: CurrentData) : this(
+        raceRepository = RaceRepositoryImpl(NetworkModule.tarasDataService, currentData),
+        currentData = currentData
+    )
 
     private val _races = MutableStateFlow<UiState<List<CalendarRaceEvent>>>(UiState.Loading)
     val races = _races.asStateFlow()
@@ -53,8 +59,7 @@ class RacesViewModel(
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                currentData.racesData.firstOrNull()?.let { json ->
-                    val cachedData = NetworkModule.json.decodeFromString<List<CalendarRaceEvent>>(json)
+                raceRepository.getCachedCalendar().firstOrNull()?.let { cachedData ->
                     if (_races.value is UiState.Loading) {
                         _races.value = UiState.Success(cachedData)
                     }
@@ -78,23 +83,16 @@ class RacesViewModel(
             }
 
             try {
-                val calendarData = racesDataService.getCalendar()
+                val calendarData = raceRepository.getCalendar(forceRefresh = isRefresh)
                 _races.value = UiState.Success(calendarData)
                 preloadTrackImages(calendarData)
-                try {
-                    val json = NetworkModule.json.encodeToString(calendarData)
-                    currentData.saveRacesData(json)
-                } catch (e: Exception) {
-                    Log.e(logTag, "Error saving races data to cache", e)
-                }
             } catch (e: Exception) {
                 Log.e(logTag, "Error fetching races data", e)
 
                 // Fallback to cache if not already loaded OR if it's a refresh failure
                 try {
-                    val cachedJson = currentData.racesData.first()
-                    if (cachedJson != null) {
-                        val cachedData = NetworkModule.json.decodeFromString<List<CalendarRaceEvent>>(cachedJson)
+                    val cachedData = raceRepository.getCachedCalendar().firstOrNull()
+                    if (cachedData != null) {
                         _races.value = UiState.Success(cachedData)
                         preloadTrackImages(cachedData)
                     } else if (_races.value !is UiState.Success) {
@@ -283,7 +281,7 @@ class RacesViewModel(
 
     private fun saveSessionStatus(name: String, time: String) {
         viewModelScope.launch {
-            currentData.saveCurrentSessionStatus(name, time)
+            raceRepository.saveCurrentSessionStatus(name, time)
         }
     }
 }
@@ -365,11 +363,15 @@ data class CurrentRace(
     val parsedSessions: ImmutableList<ParsedSession>
 )
 
-class RacesViewModelFactory(private val currentData: CurrentData) : ViewModelProvider.Factory {
+class RacesViewModelFactory(private val currentData: CurrentData? = null) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(RacesViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return RacesViewModel(currentData) as T
+            return if (currentData != null) {
+                RacesViewModel(currentData) as T
+            } else {
+                RacesViewModel() as T
+            }
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

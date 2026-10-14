@@ -11,6 +11,9 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.CachePolicy
 import coil3.request.allowHardware
 import coil3.request.crossfade
+import com.example.taras.core.di.AppContainer
+import com.example.taras.core.di.DefaultAppContainer
+import com.example.taras.core.di.TarasViewModelFactory
 import com.example.taras.network_calls.NetworkModule
 
 class TarasApplication : Application(), SingletonImageLoader.Factory {
@@ -19,9 +22,17 @@ class TarasApplication : Application(), SingletonImageLoader.Factory {
             private set
     }
 
+    lateinit var appContainer: AppContainer
+        private set
+
+    val viewModelFactory: TarasViewModelFactory by lazy {
+        TarasViewModelFactory(appContainer)
+    }
+
     override fun onCreate() {
         super.onCreate()
         instance = this
+        appContainer = DefaultAppContainer(this)
         SingletonImageLoader.setSafe { newImageLoader(it) }
     }
 

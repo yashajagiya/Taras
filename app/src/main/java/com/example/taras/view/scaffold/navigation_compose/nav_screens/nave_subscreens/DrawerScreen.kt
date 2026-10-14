@@ -88,6 +88,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.taras.viewmodel.AppearanceViewModel
 import com.example.taras.viewmodel.UserViewModel
+import androidx.compose.ui.platform.LocalLocale
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -263,7 +264,7 @@ fun SettingDrawer(
                                 val appLocales = localeManager?.applicationLocales?.toLanguageTags()?.split(",")?.firstOrNull() ?: ""
                                 if (appLocales.isNotEmpty()) appLocales else drawerConfig.locales[0]?.language ?: ""
                             } else {
-                                drawerConfig.locales[0]?.language ?: java.util.Locale.getDefault().language
+                                drawerConfig.locales[0]?.language ?: LocalLocale.current.platformLocale.language
                             }
 
                             val languageOptions = listOf(
@@ -415,6 +416,9 @@ private fun NotificationPermissionItem() {
     var showSettingsDialog by remember { mutableStateOf(false) }
     var hasRequestedOnce by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
 
+    val alreadyGrantedMessage = stringResource(R.string.drawer_notifications_already_granted)
+    val couldNotOpenSettingsMessage = stringResource(R.string.drawer_could_not_open_settings)
+
     if (!notificationPermissionState.status.isGranted) {
         NavigationDrawerItem(
             label = { Text(stringResource(R.string.drawer_notification_permission)) },
@@ -432,7 +436,7 @@ private fun NotificationPermissionItem() {
                 ) == PackageManager.PERMISSION_GRANTED
 
                 if (hasPermission) {
-                    Toast.makeText(context, context.getString(R.string.drawer_notifications_already_granted), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, alreadyGrantedMessage, Toast.LENGTH_SHORT).show()
                 } else if (notificationPermissionState.status.shouldShowRationale) {
                     showRationaleDialog = true
                 } else if (hasRequestedOnce) {
@@ -480,7 +484,7 @@ private fun NotificationPermissionItem() {
                         }
                         context.startActivity(intent)
                     } catch (e: Exception) {
-                        Toast.makeText(context, context.getString(R.string.drawer_could_not_open_settings), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, couldNotOpenSettingsMessage, Toast.LENGTH_SHORT).show()
                     }
                 }) {
                     Text(stringResource(R.string.dialog_open_settings))

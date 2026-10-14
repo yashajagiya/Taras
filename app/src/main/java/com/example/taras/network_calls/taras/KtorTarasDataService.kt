@@ -1,6 +1,7 @@
 package com.example.taras.network_calls.taras
 
 import com.example.taras.network_calls.ApiConstants
+import com.example.taras.network_calls.taras.model.live.LiveDiscoveryResponse
 import com.example.taras.network_calls.taras.model.v2.CalendarRaceEvent
 import com.example.taras.network_calls.taras.model.v2.DriverDetailResponseV2
 import com.example.taras.network_calls.taras.model.v2.OverviewResponse
@@ -37,4 +38,7 @@ class KtorTarasDataService(
         val endpoint = ApiConstants.ENDPOINT_V2_RESULTS_ROUND.replace("{round}", round.toString())
         return client.get(endpoint).body()
     }
+
+    override suspend fun getLive(): LiveDiscoveryResponse =
+        client.get(ApiConstants.ENDPOINT_V2_LIVE).body()
 }

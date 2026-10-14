@@ -6,9 +6,10 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.taras.core.common.AppError
+import com.example.taras.core.common.TarasApplication
 import com.example.taras.core.common.UiState
 import com.example.taras.core.common.toAppError
-import com.example.taras.core.repository.F1InfoRepository
+import com.example.taras.domain.repository.TeamRepository
 import com.example.taras.network_calls.taras.model.Racedata
 import com.example.taras.network_calls.taras.model.SeasonStats
 import com.example.taras.network_calls.taras.model.TeamSummary
@@ -25,7 +26,7 @@ import kotlinx.coroutines.launch
 
 @Stable
 class TeamsViewModel(
-    private val f1InfoRepository: F1InfoRepository = F1InfoRepository.instance
+    private val teamRepository: TeamRepository = TarasApplication.instance.appContainer.teamRepository
 ) : ViewModel() {
     private val logTag = "TeamsViewModel"
 
@@ -119,7 +120,7 @@ class TeamsViewModel(
             }
 
             try {
-                val teams = f1InfoRepository.getTeamsV2(forceRefresh = isRefresh)
+                val teams = teamRepository.getTeams(forceRefresh = isRefresh)
                 _teamsList.value = UiState.Success(teams)
             } catch (e: Exception) {
                 Log.e(logTag, "Error in fetchTeams", e)

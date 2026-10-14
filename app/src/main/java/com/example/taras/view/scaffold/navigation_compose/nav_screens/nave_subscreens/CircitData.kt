@@ -74,14 +74,11 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone.Companion.currentSystemDefault
 import kotlinx.datetime.toLocalDateTime
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CircuitData(
     circuitId: String,
     modifier: Modifier = Modifier,
-    racesViewModel: RacesViewModel = viewModel(
-        factory = RacesViewModelFactory(CurrentData(LocalContext.current))
-    )
+    racesViewModel: RacesViewModel = viewModel()
 ) {
     val racesState by racesViewModel.combinedRaces.collectAsStateWithLifecycle()
 
@@ -93,7 +90,7 @@ fun CircuitData(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CircuitProfileContent(
     circuitId: String,
@@ -186,17 +183,17 @@ fun CircuitProfileContent(
                                 modifier = Modifier.fillMaxSize(),
                                 contentPadding = PaddingValues(bottom = 24.dp)
                             ) {
-                                item {
+                                item(contentType = "contentType1") {
                                     CircuitHeader(race)
                                 }
 
                                 if (race.winnerName.isNotEmpty()) {
-                                    item {
+                                    item(contentType = "contentType2") {
                                         WinnerCard(race)
                                     }
                                 }
 
-                                item {
+                                item(contentType = "contentType3") {
                                     Row(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -210,7 +207,7 @@ fun CircuitProfileContent(
                                     }
                                 }
 
-                                item {
+                                item(contentType = "contentType4") {
                                     WeekendScheduleSection(race)
                                 }
                             }

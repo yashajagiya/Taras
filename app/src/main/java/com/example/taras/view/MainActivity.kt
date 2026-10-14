@@ -62,31 +62,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navTarget by navTargetState.collectAsStateWithLifecycle()
-            val context = LocalContext.current
-            val appearanceViewModel: AppearanceViewModel = viewModel(
-                factory = object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return AppearanceViewModel(OfflineDataStoreAppearance(context.applicationContext)) as T
-                    }
-                }
-            )
-            val userViewModel: UserViewModel = viewModel(
-                factory = object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        return UserViewModel(UserPreferences(context.applicationContext)) as T
-                    }
-                }
-            )
-            val tcgViewModel: TcgViewModel = viewModel(
-                factory = object : ViewModelProvider.Factory {
-                    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                        val db = AppDatabase.getDatabase(context.applicationContext)
-                        val repo = TcgRepository(db.tcgCardDao())
-                        @Suppress("UNCHECKED_CAST")
-                        return TcgViewModel(repo) as T
-                    }
-                }
-            )
+            val appearanceViewModel: AppearanceViewModel = viewModel()
+            val userViewModel: UserViewModel = viewModel()
+            val tcgViewModel: TcgViewModel = viewModel()
 
             var isTutorialActive by rememberSaveable { mutableStateOf(false) }
             var tutorialStep by rememberSaveable { mutableStateOf(AppTutorialStep.PADDOCK) }

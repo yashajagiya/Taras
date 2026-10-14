@@ -4,7 +4,10 @@ import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.taras.core.common.TarasApplication
 import com.example.taras.core.common.UiState
+import com.example.taras.data.repository.NewsRepositoryImpl
+import com.example.taras.domain.repository.NewsRepository
 import com.example.taras.network_calls.rss.NewsSource
 import com.example.taras.network_calls.rss.NewsSources
 import com.example.taras.network_calls.rss.RssItem
@@ -23,8 +26,13 @@ import kotlinx.coroutines.launch
 
 @Stable
 class NewsViewModel(
-    private val rssRepository: RssRepository = RssRepository()
+    private val newsRepository: NewsRepository = TarasApplication.instance.appContainer.newsRepository
 ) : ViewModel() {
+
+    // Backwards-compatible constructor
+    constructor(rssRepository: RssRepository) : this(
+        newsRepository = NewsRepositoryImpl(rssRepository)
+    )
 
     private val logTag = "NewsViewModel"
 
@@ -76,7 +84,7 @@ class NewsViewModel(
                 _rawNews.value = UiState.Loading
             }
             try {
-                rssRepository.getF1News()
+                newsRepository.getNews(forceRefresh = isRefresh)
                     .onSuccess { items ->
                         _rawNews.value = UiState.Success(items)
                     }

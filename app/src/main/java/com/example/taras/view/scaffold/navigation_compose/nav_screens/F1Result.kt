@@ -41,7 +41,8 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberBottomSheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.filled.SignalWifiStatusbarConnectedNoInternet4
@@ -102,11 +103,12 @@ import com.example.taras.viewmodel.ResultRowData
 import com.example.taras.viewmodel.ResultViewModel
 import com.example.taras.viewmodel.SessionResultUiState
 import kotlinx.coroutines.launch
+import com.example.taras.network_calls.taras.model.live.TrackStatus
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.core.graphics.toColorInt
 
-@OptIn(
-    ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3ExpressiveApi::class
-)
 @Composable
 fun NavF1DriversScreen(
     modifier: Modifier = Modifier,
@@ -121,6 +123,9 @@ fun NavF1DriversScreen(
     val isRefreshing by resultViewModel.isRefreshing.collectAsStateWithLifecycle()
     val selectedRound by resultViewModel.selectedRound.collectAsStateWithLifecycle()
     val availableRounds by resultViewModel.availableRounds.collectAsStateWithLifecycle()
+    val isLiveSession by resultViewModel.isLiveSession.collectAsStateWithLifecycle()
+    val liveTrackStatus by resultViewModel.liveTrackStatus.collectAsStateWithLifecycle()
+    val liveActiveTabIndex by resultViewModel.liveActiveTabIndex.collectAsStateWithLifecycle()
 
     ResultContent(
         fp1State = fp1State,
@@ -132,6 +137,9 @@ fun NavF1DriversScreen(
         isRefreshing = isRefreshing,
         selectedRound = selectedRound,
         availableRounds = availableRounds,
+        isLiveSession = isLiveSession,
+        liveTrackStatus = liveTrackStatus,
+        liveActiveTabIndex = liveActiveTabIndex,
         onRoundSelected = { resultViewModel.selectRound(it) },
         onRefresh = {
             resultViewModel.fetchRacesResultData(isRefresh = true)
@@ -141,9 +149,7 @@ fun NavF1DriversScreen(
 }
 
 @OptIn(
-    ExperimentalMaterial3ExpressiveApi::class,
-    ExperimentalMaterial3Api::class
-)
+    ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ResultContent(
     fp1State: UiState<SessionResultUiState>,
@@ -155,6 +161,9 @@ private fun ResultContent(
     isRefreshing: Boolean,
     selectedRound: Int?,
     availableRounds: List<Int>,
+    isLiveSession: Boolean = false,
+    liveTrackStatus: TrackStatus = TrackStatus.GREEN,
+    liveActiveTabIndex: Int = -1,
     onRoundSelected: (Int) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
@@ -204,6 +213,12 @@ private fun ResultContent(
 
     RefreshHapticEffect(isRefreshing = isRefreshing, state = pullToRefreshState)
 
+    LaunchedEffect(isLiveSession, liveActiveTabIndex) {
+        if (isLiveSession && liveActiveTabIndex in tabs.indices && pagerState.currentPage != liveActiveTabIndex) {
+            pagerState.animateScrollToPage(liveActiveTabIndex)
+        }
+    }
+
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = onRefresh,
@@ -218,6 +233,13 @@ private fun ResultContent(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = modifier.fillMaxSize()) {
+                if (isLiveSession) {
+                    LiveTrackStatusBanner(
+                        trackStatus = liveTrackStatus,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
+                    )
+                }
+
                 if (availableRounds.isNotEmpty()) {
                     LazyRow(
                         modifier = Modifier
@@ -260,6 +282,7 @@ private fun ResultContent(
                     divider = {},
                     tabs = {
                         tabs.forEachIndexed { index, title ->
+                            val isTabLive = isLiveSession && liveActiveTabIndex == index
                             Tab(
                                 selected = pagerState.currentPage == index,
                                 onClick = {
@@ -268,13 +291,32 @@ private fun ResultContent(
                                     }
                                 },
                                 text = {
-                                    Text(
-                                        text = title,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        style = MaterialTheme.typography.labelLarge,
-                                        fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Medium
-                                    )
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = title,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            style = MaterialTheme.typography.labelLarge,
+                                            fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Medium
+                                        )
+                                        if (isTabLive) {
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(4.dp))
+                                                    .background(Color(0xFFE53935))
+                                                    .padding(horizontal = 5.dp, vertical = 1.dp)
+                                            ) {
+                                                Text(
+                                                    text = "LIVE",
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    fontSize = 9.sp,
+                                                    fontWeight = FontWeight.Black,
+                                                    color = Color.White
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             )
                         }
@@ -439,10 +481,13 @@ private fun SessionTabs(
                     }
                     items(
                         data.results,
-                        key = { "${it.position}_${it.driver}_${it.number}_${it.team}" },
+                        key = { "${it.number.ifEmpty { it.driver }}_${it.driver}" },
                         contentType = { "Result" }
                     ) { item ->
-                        ResultCard(item)
+                        ResultCard(
+                            data = item,
+                            modifier = Modifier.animateItem()
+                        )
                     }
                 }
             }
@@ -514,10 +559,12 @@ fun ShareResultBottomSheet(
     data: SessionResultUiState,
     onDismiss: () -> Unit
 ) {
-    @Suppress("DEPRECATION")
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded)
+    )
     val context = LocalContext.current
-    var selectedLimit by remember { mutableStateOf(3) } // 3 = Podium, 10 = Top 10, -1 = All
+    var selectedLimit by remember { mutableIntStateOf(3) } // 3 = Podium, 10 = Top 10, -1 = All
 
     val raceName = data.header?.raceName ?: "Formula 1 Grand Prix"
     val circuitName = data.header?.circuitName ?: ""
@@ -799,13 +846,48 @@ private fun ResultCard(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text(
-                        text = "P${data.position}",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = if (isFirstPlace) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.width(48.dp)
-                    )
+                    Column(
+                        modifier = Modifier.width(54.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(
+                            text = "P${data.position}",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = if (isFirstPlace) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        if (data.positionDelta != 0) {
+                            val isGain = data.positionDelta > 0
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .padding(top = 2.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(if (isGain) Color(0xFF2E7D32).copy(alpha = 0.2f) else Color(0xFFC62828).copy(alpha = 0.2f))
+                                    .padding(horizontal = 4.dp, vertical = 1.dp)
+                            ) {
+                                Text(
+                                    text = if (isGain) "▲ +${data.positionDelta}" else "▼ ${data.positionDelta}",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = if (isGain) Color(0xFF4CAF50) else Color(0xFFEF5350)
+                                )
+                            }
+                        }
+                    }
+
+                    val effectiveTeamColor = remember(data.teamColorHex, data.team) {
+                        if (!data.teamColorHex.isNullOrBlank()) {
+                            try {
+                                Color(data.teamColorHex.toColorInt())
+                            } catch (_: Exception) {
+                                teamColor
+                            }
+                        } else {
+                            teamColor
+                        }
+                    }
 
                     Box(
                         modifier = Modifier
@@ -813,7 +895,7 @@ private fun ResultCard(
                             .width(4.dp)
                             .height(40.dp)
                             .clip(RoundedCornerShape(50))
-                            .background(teamColor)
+                            .background(effectiveTeamColor)
                     )
 
                     AsyncImage(
@@ -851,6 +933,60 @@ private fun ResultCard(
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (data.driverStatus == "PIT") {
+                        Text(
+                            text = "PIT",
+                            modifier = Modifier
+                                .padding(end = 6.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFFFFB300))
+                                .padding(horizontal = 6.dp, vertical = 2.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Black,
+                            color = Color.Black
+                        )
+                    } else if (data.driverStatus in listOf("OUT", "DNF")) {
+                        Text(
+                            text = "OUT",
+                            modifier = Modifier
+                                .padding(end = 6.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFFE53935))
+                                .padding(horizontal = 6.dp, vertical = 2.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Black,
+                            color = Color.White
+                        )
+                    }
+
+                    if (!data.tyreCompound.isNullOrBlank() && data.tyreCompound != "UNKNOWN") {
+                        val (compoundChar, compoundBg, compoundFg) = when (data.tyreCompound.uppercase()) {
+                            "SOFT" -> Triple("S", Color(0xFFE53935), Color.White)
+                            "MEDIUM" -> Triple("M", Color(0xFFFFD54F), Color.Black)
+                            "HARD" -> Triple("H", Color(0xFFF5F5F5), Color.Black)
+                            "INTERMEDIATE", "INTER" -> Triple("I", Color(0xFF43A047), Color.White)
+                            "WET" -> Triple("W", Color(0xFF1E88E5), Color.White)
+                            else -> Triple(data.tyreCompound.take(1), MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        Box(
+                            modifier = Modifier
+                                .padding(end = 6.dp)
+                                .size(24.dp)
+                                .clip(CircleShape)
+                                .background(compoundBg)
+                                .border(1.dp, Color.Black.copy(alpha = 0.2f), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = compoundChar,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Black,
+                                color = compoundFg,
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+
                     if (displayPoints != null) {
                         Text(
                             text = "$displayPoints PTS",
@@ -1023,4 +1159,48 @@ private fun EmptyView(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
-}
+}
+
+private data class TrackBannerUi(
+    val bgColor: Color,
+    val fgColor: Color,
+    val text: String,
+    val icon: String
+)
+
+@Composable
+fun LiveTrackStatusBanner(
+    trackStatus: TrackStatus,
+    modifier: Modifier = Modifier
+) {
+    val bannerUi = when (trackStatus) {
+        TrackStatus.GREEN -> TrackBannerUi(Color(0xFF1B5E20), Color.White, "TRACK CLEAR • RACING LIVE", "🟢")
+        TrackStatus.YELLOW -> TrackBannerUi(Color(0xFFF57F17), Color.Black, "YELLOW FLAG IN SECTOR", "🟡")
+        TrackStatus.SAFETY_CAR -> TrackBannerUi(Color(0xFFE65100), Color.White, "SAFETY CAR DEPLOYED (SC)", "⚠️")
+        TrackStatus.VIRTUAL_SAFETY_CAR -> TrackBannerUi(Color(0xFFFF8F00), Color.Black, "VIRTUAL SAFETY CAR (VSC)", "⏱️")
+        TrackStatus.RED_FLAG -> TrackBannerUi(Color(0xFFB71C1C), Color.White, "RED FLAG • SESSION SUSPENDED", "🔴")
+        TrackStatus.FINISHED -> TrackBannerUi(Color(0xFF212121), Color.White, "CHEQUERED FLAG • SESSION CONCLUDED", "🏁")
+    }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = bannerUi.bgColor)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "${bannerUi.icon} ${bannerUi.text}",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Black,
+                color = bannerUi.fgColor,
+                letterSpacing = 1.sp
+            )
+        }
+    }
+}

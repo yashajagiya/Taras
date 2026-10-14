@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,7 +25,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.FlagCircle
@@ -56,18 +54,14 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import com.example.taras.core.helpercore.RefreshHapticEffect
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -80,41 +74,30 @@ import com.example.taras.network_calls.ApiConstants
 import com.example.taras.core.common.UiState
 import com.example.taras.core.helpercore.toComposeColor
 import com.example.taras.network_calls.taras.model.Racedata
-import com.example.taras.core.common.UserPreferences
 import com.example.taras.viewmodel.DetailedTeamUiModel
 import com.example.taras.viewmodel.TeamsViewModel
 import com.example.taras.viewmodel.UserViewModel
-import com.example.taras.viewmodel.UserViewModelFactory
 import io.github.dautovicharis.charts.LineChart
 import io.github.dautovicharis.charts.model.toChartDataSet
-import io.github.dautovicharis.charts.style.ChartViewDefaults
-import io.github.dautovicharis.charts.style.ChartViewStyle
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.style.TextOverflow
-import com.example.taras.core.db.AppDatabase
 import com.example.taras.viewmodel.DriverDetailUiModel
 import com.example.taras.viewmodel.DriversViewModel
-import com.example.taras.viewmodel.DriversViewModelFactory
 import com.example.taras.view.subview.DriverCard
 import com.example.taras.viewmodel.toDriverUiModel
 import io.github.dautovicharis.charts.style.LineChartDefaults
 import kotlinx.collections.immutable.ImmutableList
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun TeamsData(
     teamName: String,
     modifier: Modifier = Modifier,
-    userViewModel: UserViewModel = viewModel(
-        factory = UserViewModelFactory(UserPreferences(LocalContext.current))
-    ),
+    userViewModel: UserViewModel = viewModel(),
     teamsViewModel: TeamsViewModel = viewModel(),
-    driversViewModel: DriversViewModel = viewModel(
-        factory = DriversViewModelFactory(AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao())
-    ),
+    driversViewModel: DriversViewModel = viewModel(),
     onCompareTeammatesClick: (String, String) -> Unit = { _, _ -> },
     onDriverClick: (String) -> Unit = {}
 ) {
@@ -689,7 +672,7 @@ fun TeamProfileContent(
 
 @Composable
 private fun ChartPerTeam(
-    perRace: ImmutableList<com.example.taras.network_calls.taras.model.Racedata>,
+    perRace: ImmutableList<Racedata>,
     points: String
 ) {
     val playedRaces = remember(perRace) {

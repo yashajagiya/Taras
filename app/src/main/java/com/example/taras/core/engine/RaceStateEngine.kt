@@ -161,8 +161,8 @@ object RaceStateEngine {
         now: Instant = Clock.System.now(),
         forWidget: Boolean = false
     ): SessionInfo? {
-        for (race in races) {
-            val upcomingSession = race.parsedSessions
+        for ((roundNumber, _, raceName, circuitName, _, _, _, _, _, parsedSessions) in races) {
+            val upcomingSession = parsedSessions
                 .filter { it.instant > now }
                 .minByOrNull { it.instant }
 
@@ -175,13 +175,13 @@ object RaceStateEngine {
                 }
 
                 return SessionInfo(
-                    roundNumber = race.roundNumber,
+                    roundNumber = roundNumber,
                     sessionName = upcomingSession.name,
                     countdown = countdownStr,
                     sessionTime = upcomingSession.instant.toString(),
                     targetInstant = upcomingSession.instant,
-                    circuitName = race.circuitName,
-                    raceName = race.raceName
+                    circuitName = circuitName,
+                    raceName = raceName
                 )
             }
         }

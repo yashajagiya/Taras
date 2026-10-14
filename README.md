@@ -93,7 +93,7 @@ This project is a continuous learning experience. Here are some of the technical
 
 - **Widget Synchronization**: Managing Home Screen widget (Glance) refreshes against Android's strict battery optimization policies remains an active area of refinement.
 - **Live Data Evolution**: While the app currently excels at post-session data, I am prototyping real-time session tracking using WebViews and official telemetry streams.
-- **Automated Scraper (GitHub Actions)**: Moving from static RSS to a full-scale automated scraper that will aggregate data from multiple major outlets into the [TarasF1Data](https://github.com/yashajagiya/tarasF1Data) backbone.
+- **Automated Scraper (GitHub Actions)**: Automated scrapers aggregate data from multiple major outlets into the [TarasAPIstatic](https://github.com/yashajagiya/TarasAPIstatic) backbone.
 - **Workflow Reliability**: Improving the stability of my custom notification flow to ensure 100% delivery without relying on Firebase Cloud Messaging.
 
 ---
@@ -108,7 +108,7 @@ app/src/main/java/com/example/taras/
 │   ├── notification/       # WorkManager logic for GitHub-based broadcasts
 │   └── UserPreferences.kt  # DataStore for global settings
 ├── network_calls/
-│   ├── taras/              # Primary API (TarasF1Data)
+│   ├── taras/              # Primary API (TarasAPIstatic)
 │   ├── openf1/             # Secondary API integration
 │   ├── rss/                # News feed parsing
 │   ├── ApiConstants.kt     # Centralized endpoints
@@ -141,7 +141,7 @@ app/src/main/java/com/example/taras/
 
 - **AI Co-pilot**: A huge thanks to **Gemini** for its role as a professional tool in debugging, suggesting architectural patterns, and solving complex logic problems.
 - **UI Inspiration**: Design system and minimalist layouts were inspired by [stitch.withgoogle.com](https://stitch.withgoogle.com/).
-- **Data Backbone**: Built upon [TarasF1Data](https://github.com/yashajagiya/tarasF1Data), my personal repository for scraping and hosting F1 data from multiple APIs and web sources.
+- **Data Backbone**: Built upon [TarasAPIstatic](https://github.com/yashajagiya/TarasAPIstatic), my personal repository for scraping and hosting F1 data from multiple APIs and web sources.
 
 ---
 

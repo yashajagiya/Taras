@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.sin
+import kotlin.time.Duration.Companion.milliseconds
 
 object TcgSoundManager {
 
@@ -76,7 +77,7 @@ object TcgSoundManager {
 
             audioTrack.write(sample, 0, numSamples)
             audioTrack.play()
-            kotlinx.coroutines.delay(durationMs + 60L)
+            kotlinx.coroutines.delay((durationMs + 60L).milliseconds)
             try {
                 audioTrack.stop()
                 audioTrack.release()

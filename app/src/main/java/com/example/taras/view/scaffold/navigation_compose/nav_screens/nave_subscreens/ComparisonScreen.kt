@@ -54,10 +54,11 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -106,9 +107,7 @@ fun ComparisonScreen(
     onBackClick: () -> Unit = {},
     onBattleArenaClick: (String, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
-    driversViewModel: DriversViewModel = viewModel(
-        factory = DriversViewModelFactory(AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao())
-    ),
+    driversViewModel: DriversViewModel = viewModel(),
     teamsViewModel: TeamsViewModel = viewModel()
 ) {
     val driversState by driversViewModel.combinedDetailedDrivers.collectAsStateWithLifecycle()
@@ -244,8 +243,7 @@ private fun DriverComparisonView(
 
     var selectedDriver1Number by rememberSaveable {
         mutableStateOf(
-            if (initialDriver1.isNotBlank()) initialDriver1
-            else sortedDrivers.getOrNull(0)?.driverNumber.orEmpty()
+            initialDriver1.ifBlank { sortedDrivers.getOrNull(0)?.driverNumber.orEmpty() }
         )
     }
 
@@ -1578,10 +1576,10 @@ private fun ComparisonMetricCard(
             val valid1 = val1 > 0f && val1 < 99f
             val valid2 = val2 > 0f && val2 < 99f
             if (valid1 && valid2) val1 < val2
-            else if (valid1 && !valid2) true
+            else if (valid1) true
             else false
         }
-        else -> if (isBothZero) false else val1 > val2
+        else -> !isBothZero && val1 > val2
     }
 
     val d2Wins = when {
@@ -1590,10 +1588,10 @@ private fun ComparisonMetricCard(
             val valid1 = val1 > 0f && val1 < 99f
             val valid2 = val2 > 0f && val2 < 99f
             if (valid1 && valid2) val2 < val1
-            else if (valid2 && !valid1) true
+            else if (valid2) true
             else false
         }
-        else -> if (isBothZero) false else val2 > val1
+        else -> !isBothZero && val2 > val1
     }
 
     val diffValue = kotlin.math.abs(val1 - val2)
@@ -1613,9 +1611,9 @@ private fun ComparisonMetricCard(
             if (valid1 && valid2) {
                 val total = val1 + val2
                 if (total > 0f) (val2 / total).coerceIn(0.15f, 0.85f) else 0.5f
-            } else if (valid1 && !valid2) {
+            } else if (valid1) {
                 0.85f
-            } else if (!valid1 && valid2) {
+            } else if (valid2) {
                 0.15f
             } else {
                 0.5f
@@ -1998,7 +1996,10 @@ private fun DriverSelectionSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        sheetState = rememberBottomSheetState(
+            initialValue = SheetValue.Hidden,
+            enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded)
+        )
     ) {
         Column(
             modifier = Modifier
@@ -2205,7 +2206,10 @@ private fun TeamSelectionSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        sheetState = rememberBottomSheetState(
+            initialValue = SheetValue.Hidden,
+            enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded)
+        )
     ) {
         Column(
             modifier = Modifier
@@ -2477,21 +2481,27 @@ private fun HeadToHeadDriverChart(
     if (maxPlayedRound <= 0) return
 
     var cum1 = 0
-    val d1Points = (0 until maxPlayedRound).map { i ->
-        cum1 += driver1.races.getOrNull(i)?.value ?: 0
-        cum1
+    val d1Points = remember(driver1) {
+        (0 until maxPlayedRound).map { i ->
+            cum1 += driver1.races.getOrNull(i)?.value ?: 0
+            cum1
+        }
     }
 
     var cum2 = 0
-    val d2Points = (0 until maxPlayedRound).map { i ->
-        cum2 += driver2.races.getOrNull(i)?.value ?: 0
-        cum2
+    val d2Points = remember(driver2) {
+        (0 until maxPlayedRound).map { i ->
+            cum2 += driver2.races.getOrNull(i)?.value ?: 0
+            cum2
+        }
     }
 
-    val categories = (0 until maxPlayedRound).map { i ->
-        val code1 = driver1.races.getOrNull(i)?.displayName.orEmpty()
-        val code2 = driver2.races.getOrNull(i)?.displayName.orEmpty()
-        code1.ifBlank { code2.ifBlank { "R${i + 1}" } }
+    val categories = remember(driver1, driver2) {
+        (0 until maxPlayedRound).map { i ->
+            val code1 = driver1.races.getOrNull(i)?.displayName.orEmpty()
+            val code2 = driver2.races.getOrNull(i)?.displayName.orEmpty()
+            code1.ifBlank { code2.ifBlank { "R${i + 1}" } }
+        }
     }
 
     val items = listOf(
@@ -2571,21 +2581,27 @@ private fun HeadToHeadTeamChart(
     if (maxPlayedRound <= 0) return
 
     var cum1 = 0
-    val t1Points = (0 until maxPlayedRound).map { i ->
-        cum1 += team1.races.getOrNull(i)?.value ?: 0
-        cum1
+    val t1Points = remember(team1) {
+        (0 until maxPlayedRound).map { i ->
+            cum1 += team1.races.getOrNull(i)?.value ?: 0
+            cum1
+        }
     }
 
     var cum2 = 0
-    val t2Points = (0 until maxPlayedRound).map { i ->
-        cum2 += team2.races.getOrNull(i)?.value ?: 0
-        cum2
+    val t2Points = remember(team2) {
+        (0 until maxPlayedRound).map { i ->
+            cum2 += team2.races.getOrNull(i)?.value ?: 0
+            cum2
+        }
     }
 
-    val categories = (0 until maxPlayedRound).map { i ->
-        val code1 = team1.races.getOrNull(i)?.displayName.orEmpty()
-        val code2 = team2.races.getOrNull(i)?.displayName.orEmpty()
-        code1.ifBlank { code2.ifBlank { "R${i + 1}" } }
+    val categories = remember(team1, team2) {
+        (0 until maxPlayedRound).map { i ->
+            val code1 = team1.races.getOrNull(i)?.displayName.orEmpty()
+            val code2 = team2.races.getOrNull(i)?.displayName.orEmpty()
+            code1.ifBlank { code2.ifBlank { "R${i + 1}" } }
+        }
     }
 
     val items = listOf(

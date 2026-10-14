@@ -3,7 +3,9 @@ package com.example.taras.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.taras.core.common.TarasApplication
 import com.example.taras.core.common.UserPreferences
+import com.example.taras.domain.repository.UserPreferencesRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.map
@@ -11,7 +13,16 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class UserViewModel (private val userPreferences: UserPreferences) : ViewModel() {
+class UserViewModel(
+    private val userPreferencesRepository: UserPreferencesRepository = TarasApplication.instance.appContainer.userPreferencesRepository,
+    private val userPreferences: UserPreferences = TarasApplication.instance.appContainer.userPreferences
+) : ViewModel() {
+
+    // Backwards-compatible constructor
+    constructor(userPreferences: UserPreferences) : this(
+        userPreferencesRepository = TarasApplication.instance.appContainer.userPreferencesRepository,
+        userPreferences = userPreferences
+    )
     val userName = userPreferences.userNameFlow.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -152,11 +163,15 @@ class UserViewModel (private val userPreferences: UserPreferences) : ViewModel()
     }
 }
 
-class UserViewModelFactory(private val userPreferences: UserPreferences) : ViewModelProvider.Factory {
+class UserViewModelFactory(private val userPreferences: UserPreferences? = null) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(UserViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return UserViewModel(userPreferences) as T
+            return if (userPreferences != null) {
+                UserViewModel(userPreferences) as T
+            } else {
+                UserViewModel() as T
+            }
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

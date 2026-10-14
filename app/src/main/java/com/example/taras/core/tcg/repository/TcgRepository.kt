@@ -16,7 +16,7 @@ class TcgRepository(
     suspend fun ensureSeeded() {
         // Upsert all current 23 driver cards with latest API images and telemetry
         tcgCardDao.insertAllCards(RosterSeedData.allCards)
-        
+
         // Purge any cards and inventory not in the official 23 cards roster
         val validIds = RosterSeedData.allCards.map { it.id }
         tcgCardDao.deleteCardsNotIn(validIds)
@@ -55,9 +55,11 @@ class TcgRepository(
 
     suspend fun getCardByIdDirect(id: String): TcgCardEntity? = tcgCardDao.getCardByIdDirect(id)
 
-    fun getCardsByTeam(teamId: String): Flow<List<TcgCardEntity>> = tcgCardDao.getCardsByTeam(teamId)
+    fun getCardsByTeam(teamId: String): Flow<List<TcgCardEntity>> =
+        tcgCardDao.getCardsByTeam(teamId)
 
-    fun getCardsByTier(tier: RarityTier): Flow<List<TcgCardEntity>> = tcgCardDao.getCardsByTier(tier)
+    fun getCardsByTier(tier: RarityTier): Flow<List<TcgCardEntity>> =
+        tcgCardDao.getCardsByTier(tier)
 
     fun getUserInventory(): Flow<List<UserCardInventoryEntity>> = tcgCardDao.getUserInventory()
 
@@ -87,7 +89,7 @@ class TcgRepository(
      * - B-Tier: 35%
      * - C-Tier: 45%
      */
-    suspend fun drawMysteryPackCard(): TcgCardEntity {
+    fun drawMysteryPackCard(): TcgCardEntity {
         val roll = Random.nextFloat() // 0.0 to 1.0
         val targetTier = when {
             roll < 0.05f -> RarityTier.S_TIER
@@ -97,7 +99,7 @@ class TcgRepository(
         }
 
         val allInTier = RosterSeedData.allCards.filter { it.tier == targetTier }
-        val pool = if (allInTier.isNotEmpty()) allInTier else RosterSeedData.allCards
+        val pool = allInTier.ifEmpty { RosterSeedData.allCards }
         return pool.random()
     }
 }

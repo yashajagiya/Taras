@@ -1,5 +1,6 @@
 package com.example.taras.network_calls.taras
 
+import com.example.taras.network_calls.taras.model.live.LiveDiscoveryResponse
 import com.example.taras.network_calls.taras.model.v2.CalendarRaceEvent
 import com.example.taras.network_calls.taras.model.v2.DriverDetailResponseV2
 import com.example.taras.network_calls.taras.model.v2.OverviewResponse
@@ -22,4 +23,6 @@ interface TarasDataService {
     suspend fun getLatestResults(): WeekendResultsResponse
 
     suspend fun getResultsByRound(round: Int): WeekendResultsResponse
+
+    suspend fun getLive(): LiveDiscoveryResponse
 }

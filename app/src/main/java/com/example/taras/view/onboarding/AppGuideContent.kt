@@ -1,10 +1,7 @@
 package com.example.taras.view.onboarding
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -14,13 +11,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -33,7 +27,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -49,20 +42,14 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.ElectricBolt
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.SportsMotorsports
 import androidx.compose.material.icons.filled.Style
-import androidx.compose.material.icons.filled.TouchApp
-import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -74,10 +61,8 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -86,33 +71,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.taras.R
 import com.example.taras.core.db.tcg.TcgCardEntity
 import com.example.taras.core.helpercore.RefreshHapticFeedback
 import com.example.taras.core.navigation.MainNavRoutes
-import com.example.taras.core.tcg.model.CardRole
-import com.example.taras.core.tcg.model.RarityTier
 import com.example.taras.core.tcg.seed.RosterSeedData
 import com.example.taras.view.tcg.components.CardFrontLayout
 import com.example.taras.view.tcg.components.ScratchCardReveal
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Chapters of the interactive beginner's visual tutorial.
@@ -806,9 +784,16 @@ private fun InteractiveAppTourChapter(
                                     Column(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(10.dp))
-                                            .background(if (isTabActive) tab.highlightColor.copy(alpha = 0.2f) else Color.Transparent)
+                                            .background(
+                                                if (isTabActive) tab.highlightColor.copy(
+                                                    alpha = 0.2f
+                                                ) else Color.Transparent
+                                            )
                                             .clickable {
-                                                RefreshHapticFeedback.triggerStartHaptic(context, view)
+                                                RefreshHapticFeedback.triggerStartHaptic(
+                                                    context,
+                                                    view
+                                                )
                                                 selectedTab = tab
                                             }
                                             .padding(horizontal = 10.dp, vertical = 6.dp),
@@ -927,7 +912,9 @@ private fun InteractiveScratchChapter(
                     shape = RoundedCornerShape(14.dp),
                     color = Color(0xDD000000),
                     border = BorderStroke(2.dp, Color(0xFFFFD700)),
-                    modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp)
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 16.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
@@ -1806,12 +1793,12 @@ private fun InteractiveBattleArenaChapter(
                                 coroutineScope.launch {
                                     isAttacking = true
                                     lastDamageDealt = 45
-                                    delay(400)
+                                    delay(400.milliseconds)
                                     rivalHp = (rivalHp - 45).coerceAtLeast(0)
                                     if (rivalHp <= 0) {
                                         hasWon = true
                                     }
-                                    delay(400)
+                                    delay(400.milliseconds)
                                     isAttacking = false
                                 }
                             },

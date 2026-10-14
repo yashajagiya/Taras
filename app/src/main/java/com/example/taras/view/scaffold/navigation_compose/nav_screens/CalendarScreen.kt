@@ -39,14 +39,11 @@ import com.example.taras.viewmodel.RacesViewModel
 import com.example.taras.viewmodel.RacesViewModelFactory
 import kotlinx.collections.immutable.ImmutableList
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun NavCalendarScreen(
     onCircuitClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    racesViewModel: RacesViewModel = viewModel(
-        factory = RacesViewModelFactory(CurrentData(LocalContext.current))
-    )
+    racesViewModel: RacesViewModel = viewModel()
 ) {
     val racesState by racesViewModel.combinedRaces.collectAsStateWithLifecycle()
     val racesCurrentState by racesViewModel.upcomingRoundInfo.collectAsStateWithLifecycle()

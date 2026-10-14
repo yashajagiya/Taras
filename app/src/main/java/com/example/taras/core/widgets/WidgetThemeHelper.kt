@@ -15,6 +15,7 @@ import com.example.taras.core.common.OfflineDataStoreAppearance
 import com.example.taras.ui.theme.DarkColorScheme
 import com.example.taras.ui.theme.LightColorScheme
 import kotlinx.coroutines.flow.firstOrNull
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 /**
  * Custom FixedColorProvider implementing Glance ColorProvider directly to avoid
@@ -87,8 +88,8 @@ fun resolveWidgetThemeColors(widgetTheme: String?, appTheme: String?): ColorProv
 fun rememberWidgetThemeColors(): ColorProviders {
     val context = androidx.glance.LocalContext.current
     val appearanceStore = androidx.compose.runtime.remember(context) { OfflineDataStoreAppearance(context) }
-    val widgetTheme by appearanceStore.widgetThemeData.collectAsState(initial = "Dark")
-    val appTheme by appearanceStore.appearanceData.collectAsState(initial = "Light")
+    val widgetTheme by appearanceStore.widgetThemeData.collectAsStateWithLifecycle( "Dark")
+    val appTheme by appearanceStore.appearanceData.collectAsStateWithLifecycle("Light")
     return resolveWidgetThemeColors(widgetTheme, appTheme)
 }
 

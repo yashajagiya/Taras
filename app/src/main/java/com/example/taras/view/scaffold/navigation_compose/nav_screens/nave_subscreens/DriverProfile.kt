@@ -95,20 +95,13 @@ import com.example.taras.viewmodel.toDriverUiModel
 import io.github.dautovicharis.charts.style.LineChartDefaults
 import kotlinx.collections.immutable.ImmutableList
 
-@OptIn(
-    ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3ExpressiveApi::class
-)
+
 @Composable
 fun DriverProfile(
     driverNumber: String,
     modifier: Modifier = Modifier,
-    userViewModel: UserViewModel = viewModel(
-        factory = UserViewModelFactory(UserPreferences(LocalContext.current))
-    ),
-    driversViewModel: DriversViewModel = viewModel(
-        factory = DriversViewModelFactory(AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao())
-    ),
+    userViewModel: UserViewModel = viewModel(),
+    driversViewModel: DriversViewModel = viewModel(),
     onCompareTeammatesClick: (String, String) -> Unit = { _, _ -> },
     onDriverClick: (String) -> Unit = {},
     onNavigateToTcgBinder: () -> Unit = {}
@@ -226,7 +219,7 @@ fun DriverProfileContent(
                             )
                         }
                     } else {
-                        val allDrivers = (driverDetailsState as? UiState.Success)?.data.orEmpty()
+                        val allDrivers = driverDetails.orEmpty()
                         val teammate = remember(allDrivers, driver.teamName, driver.driverNumber) {
                             allDrivers.find { other ->
                                 other.driverNumber != driver.driverNumber &&

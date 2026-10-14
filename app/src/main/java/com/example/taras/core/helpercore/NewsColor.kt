@@ -19,20 +19,19 @@ fun getNewsColor(
     val content = "$title $description"
 
     //dynamic teams
-    for (team in teams) {
-        if (content.contains(team.teamName, ignoreCase = true)) {
-            return team.teamColor?.toComposeColor() ?: defaultColor
+    for ((teamName, _, _, teamColor) in teams) {
+        if (content.contains(teamName, ignoreCase = true)) {
+            return teamColor?.toComposeColor() ?: defaultColor
         }
     }
 
     //dynamic drivers
-    for (driver in drivers) {
-        val fullName = driver.fullName ?: ""
-        val name = driver.name
+    for ((_, _, name, _, _, teamColor, _, _, fullName1) in drivers) {
+        val fullName = fullName1 ?: ""
         if ((fullName.isNotEmpty() && content.contains(fullName, ignoreCase = true)) ||
             (name.isNotEmpty() && content.contains(name, ignoreCase = true))
         ) {
-            return driver.teamColor?.toComposeColor() ?: defaultColor
+            return teamColor?.toComposeColor() ?: defaultColor
         }
     }
 

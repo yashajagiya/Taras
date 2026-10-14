@@ -99,16 +99,28 @@ import androidx.compose.ui.unit.sp
 import com.example.taras.R
 import com.example.taras.network_calls.ApiConstants
 import com.example.taras.view.subview.LegalTab
+import androidx.core.net.toUri
+import androidx.compose.ui.platform.LocalLocale
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LegalHubScreen(
     initialTabName: String = "about",
     onBackClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    locale: String? = null
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
+    val configuration = LocalConfiguration.current
+
+    val currentLocale = locale ?: if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val localeManager = context.getSystemService(Context.LOCALE_SERVICE) as? android.app.LocaleManager
+        val appLocales = localeManager?.applicationLocales?.toLanguageTags()?.split(",")?.firstOrNull() ?: ""
+        if (appLocales.isNotEmpty()) appLocales else configuration.locales[0]?.language ?: ""
+    } else {
+        configuration.locales[0]?.language ?: LocalLocale.current.toLanguageTag()
+    }
 
     val initialTab = when (initialTabName.lowercase()) {
         "privacy" -> LegalTab.PRIVACY
@@ -133,17 +145,8 @@ fun LegalHubScreen(
         "pt" to stringResource(R.string.lang_pt)
     )
 
-    val configuration = LocalConfiguration.current
-    val currentLocaleTag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        val localeManager = context.getSystemService(Context.LOCALE_SERVICE) as? android.app.LocaleManager
-        val appLocales = localeManager?.applicationLocales?.toLanguageTags()?.split(",")?.firstOrNull() ?: ""
-        if (appLocales.isNotEmpty()) appLocales else configuration.locales[0]?.language ?: ""
-    } else {
-        configuration.locales[0]?.language ?: java.util.Locale.getDefault().language
-    }
-
-    val currentLangLabel = languages.firstOrNull { it.first == currentLocaleTag }?.second
-        ?: languages.firstOrNull { currentLocaleTag.startsWith(it.first) && it.first.isNotEmpty() }?.second
+    val currentLangLabel = languages.firstOrNull { it.first == currentLocale }?.second
+        ?: languages.firstOrNull { currentLocale.startsWith(it.first) && it.first.isNotEmpty() }?.second
         ?: stringResource(R.string.lang_system_default)
 
     val openOnline = {
@@ -162,7 +165,7 @@ fun LegalHubScreen(
     val contactGrievanceOfficer = {
         try {
             val intent = Intent(Intent.ACTION_SENDTO).apply {
-                data = Uri.parse("mailto:${ApiConstants.GRIEVANCE_EMAIL}")
+                data = "mailto:${ApiConstants.GRIEVANCE_EMAIL}".toUri()
                 putExtra(Intent.EXTRA_SUBJECT, "Taras App — Legal & Privacy Inquiry")
             }
             context.startActivity(intent)
@@ -253,8 +256,8 @@ fun LegalHubScreen(
                                 text = {
                                     Text(
                                         text = name,
-                                        fontWeight = if (tag == currentLocaleTag) FontWeight.Bold else FontWeight.Normal,
-                                        color = if (tag == currentLocaleTag) Color(0xFFE10600) else MaterialTheme.colorScheme.onSurface
+                                        fontWeight = if (tag == currentLocale) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (tag == currentLocale) Color(0xFFE10600) else MaterialTheme.colorScheme.onSurface
                                     )
                                 },
                                 onClick = {
@@ -267,10 +270,10 @@ fun LegalHubScreen(
                                             localeManager?.applicationLocales = android.os.LocaleList.forLanguageTags(tag)
                                         }
                                     } else {
-                                        val locale = if (tag.isEmpty()) java.util.Locale.getDefault() else java.util.Locale.forLanguageTag(tag)
-                                        java.util.Locale.setDefault(locale)
+                                        val targetLocale = if (tag.isEmpty()) java.util.Locale.getDefault() else java.util.Locale.forLanguageTag(tag)
+                                        java.util.Locale.setDefault(targetLocale)
                                         val config = context.resources.configuration
-                                        config.setLocale(locale)
+                                        config.setLocale(targetLocale)
                                         @Suppress("DEPRECATION")
                                         context.resources.updateConfiguration(config, context.resources.displayMetrics)
                                     }

@@ -6,13 +6,15 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.taras.core.common.TarasApplication
 import com.example.taras.core.common.UiState
 import com.example.taras.core.common.toAppError
 import com.example.taras.core.db.TopThreeDriversDAO
 import com.example.taras.core.db.TopThreeDriversEntity
 import com.example.taras.core.repository.F1InfoRepository
+import com.example.taras.data.repository.DriverRepositoryImpl
+import com.example.taras.domain.repository.DriverRepository
 import com.example.taras.network_calls.NetworkModule
-import com.example.taras.network_calls.taras.TarasDataService
 import com.example.taras.network_calls.taras.model.CareerStats
 import com.example.taras.network_calls.taras.model.DriverPerRace
 import com.example.taras.network_calls.taras.model.DriverSeasonStats
@@ -33,12 +35,17 @@ import kotlinx.coroutines.launch
 
 @Stable
 class DriversViewModel(
-    private val topThreeDriversDAO: TopThreeDriversDAO,
-    private val f1InfoRepository: F1InfoRepository = F1InfoRepository.instance
+    private val driverRepository: DriverRepository = TarasApplication.instance.appContainer.driverRepository
 ) : ViewModel() {
     private val logTag = "DriversViewModel"
 
-    private val tarasDataService = NetworkModule.tarasDataService
+    // Backwards-compatible constructor
+    constructor(
+        topThreeDriversDAO: TopThreeDriversDAO,
+        f1InfoRepository: F1InfoRepository = F1InfoRepository.instance
+    ) : this(
+        driverRepository = DriverRepositoryImpl(NetworkModule.tarasDataService, topThreeDriversDAO)
+    )
 
     private val _driversList =
         MutableStateFlow<UiState<List<DriverDetailResponseV2>>>(UiState.Loading)
@@ -83,7 +90,7 @@ class DriversViewModel(
         UiState.Loading
     )
 
-    val topThree = combine(combinedLowDrivers, topThreeDriversDAO.getAll()) { state, dbList ->
+    val topThree = combine(combinedLowDrivers, driverRepository.getTopThreeDrivers()) { state, dbList ->
         if (state is UiState.Success) {
             val top3 = state.data.take(3).toImmutableList()
             UiState.Success(top3)
@@ -131,7 +138,7 @@ class DriversViewModel(
                         team = uiModel.teamName
                     )
                 }
-                topThreeDriversDAO.insertAll(*entities.toTypedArray())
+                driverRepository.saveTopThreeDrivers(entities)
                 Log.d(logTag, "Successfully saved top 3 drivers to DB")
             } catch (e: Exception) {
                 Log.e(logTag, "Error saving top 3 drivers to DB", e)
@@ -199,7 +206,7 @@ class DriversViewModel(
             }
 
             try {
-                val drivers = f1InfoRepository.getDriversV2(forceRefresh = isRefresh)
+                val drivers = driverRepository.getDrivers(forceRefresh = isRefresh)
                 _driversList.value = UiState.Success(drivers)
             } catch (e: Exception) {
                 Log.e(logTag, "Error in fetchDriverData", e)
@@ -275,11 +282,15 @@ fun DriverDetailUiModel.toDriverUiModel(): DriverUiModel {
     )
 }
 
-class DriversViewModelFactory(private val dao: TopThreeDriversDAO) : ViewModelProvider.Factory {
+class DriversViewModelFactory(private val dao: TopThreeDriversDAO? = null) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DriversViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return DriversViewModel(dao) as T
+            return if (dao != null) {
+                DriversViewModel(dao) as T
+            } else {
+                DriversViewModel() as T
+            }
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

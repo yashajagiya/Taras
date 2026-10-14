@@ -14,6 +14,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+import androidx.lifecycle.ViewModelProvider
+import com.example.taras.core.common.TarasApplication
+
 data class BinderCardItem(
     val card: TcgCardEntity,
     val inventory: UserCardInventoryEntity?,
@@ -34,7 +37,7 @@ data class BinderUiState(
 )
 
 class TcgViewModel(
-    private val repository: TcgRepository
+    private val repository: TcgRepository = TarasApplication.instance.appContainer.tcgRepository
 ) : ViewModel() {
 
     private val _selectedTier = MutableStateFlow<RarityTier?>(null)
@@ -124,5 +127,19 @@ class TcgViewModel(
             TcgSoundManager.playRadioBeep()
             onDrawn(drawn)
         }
+    }
+}
+
+class TcgViewModelFactory(private val repository: TcgRepository? = null) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(TcgViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return if (repository != null) {
+                TcgViewModel(repository) as T
+            } else {
+                TcgViewModel() as T
+            }
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

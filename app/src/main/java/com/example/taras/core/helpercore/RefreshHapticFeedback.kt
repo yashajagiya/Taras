@@ -231,7 +231,6 @@ object RefreshHapticFeedback {
  * 1. A crisp tactile tick when pulled past the threshold (distanceFraction >= 1.0f).
  * 2. A satisfying double-pulse confirmation when refreshing finishes (true -> false).
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RefreshHapticEffect(
     isRefreshing: Boolean,

@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.ui.res.stringResource
 import com.example.taras.R
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TarasTopBar(
     modifier: Modifier = Modifier,

@@ -68,7 +68,7 @@ Taras was built to deliver the exact opposite: **a lightning-fast, minimalist, a
 | **Navigation** | Navigation 3 | Modern, type-safe navigation graph |
 | **Local Database** | Room (SQLite) | Caching standings, circuits, and TCG binder |
 | **Preferences** | Jetpack DataStore | Reactive user preferences (driver, team, theme) |
-| **Networking** | Retrofit & Ksoup | Fast JSON fetching and on-device RSS parsing |
+| **Networking** | Ktor & Ksoup | Fast asynchronous JSON fetching and on-device RSS parsing |
 | **Background Tasks** | WorkManager | Weekly card pack generation & session notifications |
 | **Widgets** | Android Glance | Interactive home-screen widgets |
 

@@ -73,15 +73,9 @@ fun NavGridScreen(
     onDriverClick: (String) -> Unit,
     onTeamClick: (String) -> Unit,
     onCompareClick: () -> Unit = {},
-    userViewModel: UserViewModel = viewModel(
-        factory = UserViewModelFactory(UserPreferences(LocalContext.current))
-    ),
+    userViewModel: UserViewModel = viewModel(),
     modifier: Modifier = Modifier,
-    driversViewModel: DriversViewModel = viewModel(
-        factory = DriversViewModelFactory(
-            AppDatabase.getDatabase(LocalContext.current).topThreeDriversDao()
-        )
-    ),
+    driversViewModel: DriversViewModel = viewModel(),
     teamsViewModel: TeamsViewModel = viewModel()
 ) {
     val driversState by driversViewModel.combinedLowDrivers.collectAsStateWithLifecycle()
@@ -118,9 +112,7 @@ fun GridContent(
     onDriverClick: (String) -> Unit,
     onTeamClick: (String) -> Unit,
     onCompareClick: () -> Unit = {},
-    userViewModel: UserViewModel = viewModel(
-        factory = UserViewModelFactory(UserPreferences(LocalContext.current))
-    ),
+    userViewModel: UserViewModel = viewModel(),
     modifier: Modifier = Modifier
 ) {
     val favoriteDriverNumber by userViewModel.favoriteDriverNumber.collectAsStateWithLifecycle()

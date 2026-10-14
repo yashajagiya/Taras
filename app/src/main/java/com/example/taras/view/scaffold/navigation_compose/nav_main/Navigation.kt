@@ -19,7 +19,13 @@ import com.example.taras.view.scaffold.navigation_compose.nav_screens.nave_subsc
 import com.example.taras.viewmodel.AppearanceViewModel
 import com.example.taras.viewmodel.UserViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.taras.view.scaffold.navigation_compose.nav_screens.nave_subscreens.ComparisonScreen
+import com.example.taras.view.scaffold.navigation_compose.nav_screens.nave_subscreens.LegalHubScreen
+import com.example.taras.view.tcg.screens.BattleArenaScreen
+import com.example.taras.viewmodel.TcgViewModel
 
 @Composable
 fun MainNavHost(
@@ -29,7 +35,7 @@ fun MainNavHost(
     userViewModel: UserViewModel,
     modifier: Modifier = Modifier
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
     NavDisplay(
         modifier = modifier.fillMaxSize(),
         onBack = {
@@ -115,7 +121,7 @@ fun MainNavHost(
                     )
                 }
                 entry<MainNavRoutes.Comparison> { route ->
-                    com.example.taras.view.scaffold.navigation_compose.nav_screens.nave_subscreens.ComparisonScreen(
+                    ComparisonScreen(
                         initialDriver1 = route.initialDriver1,
                         initialDriver2 = route.initialDriver2,
                         onBackClick = { navigator.goBack() },
@@ -127,16 +133,7 @@ fun MainNavHost(
                     )
                 }
                 entry<MainNavRoutes.TcgBinder> {
-                    val tcgViewModel: com.example.taras.viewmodel.TcgViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-                        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
-                            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                                val db = com.example.taras.core.db.AppDatabase.getDatabase(context)
-                                val repo = com.example.taras.core.tcg.repository.TcgRepository(db.tcgCardDao())
-                                @Suppress("UNCHECKED_CAST")
-                                return com.example.taras.viewmodel.TcgViewModel(repo) as T
-                            }
-                        }
-                    )
+                    val tcgViewModel: TcgViewModel = viewModel()
                     com.example.taras.view.tcg.screens.BinderGridScreen(
                         viewModel = tcgViewModel,
                         onBackClick = { navigator.goBack() },
@@ -151,16 +148,7 @@ fun MainNavHost(
                     )
                 }
                 entry<MainNavRoutes.TcgScratchPack> { route ->
-                    val tcgViewModel: com.example.taras.viewmodel.TcgViewModel = androidx.lifecycle.viewmodel.compose.viewModel(
-                        factory = object : androidx.lifecycle.ViewModelProvider.Factory {
-                            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-                                val db = com.example.taras.core.db.AppDatabase.getDatabase(context)
-                                val repo = com.example.taras.core.tcg.repository.TcgRepository(db.tcgCardDao())
-                                @Suppress("UNCHECKED_CAST")
-                                return com.example.taras.viewmodel.TcgViewModel(repo) as T
-                            }
-                        }
-                    )
+                    val tcgViewModel: TcgViewModel = viewModel()
                     val uiState by tcgViewModel.uiState.collectAsStateWithLifecycle()
                     val cardToScratch = uiState.allBinderItems.find { it.card.id == route.cardId }?.card
                         ?: uiState.unrevealedCard
@@ -179,14 +167,14 @@ fun MainNavHost(
                     )
                 }
                 entry<MainNavRoutes.TcgArena> { route ->
-                    com.example.taras.view.tcg.screens.BattleArenaScreen(
+                    BattleArenaScreen(
                         initialCard1Id = route.card1Id,
                         initialCard2Id = route.card2Id,
                         onBackClick = { navigator.goBack() }
                     )
                 }
                 entry<MainNavRoutes.LegalHub> { route ->
-                    com.example.taras.view.scaffold.navigation_compose.nav_screens.nave_subscreens.LegalHubScreen(
+                   LegalHubScreen(
                         initialTabName = route.initialTab,
                         onBackClick = { navigator.goBack() }
                     )

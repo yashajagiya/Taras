@@ -63,6 +63,7 @@ fun NewsCarousel(
 
     val items = newsState.data
     val context = LocalContext.current
+    val newsOpenErrorMessage = stringResource(R.string.news_open_error)
 
     if (items.isEmpty()) {
         Card(
@@ -150,7 +151,7 @@ fun NewsCarousel(
                         } catch (e: Exception) {
                             android.widget.Toast.makeText(
                                 context,
-                                context.getString(R.string.news_open_error),
+                                newsOpenErrorMessage,
                                 android.widget.Toast.LENGTH_SHORT
                             ).show()
                         }

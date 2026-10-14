@@ -80,7 +80,7 @@ In accordance with Section 9 of the DPDPA 2023 and the Children’s Online Priva
 
 Taras uses network connectivity exclusively for retrieving public motorsport content over encrypted channels:
 
-1. **Public Sports Data ([TarasF1Data](https://github.com/yashajagiya/tarasF1Data)):** Driver standings, constructor standings, race calendars, circuit information, and session schedules are downloaded from a public static GitHub repository. No user-specific data is passed in request queries or HTTP headers.
+1. **Public Sports Data ([TarasAPIstatic](https://github.com/yashajagiya/TarasAPIstatic)):** Driver standings, constructor standings, race calendars, circuit information, and session schedules are downloaded from a public static GitHub repository. No user-specific data is passed in request queries or HTTP headers.
 2. **Public News Feeds (Intermediary Status):** News headlines, summaries, and publication timestamps are parsed directly on your device from public RSS feeds published by motorsport journalism outlets (Motorsport.com, Autosport, RaceFans, PlanetF1).
 3. **Transport Layer Security (TLS/HTTPS):** All network requests are made strictly over encrypted Transport Layer Security (`HTTPS`).
 

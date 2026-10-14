@@ -53,6 +53,7 @@ class CountdownMatrixWidget : GlanceAppWidget() {
                 raceCurrentState = raceCurrentState,
                 nextSessionInfo = nextSessionInfo,
                 seasonRounds = seasonRounds,
+                currentRoundNumber = currentRoundNum,
                 circuitBitmap = circuitBitmap,
                 colors = colors
             )

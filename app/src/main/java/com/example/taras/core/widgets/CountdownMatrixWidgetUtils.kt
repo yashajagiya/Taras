@@ -288,19 +288,21 @@ object CountdownMatrixWidgetUtils {
     }
 
     /**
-     * Renders the double-walled race track vector silhouette matching the design spec.
+     * Renders the double-walled race track vector silhouette with an authentic
+     * F1 Start / Finish Line hash mark at the apex straight.
      */
     fun renderCircuitMapBitmap(
         circuitName: String?,
         widthPx: Int = 180,
         heightPx: Int = 110,
         outerStrokeColorArgb: Int = 0xFFD5D7DC.toInt(),
-        innerStrokeColorArgb: Int = 0xFF111214.toInt()
+        innerStrokeColorArgb: Int = 0xFF111214.toInt(),
+        startFinishColorArgb: Int = 0xFFFF1801.toInt()
     ): Bitmap {
         val safeWidth = widthPx.coerceAtLeast(60)
         val safeHeight = heightPx.coerceAtLeast(40)
         val key = getNormalizedCircuitKey(circuitName)
-        val cacheKey = "track:$key:${safeWidth}x${safeHeight}:$outerStrokeColorArgb:$innerStrokeColorArgb"
+        val cacheKey = "track:$key:${safeWidth}x${safeHeight}:$outerStrokeColorArgb:$innerStrokeColorArgb:$startFinishColorArgb"
 
         bitmapCache.get(cacheKey)?.let { return it }
 
@@ -326,7 +328,7 @@ object CountdownMatrixWidgetUtils {
         }
         path.transform(matrix)
 
-        // Outer light-silver track wall
+        // Outer track wall
         val outerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE
             strokeWidth = (safeHeight * 0.10f).coerceIn(4.5f, 6.5f)
@@ -336,7 +338,7 @@ object CountdownMatrixWidgetUtils {
         }
         canvas.drawPath(path, outerPaint)
 
-        // Inner dark cutout core creating the double-wall track outline
+        // Inner cutout core creating the double-wall track outline
         val innerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE
             strokeWidth = (safeHeight * 0.045f).coerceIn(1.8f, 2.6f)
@@ -345,6 +347,33 @@ object CountdownMatrixWidgetUtils {
             strokeJoin = Paint.Join.ROUND
         }
         canvas.drawPath(path, innerPaint)
+
+        // Authentic F1 Start / Finish Line hash mark perpendicular to the track
+        try {
+            val pathMeasure = android.graphics.PathMeasure(path, false)
+            val pos = FloatArray(2)
+            val tan = FloatArray(2)
+            if (pathMeasure.length > 0 && pathMeasure.getPosTan(0f, pos, tan)) {
+                val nx = -tan[1]
+                val ny = tan[0]
+                val tickLen = (safeHeight * 0.08f).coerceIn(4f, 7f)
+                val finishLinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    style = Paint.Style.STROKE
+                    strokeWidth = (safeHeight * 0.04f).coerceIn(2.2f, 3.4f)
+                    color = startFinishColorArgb
+                    strokeCap = Paint.Cap.ROUND
+                }
+                canvas.drawLine(
+                    pos[0] - nx * tickLen,
+                    pos[1] - ny * tickLen,
+                    pos[0] + nx * tickLen,
+                    pos[1] + ny * tickLen,
+                    finishLinePaint
+                )
+            }
+        } catch (_: Throwable) {
+            // Silently skip if path measurement unavailable
+        }
 
         bitmapCache.put(cacheKey, bitmap)
         return bitmap
@@ -631,6 +660,10 @@ object CountdownMatrixWidgetUtils {
 
         val roundMap = rounds.associateBy { it.roundNumber }
 
+        val chipPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.FILL
+        }
+
         for (i in 0 until 24) {
             val roundNum = i + 1
             val col = i % cols
@@ -642,7 +675,14 @@ object CountdownMatrixWidgetUtils {
             val item = roundMap[roundNum]
 
             if (item != null && !item.winnerNumber.isNullOrBlank()) {
-                textPaint.color = getDriverWinnerColor(item.winnerNumber, item.teamColor)
+                val winnerColor = getDriverWinnerColor(item.winnerNumber, item.teamColor)
+
+                // Soft luxury driver badge chip background (15% opacity)
+                chipPaint.color = (winnerColor and 0x00FFFFFF) or 0x24000000
+                canvas.drawCircle(cx, cy, (cellH * 0.35f).coerceIn(8f, 15f), chipPaint)
+
+                // Bold driver number
+                textPaint.color = winnerColor
                 canvas.drawText(item.winnerNumber, cx, cy + textBaselineOffset, textPaint)
             } else {
                 canvas.drawCircle(cx, cy, dotRadius, dotPaint)

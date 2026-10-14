@@ -44,8 +44,8 @@ class FavoriteDriverWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val repository = WidgetDataRepository()
         val data = repository.getFavoriteDriverData(context)
+        val colors = getWidgetThemeColors(context)
         provideContent {
-            val colors = rememberWidgetThemeColors()
             FavoriteDriverWidgetUI(data = data, colors = colors)
         }
     }

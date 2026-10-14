@@ -27,8 +27,9 @@ class CountdownMatrixWidget : GlanceAppWidget() {
         // Schedule zero-battery milestone alarm for exact session start
         CountdownMatrixWidgetUtils.scheduleNextSessionMilestoneAlarm(context, nextSessionInfo?.targetInstant)
 
+        val colors = getWidgetThemeColors(context)
+
         provideContent {
-            val colors = rememberWidgetThemeColors()
             CountdownMatrixWidgetUI(
                 raceCurrentState = raceCurrentState,
                 nextSessionInfo = nextSessionInfo,

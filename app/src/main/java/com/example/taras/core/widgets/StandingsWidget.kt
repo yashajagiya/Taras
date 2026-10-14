@@ -44,8 +44,8 @@ class StandingsWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val repository = WidgetDataRepository()
         val standings = repository.getTopThreeStandings(context)
+        val colors = getWidgetThemeColors(context)
         provideContent {
-            val colors = rememberWidgetThemeColors()
             StandingsWidgetUI(standings = standings, colors = colors)
         }
     }

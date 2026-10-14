@@ -29,8 +29,8 @@ class NextWidget : GlanceAppWidget() {
             )
         } else null
 
+        val colors = getWidgetThemeColors(context)
         provideContent {
-            val colors = rememberWidgetThemeColors()
             NextRaceWidgetUI(
                 raceCurrentState = raceCurrentState,
                 nextSessionInfoForWidget = nextSessionInfo,

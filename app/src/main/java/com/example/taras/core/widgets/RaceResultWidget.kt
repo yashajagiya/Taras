@@ -44,8 +44,8 @@ class RaceResultWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val repository = WidgetDataRepository()
         val data = repository.getRaceResultData(context)
+        val colors = getWidgetThemeColors(context)
         provideContent {
-            val colors = rememberWidgetThemeColors()
             RaceResultWidgetUI(data = data, colors = colors)
         }
     }

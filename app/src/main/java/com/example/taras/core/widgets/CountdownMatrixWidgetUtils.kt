@@ -610,7 +610,7 @@ object CountdownMatrixWidgetUtils {
         val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             textAlign = Paint.Align.CENTER
             typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
-            textSize = (cellH * 0.58f).coerceIn(13f, 25f)
+            textSize = (cellH * 0.50f).coerceIn(11f, 20f)
         }
 
         // Solid grey dot color matching Image 2 (#6E7075 or outline)
@@ -621,11 +621,11 @@ object CountdownMatrixWidgetUtils {
 
         val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE
-            strokeWidth = 2.5f
+            strokeWidth = 2.2f
             color = activeHighlightArgb
         }
 
-        val dotRadius = (cellH * 0.24f).coerceIn(5.5f, 11f)
+        val dotRadius = (cellH * 0.22f).coerceIn(4.5f, 9.5f)
         val fontMetrics = textPaint.fontMetrics
         val textBaselineOffset = (fontMetrics.descent - fontMetrics.ascent) / 2f - fontMetrics.descent
 

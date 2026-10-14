@@ -41,11 +41,19 @@ class CountdownMatrixWidget : GlanceAppWidget() {
 
         val colors = getWidgetThemeColors(context)
 
+        // Load real official F1 circuit track outline image if available
+        val trackImageUrl = calendarEvents.find { it.round == currentRoundNum }?.circuit?.trackImage
+            ?: nextSessionInfo?.circuitName?.let { cName ->
+                calendarEvents.find { it.circuit.name.contains(cName, ignoreCase = true) }?.circuit?.trackImage
+            }
+        val circuitBitmap = CountdownMatrixWidgetUtils.loadCircuitBitmap(context, trackImageUrl)
+
         provideContent {
             CountdownMatrixWidgetUI(
                 raceCurrentState = raceCurrentState,
                 nextSessionInfo = nextSessionInfo,
                 seasonRounds = seasonRounds,
+                circuitBitmap = circuitBitmap,
                 colors = colors
             )
         }

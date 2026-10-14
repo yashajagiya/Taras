@@ -55,6 +55,9 @@ fun CountdownMatrixWidgetUI(
     nextSessionInfo: SessionInfo?,
     seasonRounds: List<SeasonRoundItem>,
     currentRoundNumber: Int = 1,
+    totalRounds: Int = 24,
+    hasSprint: Boolean = false,
+    laps: Int? = null,
     circuitBitmap: Bitmap? = null,
     colors: ColorProviders = rememberWidgetThemeColors(),
     modifier: GlanceModifier = GlanceModifier
@@ -89,6 +92,9 @@ fun CountdownMatrixWidgetUI(
                         nextSession = nextSessionInfo,
                         seasonRounds = seasonRounds,
                         currentRoundNumber = currentRoundNumber,
+                        totalRounds = totalRounds,
+                        hasSprint = hasSprint,
+                        laps = laps,
                         circuitBitmap = circuitBitmap
                     )
                 }
@@ -152,6 +158,9 @@ private fun SuccessContentView(
     nextSession: SessionInfo?,
     seasonRounds: List<SeasonRoundItem>,
     currentRoundNumber: Int,
+    totalRounds: Int,
+    hasSprint: Boolean,
+    laps: Int?,
     circuitBitmap: Bitmap?
 ) {
     val size = LocalSize.current
@@ -178,7 +187,7 @@ private fun SuccessContentView(
                     verticalAlignment = Alignment.Vertical.CenterVertically
                 ) {
                     Text(
-                        text = "SEASON GRID • $completedRaces/24 RACES",
+                        text = "SEASON GRID • $completedRaces/$totalRounds RACES",
                         style = TextStyle(
                             color = GlanceTheme.colors.onSurfaceVariant,
                             fontWeight = FontWeight.Bold,
@@ -199,7 +208,8 @@ private fun SuccessContentView(
                         widthPx = if (isTall) 300 else 260,
                         heightPx = if (isTall) 190 else 150,
                         outlineColorArgb = outlineArgb,
-                        activeHighlightArgb = primaryArgb
+                        activeHighlightArgb = primaryArgb,
+                        totalRounds = totalRounds
                     )
                     Image(
                         provider = ImageProvider(matrixBitmap),
@@ -221,6 +231,8 @@ private fun SuccessContentView(
                     raceCurrent = raceCurrent,
                     nextSession = nextSession,
                     currentRoundNumber = currentRoundNumber,
+                    hasSprint = hasSprint,
+                    laps = laps,
                     circuitBitmap = circuitBitmap,
                     isExtended = true,
                     isTall = isTall
@@ -233,6 +245,8 @@ private fun SuccessContentView(
             raceCurrent = raceCurrent,
             nextSession = nextSession,
             currentRoundNumber = currentRoundNumber,
+            hasSprint = hasSprint,
+            laps = laps,
             circuitBitmap = circuitBitmap,
             isExtended = false,
             isTall = isTall
@@ -243,17 +257,20 @@ private fun SuccessContentView(
 /**
  * Flagship F1 Countdown Module styled with Taras Material 3 theme colors.
  * Elevated with bespoke luxury details:
- * - Round & Session Telemetry Badge (`R14 • PRACTICE 1`)
+ * - Round & Session Telemetry Badge (`R14 • PRACTICE 1`) + Sprint Badge (`⚡ SPRINT`)
  * - Precision Swiss Chronograph 2-Column Pod with Hairline Separator (`DAYS` | `HOURS`)
  * - Double-Walled Circuit Silhouette with Official F1 Start/Finish Line Tick
  * - Day-of-week Calendar Date (`FRI, 17 JUL`) + Bold Local Time
  * - High-Contrast Black & White Circuit in Light Theme; Silver & Obsidian in Dark Theme
+ * - Laps Telemetry Badge (`Spa • 44L`)
  */
 @Composable
 private fun CountdownModule(
     raceCurrent: CurrentRace?,
     nextSession: SessionInfo?,
     currentRoundNumber: Int,
+    hasSprint: Boolean,
+    laps: Int?,
     circuitBitmap: Bitmap?,
     isExtended: Boolean,
     isTall: Boolean
@@ -305,11 +322,12 @@ private fun CountdownModule(
         modifier = GlanceModifier.fillMaxSize(),
         verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
-        // 1. Header: Telemetry Round Tag + Session + Grand Prix Title
+        // 1. Header: Telemetry Round Tag + Sprint Tag + Session + Grand Prix Title
         HeaderRow(
             gpTitle = gpTitle,
             sessionName = sessionName,
             roundNumber = currentRoundNumber,
+            hasSprint = hasSprint,
             isLive = isLive,
             isTall = isTall
         )
@@ -327,10 +345,11 @@ private fun CountdownModule(
 
         Spacer(modifier = GlanceModifier.defaultWeight())
 
-        // 3. Footer Row: Double-line Circuit Silhouette with Start/Finish Tick + Date & Time
+        // 3. Footer Row: Double-line Circuit Silhouette with Start/Finish Tick + Laps + Date & Time
         FooterRow(
             trackBitmap = trackBitmap,
             circuitShortName = shortCircuitName,
+            laps = laps,
             sessionDate = formattedDate,
             localTime = localTime,
             isTall = isTall,
@@ -344,6 +363,7 @@ private fun HeaderRow(
     gpTitle: String,
     sessionName: String,
     roundNumber: Int,
+    hasSprint: Boolean,
     isLive: Boolean,
     isTall: Boolean
 ) {
@@ -371,6 +391,25 @@ private fun HeaderRow(
                 )
             }
 
+            if (hasSprint) {
+                Spacer(modifier = GlanceModifier.width(4.dp))
+                Box(
+                    modifier = GlanceModifier
+                        .cornerRadius(4.dp)
+                        .background(GlanceTheme.colors.secondaryContainer)
+                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "⚡ SPRINT",
+                        style = TextStyle(
+                            color = GlanceTheme.colors.onSecondaryContainer,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 7.5.sp
+                        )
+                    )
+                }
+            }
+
             Spacer(modifier = GlanceModifier.width(6.dp))
 
             if (isLive) {
@@ -395,7 +434,7 @@ private fun HeaderRow(
                     style = TextStyle(
                         color = GlanceTheme.colors.onSurfaceVariant,
                         fontWeight = FontWeight.Medium,
-                        fontSize = 9.5.sp
+                        fontSize = 9.sp
                     ),
                     maxLines = 1
                 )
@@ -516,6 +555,7 @@ private fun CountdownPill(
 private fun FooterRow(
     trackBitmap: Bitmap,
     circuitShortName: String,
+    laps: Int?,
     sessionDate: String,
     localTime: String,
     isTall: Boolean,
@@ -525,7 +565,7 @@ private fun FooterRow(
         modifier = GlanceModifier.fillMaxWidth(),
         verticalAlignment = Alignment.Vertical.Bottom
     ) {
-        // Left: Circuit Silhouette with Start/Finish tick + Circuit Name below it
+        // Left: Circuit Silhouette with Start/Finish tick + Circuit Name & Laps below it
         Column(
             modifier = GlanceModifier.defaultWeight(),
             verticalAlignment = Alignment.Vertical.Bottom,
@@ -540,12 +580,13 @@ private fun FooterRow(
                 )
             )
             Spacer(modifier = GlanceModifier.height(2.dp))
+            val circuitLabel = if (laps != null && laps > 0) "$circuitShortName • ${laps}L" else circuitShortName
             Text(
-                text = circuitShortName,
+                text = circuitLabel,
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurfaceVariant,
                     fontWeight = FontWeight.Normal,
-                    fontSize = if (isTall) 11.sp else 10.5.sp
+                    fontSize = if (isTall) 10.5.sp else 9.5.sp
                 ),
                 maxLines = 1
             )

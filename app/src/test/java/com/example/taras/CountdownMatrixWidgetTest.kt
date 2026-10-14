@@ -157,5 +157,44 @@ class CountdownMatrixWidgetTest {
         val formatted = CountdownMatrixWidgetUtils.formatShortSessionDate(instant, TimeZone.UTC)
         assertEquals("Jul 17", formatted)
     }
+
+    @Test
+    fun dynamicCalendarRoundCount_and_SprintAndLaps_areAccurate() {
+        val assetFile = File("src/main/assets/default_season_calendar.json")
+        val jsonStr = assetFile.readText()
+        val calendar = NetworkModule.json.decodeFromString<List<CalendarRaceEvent>>(jsonStr)
+
+        val totalRounds = calendar.maxOfOrNull { it.round }?.coerceAtLeast(1)
+            ?: calendar.size.takeIf { it > 0 }
+            ?: 24
+
+        // 2026 calendar in assets has 23 dynamic rounds
+        assertEquals(23, totalRounds)
+
+        val round1 = calendar.find { it.round == 1 }
+        assertNotNull(round1)
+        assertEquals(58, round1?.laps)
+        assertEquals(false, round1?.hasSprint)
+
+        val round2 = calendar.find { it.round == 2 }
+        assertNotNull(round2)
+        assertEquals(true, round2?.hasSprint)
+    }
+
+    @Test
+    fun circuitPathVector_and_normalizedKey_arePresentAndValid() {
+        val spaKey = CountdownMatrixWidgetUtils.getNormalizedCircuitKey("Circuit de Spa-Francorchamps")
+        assertEquals("spa", spaKey)
+        val spaPath = CountdownMatrixWidgetUtils.circuitPaths[spaKey]
+        assertNotNull(spaPath)
+        assertTrue(spaPath!!.startsWith("M "))
+
+        val monzaKey = CountdownMatrixWidgetUtils.getNormalizedCircuitKey("Autodromo Nazionale Monza")
+        assertEquals("monza", monzaKey)
+
+        val cotaKey = CountdownMatrixWidgetUtils.getNormalizedCircuitKey("Circuit of The Americas")
+        assertEquals("cota", cotaKey)
+    }
 }
+
 

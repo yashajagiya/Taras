@@ -607,34 +607,63 @@ object CountdownMatrixWidgetUtils {
     }
 
     /**
-     * Renders a 6 columns × 4 rows (24 rounds) matrix into a single Bitmap via Canvas.
-     * Matches Image 2:
-     * - Completed rounds show bold car numbers with official driver/team colors.
-     * - Un-raced rounds show clean solid grey circles.
-     * - Active round shows a subtle primary highlight ring.
+     * Renders a dynamic season winner matrix (supporting 22, 23, or 24 rounds dynamically)
+     * with an integrated top telemetry progress bar, soft luxury driver chips, and active radar beacon.
      */
     fun renderSeasonMatrixBitmap(
         rounds: List<SeasonRoundItem>,
         widthPx: Int,
         heightPx: Int,
         outlineColorArgb: Int,
-        activeHighlightArgb: Int
+        activeHighlightArgb: Int,
+        totalRounds: Int = 24
     ): Bitmap {
         val safeWidth = widthPx.coerceAtLeast(140)
         val safeHeight = heightPx.coerceAtLeast(90)
+        val dynamicTotal = totalRounds.coerceIn(16, 26)
 
         val hash = rounds.map { "${it.roundNumber}:${it.winnerNumber}:${it.teamColor.value}:${it.isCurrentOrNext}" }.hashCode()
-        val cacheKey = "matrix:$hash:${safeWidth}x$safeHeight:$outlineColorArgb:$activeHighlightArgb"
+        val cacheKey = "matrix:$hash:$dynamicTotal:${safeWidth}x$safeHeight:$outlineColorArgb:$activeHighlightArgb"
 
         bitmapCache.get(cacheKey)?.let { return it }
 
         val bitmap = Bitmap.createBitmap(safeWidth, safeHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
 
+        // 1. Draw Top Telemetry Progress Bar
+        val completedCount = rounds.count { !it.winnerNumber.isNullOrBlank() }
+        val progressFraction = if (dynamicTotal > 0) (completedCount.toFloat() / dynamicTotal).coerceIn(0f, 1f) else 0f
+
+        val barHeight = (safeHeight * 0.025f).coerceIn(2.5f, 4f)
+        val barTop = 1.5f
+        val barBottom = barTop + barHeight
+        val barRadius = barHeight / 2f
+
+        // Telemetry track background (20% alpha)
+        val bgBarPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.FILL
+            color = (outlineColorArgb and 0x00FFFFFF) or 0x33000000
+        }
+        canvas.drawRoundRect(0f, barTop, safeWidth.toFloat(), barBottom, barRadius, barRadius, bgBarPaint)
+
+        // Telemetry track progress fill
+        if (progressFraction > 0f) {
+            val fillBarPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.FILL
+                color = activeHighlightArgb
+            }
+            val fillWidth = (safeWidth * progressFraction).coerceAtLeast(barHeight)
+            canvas.drawRoundRect(0f, barTop, fillWidth, barBottom, barRadius, barRadius, fillBarPaint)
+        }
+
+        // 2. Matrix Grid Layout below progress bar
+        val matrixTop = barBottom + (safeHeight * 0.06f).coerceAtLeast(5f)
+        val matrixHeight = safeHeight - matrixTop
+
         val cols = 6
         val rows = 4
         val cellW = safeWidth / cols.toFloat()
-        val cellH = safeHeight / rows.toFloat()
+        val cellH = matrixHeight / rows.toFloat()
 
         val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             textAlign = Paint.Align.CENTER
@@ -642,7 +671,7 @@ object CountdownMatrixWidgetUtils {
             textSize = (cellH * 0.50f).coerceIn(11f, 20f)
         }
 
-        // Solid grey dot color matching Image 2 (#6E7075 or outline)
+        // Solid grey dot color for upcoming rounds (#6E7075 or outline)
         val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.FILL
             color = if (outlineColorArgb != 0) outlineColorArgb else 0xFF6E7075.toInt()
@@ -664,13 +693,14 @@ object CountdownMatrixWidgetUtils {
             style = Paint.Style.FILL
         }
 
-        for (i in 0 until 24) {
+        // Only draw up to dynamicTotal rounds (e.g. 22, 23, or 24)
+        for (i in 0 until dynamicTotal) {
             val roundNum = i + 1
             val col = i % cols
             val row = i / cols
 
             val cx = col * cellW + cellW / 2f
-            val cy = row * cellH + cellH / 2f
+            val cy = matrixTop + row * cellH + cellH / 2f
 
             val item = roundMap[roundNum]
 

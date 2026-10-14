@@ -27,6 +27,14 @@ class CountdownMatrixWidget : GlanceAppWidget() {
         val (raceCurrentState, nextSessionInfo, calendarEvents) = repository.getOfflineResilientCalendar(context)
 
         val currentRoundNum = nextSessionInfo?.roundNumber ?: 1
+        val currentEvent = calendarEvents.find { it.round == currentRoundNum }
+
+        val totalRounds = calendarEvents.maxOfOrNull { it.round }?.coerceAtLeast(1)
+            ?: calendarEvents.size.takeIf { it > 0 }
+            ?: 24
+        val hasSprint = currentEvent?.hasSprint == true
+        val laps = currentEvent?.laps
+
         val seasonRounds = calendarEvents.map { event ->
             SeasonRoundItem(
                 roundNumber = event.round,
@@ -42,7 +50,7 @@ class CountdownMatrixWidget : GlanceAppWidget() {
         val colors = getWidgetThemeColors(context)
 
         // Load real official F1 circuit track outline image if available
-        val trackImageUrl = calendarEvents.find { it.round == currentRoundNum }?.circuit?.trackImage
+        val trackImageUrl = currentEvent?.circuit?.trackImage
             ?: nextSessionInfo?.circuitName?.let { cName ->
                 calendarEvents.find { it.circuit.name.contains(cName, ignoreCase = true) }?.circuit?.trackImage
             }
@@ -54,9 +62,13 @@ class CountdownMatrixWidget : GlanceAppWidget() {
                 nextSessionInfo = nextSessionInfo,
                 seasonRounds = seasonRounds,
                 currentRoundNumber = currentRoundNum,
+                totalRounds = totalRounds,
+                hasSprint = hasSprint,
+                laps = laps,
                 circuitBitmap = circuitBitmap,
                 colors = colors
             )
         }
     }
 }
+

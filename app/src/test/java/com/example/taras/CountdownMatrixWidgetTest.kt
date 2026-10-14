@@ -195,6 +195,79 @@ class CountdownMatrixWidgetTest {
         val cotaKey = CountdownMatrixWidgetUtils.getNormalizedCircuitKey("Circuit of The Americas")
         assertEquals("cota", cotaKey)
     }
+
+    @Test
+    fun computeGantryLights_reflectsProximityAndLiveStatus() {
+        val now = Instant.parse("2026-05-20T10:00:00Z")
+
+        // 1. Live status should always illuminate all 5 lights
+        assertEquals(5, CountdownMatrixWidgetUtils.computeGantryLights(now + 10.hours, isLive = true, now = now))
+
+        // 2. More than 72 hours away -> 1 light
+        assertEquals(1, CountdownMatrixWidgetUtils.computeGantryLights(now + 80.hours, isLive = false, now = now))
+
+        // 3. Between 24h and 72h away -> 2 lights
+        assertEquals(2, CountdownMatrixWidgetUtils.computeGantryLights(now + 48.hours, isLive = false, now = now))
+
+        // 4. Between 6h and 24h away -> 3 lights
+        assertEquals(3, CountdownMatrixWidgetUtils.computeGantryLights(now + 12.hours, isLive = false, now = now))
+
+        // 5. Between 1h and 6h away -> 4 lights
+        assertEquals(4, CountdownMatrixWidgetUtils.computeGantryLights(now + 3.hours, isLive = false, now = now))
+
+        // 6. Within 1 hour -> 5 lights (Pre-session buildup)
+        assertEquals(5, CountdownMatrixWidgetUtils.computeGantryLights(now + 30.minutes, isLive = false, now = now))
+    }
+
+    @Test
+    fun computeWeekendTimeline_formatsConventionalAndSprintAccurately() {
+        val now = Instant.parse("2026-05-20T10:00:00Z")
+
+        // Conventional weekend with Practice 3 current
+        val conventional = CountdownMatrixWidgetUtils.computeWeekendTimeline(
+            sessions = null,
+            currentSessionName = "Practice 3",
+            targetInstant = now + 4.hours,
+            isLive = false,
+            hasSprint = false,
+            now = now
+        )
+
+        assertEquals(5, conventional.size)
+        assertEquals("FP1", conventional[0].shortCode)
+        assertTrue(conventional[0].isCompleted)
+        assertEquals("FP2", conventional[1].shortCode)
+        assertTrue(conventional[1].isCompleted)
+        assertEquals("FP3", conventional[2].shortCode)
+        assertTrue(conventional[2].isCurrent)
+        assertEquals("Q", conventional[3].shortCode)
+        assertTrue(conventional[3].isUpcoming)
+        assertEquals("GP", conventional[4].shortCode)
+        assertTrue(conventional[4].isUpcoming)
+
+        // Sprint weekend with Sprint Race current
+        val sprint = CountdownMatrixWidgetUtils.computeWeekendTimeline(
+            sessions = null,
+            currentSessionName = "Sprint",
+            targetInstant = now + 2.hours,
+            isLive = false,
+            hasSprint = true,
+            now = now
+        )
+
+        assertEquals(5, sprint.size)
+        assertEquals("FP1", sprint[0].shortCode)
+        assertTrue(sprint[0].isCompleted)
+        assertEquals("SQ", sprint[1].shortCode)
+        assertTrue(sprint[1].isCompleted)
+        assertEquals("SPR", sprint[2].shortCode)
+        assertTrue(sprint[2].isCurrent)
+        assertEquals("Q", sprint[3].shortCode)
+        assertTrue(sprint[3].isUpcoming)
+        assertEquals("GP", sprint[4].shortCode)
+        assertTrue(sprint[4].isUpcoming)
+    }
 }
+
 
 

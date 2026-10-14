@@ -318,6 +318,8 @@ private fun CountdownModule(
         startFinishColorArgb = primaryArgb
     )
 
+    val litLights = CountdownMatrixWidgetUtils.computeGantryLights(targetInstant, isLive)
+
     Column(
         modifier = GlanceModifier.fillMaxSize(),
         verticalAlignment = Alignment.Vertical.CenterVertically
@@ -332,12 +334,25 @@ private fun CountdownModule(
             isTall = isTall
         )
 
+        if (isExtended || isTall) {
+            Spacer(modifier = GlanceModifier.height(4.dp))
+            val timeline = CountdownMatrixWidgetUtils.computeWeekendTimeline(
+                sessions = raceCurrent?.parsedSessions,
+                currentSessionName = sessionName,
+                targetInstant = targetInstant,
+                isLive = isLive,
+                hasSprint = hasSprint
+            )
+            WeekendTimelineStrip(timeline = timeline)
+        }
+
         Spacer(modifier = GlanceModifier.defaultWeight())
 
-        // 2. Center: Luxury Chronograph Countdown Pod (Days | Hours)
+        // 2. Center: Luxury Chronograph Countdown Pod (FIA 5-Lights Gantry + Days | Hours)
         CountdownPill(
             days = days,
             hours = hours,
+            litLights = litLights,
             isLive = isLive,
             isExtended = isExtended,
             isTall = isTall
@@ -456,9 +471,96 @@ private fun HeaderRow(
 }
 
 @Composable
+private fun WeekendTimelineStrip(
+    timeline: List<SessionTimelineItem>,
+    modifier: GlanceModifier = GlanceModifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Vertical.CenterVertically,
+        horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+    ) {
+        timeline.forEachIndexed { index, item ->
+            val bg = when {
+                item.isCurrent -> GlanceTheme.colors.primaryContainer
+                item.isCompleted -> GlanceTheme.colors.surfaceVariant
+                else -> GlanceTheme.colors.surface
+            }
+            val textColor = when {
+                item.isCurrent -> GlanceTheme.colors.onPrimaryContainer
+                item.isCompleted -> GlanceTheme.colors.onSurfaceVariant
+                else -> GlanceTheme.colors.outline
+            }
+            val prefix = when {
+                item.isCompleted -> "✓ "
+                item.isCurrent -> "● "
+                else -> ""
+            }
+
+            Box(
+                modifier = GlanceModifier
+                    .cornerRadius(4.dp)
+                    .background(bg)
+                    .padding(horizontal = 4.dp, vertical = 2.dp)
+            ) {
+                Text(
+                    text = "$prefix${item.shortCode}",
+                    style = TextStyle(
+                        color = textColor,
+                        fontWeight = if (item.isCurrent) FontWeight.Bold else FontWeight.Medium,
+                        fontSize = 7.5.sp
+                    )
+                )
+            }
+
+            if (index < timeline.size - 1) {
+                Spacer(modifier = GlanceModifier.width(2.5.dp))
+                Box(
+                    modifier = GlanceModifier
+                        .width(4.dp)
+                        .height(1.dp)
+                        .background(GlanceTheme.colors.outline)
+                ) {}
+                Spacer(modifier = GlanceModifier.width(2.5.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun F1StartingGantry(
+    litCount: Int,
+    isLive: Boolean,
+    modifier: GlanceModifier = GlanceModifier
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.Vertical.CenterVertically,
+        horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+    ) {
+        val litColor = GlanceTheme.colors.primary
+        val unlitColor = GlanceTheme.colors.outline
+
+        for (i in 1..5) {
+            val isLit = i <= litCount
+            Box(
+                modifier = GlanceModifier
+                    .size(width = 5.dp, height = 5.dp)
+                    .cornerRadius(2.5.dp)
+                    .background(if (isLit) litColor else unlitColor)
+            ) {}
+            if (i < 5) {
+                Spacer(modifier = GlanceModifier.width(3.5.dp))
+            }
+        }
+    }
+}
+
+@Composable
 private fun CountdownPill(
     days: String,
     hours: String,
+    litLights: Int,
     isLive: Boolean,
     isExtended: Boolean,
     isTall: Boolean
@@ -468,88 +570,101 @@ private fun CountdownPill(
             .fillMaxWidth()
             .cornerRadius(16.dp)
             .background(GlanceTheme.colors.surfaceVariant)
-            .padding(vertical = if (isTall) 9.dp else 7.dp, horizontal = 10.dp),
+            .padding(vertical = if (isTall) 8.dp else 6.5.dp, horizontal = 10.dp),
         contentAlignment = Alignment.Center
     ) {
-        if (isLive) {
-            Text(
-                text = "SESSION IN PROGRESS",
-                style = TextStyle(
-                    color = GlanceTheme.colors.primary,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center
-                )
+        Column(
+            modifier = GlanceModifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+        ) {
+            // Authentic 5-Lights FIA Starting Gantry
+            F1StartingGantry(
+                litCount = litLights,
+                isLive = isLive,
+                modifier = GlanceModifier.padding(bottom = 3.dp)
             )
-        } else {
-            Row(
-                modifier = GlanceModifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Vertical.CenterVertically,
-                horizontalAlignment = Alignment.Horizontal.CenterHorizontally
-            ) {
-                // Column 1: Days
-                Column(
-                    modifier = GlanceModifier.defaultWeight(),
+
+            if (isLive) {
+                Text(
+                    text = "LIGHTS OUT • RACING",
+                    style = TextStyle(
+                        color = GlanceTheme.colors.primary,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = if (isTall) 12.sp else 11.sp,
+                        textAlign = TextAlign.Center
+                    )
+                )
+            } else {
+                Row(
+                    modifier = GlanceModifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Vertical.CenterVertically,
                     horizontalAlignment = Alignment.Horizontal.CenterHorizontally
                 ) {
-                    Text(
-                        text = days,
-                        style = TextStyle(
-                            color = GlanceTheme.colors.onSurface,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = if (isTall) 20.sp else 18.sp,
-                            textAlign = TextAlign.Center
+                    // Column 1: Days
+                    Column(
+                        modifier = GlanceModifier.defaultWeight(),
+                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+                    ) {
+                        Text(
+                            text = days,
+                            style = TextStyle(
+                                color = GlanceTheme.colors.onSurface,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = if (isTall) 20.sp else 18.sp,
+                                textAlign = TextAlign.Center
+                            )
                         )
-                    )
-                    Spacer(modifier = GlanceModifier.height(1.dp))
-                    Text(
-                        text = "DAYS",
-                        style = TextStyle(
-                            color = GlanceTheme.colors.onSurfaceVariant,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 8.5.sp,
-                            textAlign = TextAlign.Center
+                        Spacer(modifier = GlanceModifier.height(1.dp))
+                        Text(
+                            text = "DAYS",
+                            style = TextStyle(
+                                color = GlanceTheme.colors.onSurfaceVariant,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 8.sp,
+                                textAlign = TextAlign.Center
+                            )
                         )
-                    )
-                }
+                    }
 
-                // Precision Chronograph Hairline Separator
-                Box(
-                    modifier = GlanceModifier
-                        .width(1.dp)
-                        .height(22.dp)
-                        .background(GlanceTheme.colors.outline)
-                ) {}
+                    // Precision Chronograph Hairline Separator
+                    Box(
+                        modifier = GlanceModifier
+                            .width(1.dp)
+                            .height(20.dp)
+                            .background(GlanceTheme.colors.outline)
+                    ) {}
 
-                // Column 2: Hours
-                Column(
-                    modifier = GlanceModifier.defaultWeight(),
-                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally
-                ) {
-                    Text(
-                        text = hours,
-                        style = TextStyle(
-                            color = GlanceTheme.colors.onSurface,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = if (isTall) 20.sp else 18.sp,
-                            textAlign = TextAlign.Center
+                    // Column 2: Hours
+                    Column(
+                        modifier = GlanceModifier.defaultWeight(),
+                        horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+                    ) {
+                        Text(
+                            text = hours,
+                            style = TextStyle(
+                                color = GlanceTheme.colors.onSurface,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = if (isTall) 20.sp else 18.sp,
+                                textAlign = TextAlign.Center
+                            )
                         )
-                    )
-                    Spacer(modifier = GlanceModifier.height(1.dp))
-                    Text(
-                        text = "HOURS",
-                        style = TextStyle(
-                            color = GlanceTheme.colors.onSurfaceVariant,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 8.5.sp,
-                            textAlign = TextAlign.Center
+                        Spacer(modifier = GlanceModifier.height(1.dp))
+                        Text(
+                            text = "HOURS",
+                            style = TextStyle(
+                                color = GlanceTheme.colors.onSurfaceVariant,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 8.sp,
+                                textAlign = TextAlign.Center
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
     }
 }
+
 
 @Composable
 private fun FooterRow(

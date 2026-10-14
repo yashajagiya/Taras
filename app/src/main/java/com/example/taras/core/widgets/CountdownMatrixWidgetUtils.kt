@@ -13,6 +13,8 @@ import coil3.SingletonImageLoader
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
 import coil3.toBitmap
+import com.example.taras.core.common.SessionType
+import com.example.taras.viewmodel.ParsedSession
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
@@ -26,6 +28,17 @@ data class SeasonRoundItem(
     val winnerNumber: String?,
     val teamColor: Color,
     val isCurrentOrNext: Boolean = false
+)
+
+/**
+ * Item representing a single session stage in the weekend progression timeline.
+ * Example: FP1 (completed), FP2 (completed), FP3 (current), Q (upcoming), GP (upcoming).
+ */
+data class SessionTimelineItem(
+    val shortCode: String,
+    val isCompleted: Boolean,
+    val isCurrent: Boolean,
+    val isUpcoming: Boolean
 )
 
 object CountdownMatrixWidgetUtils {
@@ -765,4 +778,102 @@ object CountdownMatrixWidgetUtils {
             // Silently ignore if OS restricts alarms
         }
     }
+
+    /**
+     * Calculates how many of the 5 FIA Starting Gantry lights should be illuminated (1 to 5).
+     * When isLive is true, returns 5 (all lights active).
+     */
+    fun computeGantryLights(
+        targetInstant: Instant?,
+        isLive: Boolean,
+        now: Instant = Clock.System.now()
+    ): Int {
+        if (isLive) return 5
+        if (targetInstant == null) return 1
+        val diff = targetInstant - now
+        if (diff.isNegative()) return 5
+        val totalHours = diff.inWholeHours
+        return when {
+            totalHours <= 1 -> 5  // Within 1 hour: 5 lights (Pre-session build-up)
+            totalHours <= 6 -> 4  // Within 6 hours: 4 lights
+            totalHours <= 24 -> 3 // Within 24 hours: 3 lights
+            totalHours <= 72 -> 2 // Within 3 days: 2 lights
+            else -> 1             // More than 3 days: 1 light (Scheduled)
+        }
+    }
+
+    /**
+     * Resolves the weekend progression timeline (5 sessions: FP1, FP2/SQ, FP3/SPR, Q, GP).
+     * Accurately tracks which sessions have completed (✓), which is current/next (●), and which are upcoming.
+     */
+    fun computeWeekendTimeline(
+        sessions: List<ParsedSession>?,
+        currentSessionName: String?,
+        targetInstant: Instant?,
+        isLive: Boolean,
+        hasSprint: Boolean,
+        now: Instant = Clock.System.now()
+    ): List<SessionTimelineItem> {
+        val nonNullSessions = sessions.orEmpty()
+        if (nonNullSessions.isNotEmpty()) {
+            return nonNullSessions.map { session ->
+                val code = when (session.sessionType) {
+                    SessionType.FP1 -> "FP1"
+                    SessionType.FP2 -> "FP2"
+                    SessionType.FP3 -> "FP3"
+                    SessionType.SPRINT_QUALIFYING -> "SQ"
+                    SessionType.SPRINT_RACE -> "SPR"
+                    SessionType.QUALIFYING -> "Q"
+                    SessionType.RACE -> "GP"
+                }
+
+                val isCurrent = if (isLive) {
+                    currentSessionName != null && session.name.contains(currentSessionName, ignoreCase = true)
+                } else if (targetInstant != null) {
+                    session.instant == targetInstant
+                } else {
+                    currentSessionName != null && session.name.contains(currentSessionName, ignoreCase = true)
+                }
+
+                val isCompleted = !isCurrent && (session.instant < (targetInstant ?: now))
+                val isUpcoming = !isCurrent && !isCompleted
+
+                SessionTimelineItem(
+                    shortCode = code,
+                    isCompleted = isCompleted,
+                    isCurrent = isCurrent,
+                    isUpcoming = isUpcoming
+                )
+            }
+        }
+
+        // Fallback standard 5-stage weekend timeline
+        val fallbackCodes = if (hasSprint) {
+            listOf("FP1", "SQ", "SPR", "Q", "GP")
+        } else {
+            listOf("FP1", "FP2", "FP3", "Q", "GP")
+        }
+
+        val cleanCurrent = currentSessionName?.lowercase().orEmpty()
+        val currentIdx = when {
+            cleanCurrent.contains("fp1") || cleanCurrent.contains("practice 1") -> 0
+            cleanCurrent.contains("sprint qual") || cleanCurrent.contains("sprint shootout") -> 1
+            cleanCurrent.contains("fp2") || cleanCurrent.contains("practice 2") -> 1
+            cleanCurrent.contains("sprint") -> 2
+            cleanCurrent.contains("fp3") || cleanCurrent.contains("practice 3") -> 2
+            cleanCurrent.contains("qual") -> 3
+            cleanCurrent.contains("race") || cleanCurrent.contains("grand prix") -> 4
+            else -> 0
+        }
+
+        return fallbackCodes.mapIndexed { index, code ->
+            SessionTimelineItem(
+                shortCode = code,
+                isCompleted = index < currentIdx,
+                isCurrent = index == currentIdx,
+                isUpcoming = index > currentIdx
+            )
+        }
+    }
 }
+

@@ -123,5 +123,39 @@ class CountdownMatrixWidgetTest {
         cache.clear()
         assertEquals(0, cache.size())
     }
+
+    @Test
+    fun computeCountdownDh_removesMinutesAndReturnsDaysAndHours() {
+        val now = Instant.parse("2026-05-20T10:00:00Z")
+        val target = now + 5.days + 19.hours + 31.minutes
+
+        val (days, hours) = CountdownMatrixWidgetUtils.computeCountdownDh(target, now)
+
+        assertEquals("05", days)
+        assertEquals("19", hours)
+    }
+
+    @Test
+    fun getShortGpTitle_formatsProperly() {
+        assertEquals("BELGIAN", CountdownMatrixWidgetUtils.getShortGpTitle("Formula 1 Rolex Belgian Grand Prix 2026", "Belgium"))
+        assertEquals("UNITED STATES", CountdownMatrixWidgetUtils.getShortGpTitle("Formula 1 MSC Cruises United States Grand Prix", "United States"))
+        assertEquals("ITALIAN", CountdownMatrixWidgetUtils.getShortGpTitle("Formula 1 Pirelli Gran Premio d'Italia", "Italy"))
+        assertEquals("MONACO", CountdownMatrixWidgetUtils.getShortGpTitle("Formula 1 Grand Prix de Monaco", "Monaco"))
+    }
+
+    @Test
+    fun getShortCircuitName_returnsConciseNames() {
+        assertEquals("Spa", CountdownMatrixWidgetUtils.getShortCircuitName("Circuit de Spa-Francorchamps"))
+        assertEquals("COTA", CountdownMatrixWidgetUtils.getShortCircuitName("Circuit of The Americas"))
+        assertEquals("Monza", CountdownMatrixWidgetUtils.getShortCircuitName("Autodromo Nazionale Monza"))
+        assertEquals("Silverstone", CountdownMatrixWidgetUtils.getShortCircuitName("Silverstone Circuit"))
+    }
+
+    @Test
+    fun formatShortSessionDate_formatsMonthAndDay() {
+        val instant = Instant.parse("2026-07-17T11:30:00Z")
+        val formatted = CountdownMatrixWidgetUtils.formatShortSessionDate(instant, TimeZone.UTC)
+        assertEquals("Jul 17", formatted)
+    }
 }
 

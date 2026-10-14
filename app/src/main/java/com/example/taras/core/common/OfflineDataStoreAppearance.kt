@@ -9,14 +9,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.glance.appwidget.updateAll
-import com.example.taras.core.widgets.FavoriteDriverWidget
-import com.example.taras.core.widgets.FavoriteDriverWidgetReceiver
-import com.example.taras.core.widgets.MyAppWidgetReceiver
-import com.example.taras.core.widgets.NextWidget
-import com.example.taras.core.widgets.RaceResultWidget
-import com.example.taras.core.widgets.RaceResultWidgetReceiver
-import com.example.taras.core.widgets.StandingsWidget
-import com.example.taras.core.widgets.StandingsWidgetReceiver
+import com.example.taras.core.widgets.CountdownMatrixWidget
+import com.example.taras.core.widgets.CountdownMatrixWidgetReceiver
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -54,18 +48,12 @@ class OfflineDataStoreAppearance(private val context: Context) {
     suspend fun triggerAllWidgetUpdates() {
         val appContext = context.applicationContext
 
-        // 1. Update each Glance widget independently with isolated error handling
-        try { NextWidget().updateAll(appContext) } catch (e: Exception) { Log.e(TAG, "Error updating NextWidget", e) }
-        try { StandingsWidget().updateAll(appContext) } catch (e: Exception) { Log.e(TAG, "Error updating StandingsWidget", e) }
-        try { FavoriteDriverWidget().updateAll(appContext) } catch (e: Exception) { Log.e(TAG, "Error updating FavoriteDriverWidget", e) }
-        try { RaceResultWidget().updateAll(appContext) } catch (e: Exception) { Log.e(TAG, "Error updating RaceResultWidget", e) }
+        // 1. Update CountdownMatrixWidget with error handling
+        try { CountdownMatrixWidget().updateAll(appContext) } catch (e: Exception) { Log.e(TAG, "Error updating CountdownMatrixWidget", e) }
 
         // 2. Broadcast APPWIDGET_UPDATE to notify Android AppWidget host
         val receivers = listOf(
-            MyAppWidgetReceiver::class.java,
-            StandingsWidgetReceiver::class.java,
-            FavoriteDriverWidgetReceiver::class.java,
-            RaceResultWidgetReceiver::class.java
+            CountdownMatrixWidgetReceiver::class.java
         )
         try {
             val appWidgetManager = AppWidgetManager.getInstance(appContext)

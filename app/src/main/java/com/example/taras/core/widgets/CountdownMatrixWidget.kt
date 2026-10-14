@@ -1,6 +1,8 @@
 package com.example.taras.core.widgets
 
 import android.content.Context
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
@@ -8,7 +10,17 @@ import androidx.glance.appwidget.provideContent
 import com.example.taras.core.helpercore.RaceRepository
 
 class CountdownMatrixWidget : GlanceAppWidget() {
-    override val sizeMode: SizeMode = SizeMode.Exact
+
+    companion object {
+        val COMPACT_2X2 = DpSize(140.dp, 140.dp)
+        val TALL_2X3 = DpSize(140.dp, 210.dp)
+        val EXTENDED_4X2 = DpSize(260.dp, 140.dp)
+        val LARGE_4X3 = DpSize(260.dp, 210.dp)
+    }
+
+    override val sizeMode: SizeMode = SizeMode.Responsive(
+        setOf(COMPACT_2X2, TALL_2X3, EXTENDED_4X2, LARGE_4X3)
+    )
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val repository = RaceRepository()

@@ -152,8 +152,8 @@ private fun SuccessContentView(
     circuitBitmap: Bitmap?
 ) {
     val size = LocalSize.current
-    val isExtended = size.width >= 250.dp
-    val isTall = size.height >= 180.dp
+    val isExtended = size.width >= 230.dp
+    val isTall = size.height >= 170.dp
     val context = LocalContext.current
 
     if (isExtended) {
@@ -186,7 +186,7 @@ private fun SuccessContentView(
                 )
             }
 
-            Spacer(modifier = GlanceModifier.width(14.dp))
+            Spacer(modifier = GlanceModifier.width(16.dp))
 
             // Right Pane: Countdown Module
             Box(
@@ -217,7 +217,10 @@ private fun SuccessContentView(
 
 /**
  * F1 Countdown Module styled with Taras Material 3 theme colors.
- * Minutes removed to eliminate battery drain; no country flag.
+ * Matches Image 1 & 2:
+ * - Flag + Grand Prix Title + Session Subtitle
+ * - 3-Column Split Pill (Days | Hours | Minutes)
+ * - Double-Walled Circuit Silhouette + Circuit Name (Left) + Local Date & Bold Time (Right)
  */
 @Composable
 private fun CountdownModule(
@@ -227,12 +230,13 @@ private fun CountdownModule(
     isExtended: Boolean,
     isTall: Boolean
 ) {
+    val context = LocalContext.current
     val raceName = nextSession?.raceName ?: raceCurrent?.raceName ?: "Formula 1 Grand Prix"
     val circuitName = nextSession?.circuitName ?: raceCurrent?.circuitName ?: "Circuit"
-    val sessionName = nextSession?.sessionName.orEmpty().ifBlank { "Next Session" }
+    val sessionName = nextSession?.sessionName.orEmpty().ifBlank { "Practice 1" }
     val targetInstant = nextSession?.targetInstant
 
-    val (days, hours) = CountdownMatrixWidgetUtils.computeCountdownDh(targetInstant)
+    val (days, hours, minutes) = CountdownMatrixWidgetUtils.computeCountdownDhm(targetInstant)
     val isLive = nextSession?.countdown?.contains("live", ignoreCase = true) == true ||
             nextSession?.countdown?.contains("started", ignoreCase = true) == true
 
@@ -241,67 +245,106 @@ private fun CountdownModule(
     val shortDate = CountdownMatrixWidgetUtils.formatShortSessionDate(targetInstant)
     val localTime = CountdownMatrixWidgetUtils.formatLocalSessionTime(targetInstant)
 
+    // Country Flag Bitmap
+    val flagBitmap = CountdownMatrixWidgetUtils.renderCountryFlagBitmap(
+        countryOrGpName = circuitName.ifBlank { raceName },
+        widthPx = 56,
+        heightPx = 38
+    )
+
+    // Double-line vector circuit silhouette
+    val surfaceArgb = GlanceTheme.colors.surface.getColor(context).toArgb()
+    val onSurfaceArgb = GlanceTheme.colors.onSurface.getColor(context).toArgb()
+    val trackBitmap = circuitBitmap ?: CountdownMatrixWidgetUtils.renderCircuitMapBitmap(
+        circuitName = shortCircuitName,
+        widthPx = 180,
+        heightPx = 110,
+        outerStrokeColorArgb = onSurfaceArgb,
+        innerStrokeColorArgb = surfaceArgb
+    )
+
     Column(
         modifier = GlanceModifier.fillMaxSize(),
         verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
-        // 1. Header Row: Grand Prix Name + Session Subtitle (No flag, No emojis)
+        // 1. Header Row: Country Flag + Grand Prix Title + Session Subtitle
         HeaderRow(
+            flagBitmap = flagBitmap,
             gpTitle = gpTitle,
-            sessionName = sessionName
+            sessionName = sessionName,
+            isTall = isTall
         )
 
-        Spacer(modifier = GlanceModifier.height(if (isTall) 10.dp else 6.dp))
+        Spacer(modifier = GlanceModifier.defaultWeight())
 
-        // 2. Center: 2-Column Countdown Pill (Days | Hours) — No minutes to prevent battery drain
+        // 2. Center: 3-Column Split Countdown Pill (Days | Hours | Minutes)
         CountdownPill(
             days = days,
             hours = hours,
+            minutes = minutes,
             isLive = isLive,
             isExtended = isExtended,
             isTall = isTall
         )
 
-        Spacer(modifier = GlanceModifier.height(if (isTall) 10.dp else 6.dp))
+        Spacer(modifier = GlanceModifier.defaultWeight())
 
-        // 3. Footer Row: Real Circuit Track Map + Name (Left) + Local Date & Bold Time (Right Bottom Corner)
+        // 3. Footer Row: Double-line Circuit Silhouette + Name (Left) + Local Date & Bold Time (Right)
         FooterRow(
+            trackBitmap = trackBitmap,
             circuitShortName = shortCircuitName,
-            circuitBitmap = circuitBitmap,
             shortDate = shortDate,
             localTime = localTime,
-            isTall = isTall
+            isTall = isTall,
+            isExtended = isExtended
         )
     }
 }
 
 @Composable
 private fun HeaderRow(
+    flagBitmap: Bitmap,
     gpTitle: String,
-    sessionName: String
+    sessionName: String,
+    isTall: Boolean
 ) {
-    Column(
-        modifier = GlanceModifier.fillMaxWidth()
+    Row(
+        modifier = GlanceModifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
-        Text(
-            text = gpTitle,
-            style = TextStyle(
-                color = GlanceTheme.colors.onSurface,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp
-            ),
-            maxLines = 1
+        Image(
+            provider = ImageProvider(flagBitmap),
+            contentDescription = "Country Flag",
+            modifier = GlanceModifier
+                .size(width = 28.dp, height = 19.dp)
+                .cornerRadius(4.dp)
         )
-        Spacer(modifier = GlanceModifier.height(1.dp))
-        Text(
-            text = sessionName,
-            style = TextStyle(
-                color = GlanceTheme.colors.onSurfaceVariant,
-                fontWeight = FontWeight.Normal,
-                fontSize = 11.sp
-            ),
-            maxLines = 1
-        )
+
+        Spacer(modifier = GlanceModifier.width(10.dp))
+
+        Column(
+            modifier = GlanceModifier.defaultWeight()
+        ) {
+            Text(
+                text = gpTitle,
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurface,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = if (isTall) 15.sp else 14.sp
+                ),
+                maxLines = 1
+            )
+            Spacer(modifier = GlanceModifier.height(1.dp))
+            Text(
+                text = sessionName,
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurfaceVariant,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = if (isTall) 12.sp else 11.sp
+                ),
+                maxLines = 1
+            )
+        }
     }
 }
 
@@ -309,6 +352,7 @@ private fun HeaderRow(
 private fun CountdownPill(
     days: String,
     hours: String,
+    minutes: String,
     isLive: Boolean,
     isExtended: Boolean,
     isTall: Boolean
@@ -318,12 +362,12 @@ private fun CountdownPill(
             .fillMaxWidth()
             .cornerRadius(18.dp)
             .background(GlanceTheme.colors.surfaceVariant)
-            .padding(vertical = if (isTall) 12.dp else 8.dp, horizontal = 10.dp),
+            .padding(vertical = if (isTall) 12.dp else 9.dp, horizontal = 6.dp),
         contentAlignment = Alignment.Center
     ) {
         if (isLive) {
             Text(
-                text = "SESSION IN PROGRESS",
+                text = "SESSION LIVE",
                 style = TextStyle(
                     color = GlanceTheme.colors.primary,
                     fontWeight = FontWeight.Bold,
@@ -347,10 +391,11 @@ private fun CountdownPill(
                         style = TextStyle(
                             color = GlanceTheme.colors.onSurface,
                             fontWeight = FontWeight.Bold,
-                            fontSize = if (isExtended) 20.sp else 23.sp,
+                            fontSize = if (isExtended) 20.sp else if (isTall) 24.sp else 22.sp,
                             textAlign = TextAlign.Center
                         )
                     )
+                    Spacer(modifier = GlanceModifier.height(2.dp))
                     Text(
                         text = "days",
                         style = TextStyle(
@@ -372,12 +417,39 @@ private fun CountdownPill(
                         style = TextStyle(
                             color = GlanceTheme.colors.onSurface,
                             fontWeight = FontWeight.Bold,
-                            fontSize = if (isExtended) 20.sp else 23.sp,
+                            fontSize = if (isExtended) 20.sp else if (isTall) 24.sp else 22.sp,
                             textAlign = TextAlign.Center
                         )
                     )
+                    Spacer(modifier = GlanceModifier.height(2.dp))
                     Text(
                         text = "hours",
+                        style = TextStyle(
+                            color = GlanceTheme.colors.onSurfaceVariant,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 10.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    )
+                }
+
+                // Column 3: Minutes
+                Column(
+                    modifier = GlanceModifier.defaultWeight(),
+                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+                ) {
+                    Text(
+                        text = minutes,
+                        style = TextStyle(
+                            color = GlanceTheme.colors.onSurface,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = if (isExtended) 20.sp else if (isTall) 24.sp else 22.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    )
+                    Spacer(modifier = GlanceModifier.height(2.dp))
+                    Text(
+                        text = "minutes",
                         style = TextStyle(
                             color = GlanceTheme.colors.onSurfaceVariant,
                             fontWeight = FontWeight.Normal,
@@ -393,45 +465,44 @@ private fun CountdownPill(
 
 @Composable
 private fun FooterRow(
+    trackBitmap: Bitmap,
     circuitShortName: String,
-    circuitBitmap: Bitmap?,
     shortDate: String,
     localTime: String,
-    isTall: Boolean
+    isTall: Boolean,
+    isExtended: Boolean
 ) {
     Row(
         modifier = GlanceModifier.fillMaxWidth(),
         verticalAlignment = Alignment.Vertical.Bottom
     ) {
-        // Left: Real Circuit Track Map (if loaded) + Circuit Name
+        // Left: Double-line Circuit Track Silhouette + Circuit Name below it
         Column(
             modifier = GlanceModifier.defaultWeight(),
             verticalAlignment = Alignment.Vertical.Bottom,
             horizontalAlignment = Alignment.Horizontal.Start
         ) {
-            if (circuitBitmap != null) {
-                Image(
-                    provider = ImageProvider(circuitBitmap),
-                    contentDescription = "Track Map",
-                    modifier = GlanceModifier.size(
-                        width = if (isTall) 74.dp else 60.dp,
-                        height = if (isTall) 40.dp else 30.dp
-                    )
+            Image(
+                provider = ImageProvider(trackBitmap),
+                contentDescription = "Track Map",
+                modifier = GlanceModifier.size(
+                    width = if (isExtended) 72.dp else if (isTall) 84.dp else 74.dp,
+                    height = if (isExtended) 44.dp else if (isTall) 52.dp else 46.dp
                 )
-                Spacer(modifier = GlanceModifier.height(2.dp))
-            }
+            )
+            Spacer(modifier = GlanceModifier.height(2.dp))
             Text(
                 text = circuitShortName,
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurfaceVariant,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 11.sp
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 12.sp
                 ),
                 maxLines = 1
             )
         }
 
-        // Right Bottom Corner: Local Session Date & Bold Time
+        // Right Bottom: Local Session Date & Bold Time
         Column(
             horizontalAlignment = Alignment.Horizontal.End,
             verticalAlignment = Alignment.Vertical.Bottom
@@ -441,7 +512,7 @@ private fun FooterRow(
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurfaceVariant,
                     fontWeight = FontWeight.Normal,
-                    fontSize = 11.sp,
+                    fontSize = if (isTall) 13.sp else 12.sp,
                     textAlign = TextAlign.End
                 )
             )
@@ -451,7 +522,7 @@ private fun FooterRow(
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurface,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 17.sp,
+                    fontSize = if (isExtended) 18.sp else if (isTall) 21.sp else 19.sp,
                     textAlign = TextAlign.End
                 )
             )

@@ -12,10 +12,10 @@ import com.example.taras.core.helpercore.RaceRepository
 class CountdownMatrixWidget : GlanceAppWidget() {
 
     companion object {
-        val COMPACT_2X2 = DpSize(140.dp, 140.dp)
-        val TALL_2X3 = DpSize(140.dp, 210.dp)
-        val EXTENDED_4X2 = DpSize(260.dp, 140.dp)
-        val LARGE_4X3 = DpSize(260.dp, 210.dp)
+        val COMPACT_2X2 = DpSize(120.dp, 120.dp)
+        val TALL_2X3 = DpSize(120.dp, 190.dp)
+        val EXTENDED_4X2 = DpSize(230.dp, 120.dp)
+        val LARGE_4X3 = DpSize(230.dp, 190.dp)
     }
 
     override val sizeMode: SizeMode = SizeMode.Responsive(

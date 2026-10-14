@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:name=".core.common.TarasApplication"
@@ -78,6 +79,20 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/race_result_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".core.widgets.CountdownMatrixWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_countdown_matrix_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/countdown_matrix_widget_info" />
         </receiver>
 
         <provider

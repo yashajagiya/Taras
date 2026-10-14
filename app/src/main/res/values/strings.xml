@@ -8,6 +8,8 @@
     <string name="widget_favorite_driver_desc">Track your favorite driver\'s position, points, and last race result</string>
     <string name="widget_race_result_label">Last Race Results</string>
     <string name="widget_race_result_desc">Podium finishers of the latest Grand Prix</string>
+    <string name="widget_countdown_matrix_label">F1 Countdown &amp; Season</string>
+    <string name="widget_countdown_matrix_desc">Live session countdown with 24-round season winner matrix. Expandable 2×2 to 4×2.</string>
 
     <!-- Navigation -->
     <string name="nav_paddock">Paddock</string>

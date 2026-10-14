@@ -8,6 +8,8 @@
     <string name="widget_favorite_driver_desc">अपने पसंदीदा ड्राइवर की स्थिति, अंक और पिछले परिणाम ट्रैक करें</string>
     <string name="widget_race_result_label">पिछली रेस के परिणाम</string>
     <string name="widget_race_result_desc">नवीनतम ग्रां प्री के पोडियम फिनिशर</string>
+    <string name="widget_countdown_matrix_label">F1 काउंटडाउन और सीज़न</string>
+    <string name="widget_countdown_matrix_desc">24-राउंड सीज़न विजेता मैट्रिक्स के साथ लाइव काउंटडाउन। 2×2 से 4×2 तक विस्तार योग्य।</string>
 
     <!-- Navigation -->
     <string name="nav_paddock">पैडॉक</string>

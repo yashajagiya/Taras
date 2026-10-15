@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:initialLayout="@layout/widget_countdown_matrix_preview"
-    android:previewLayout="@layout/widget_countdown_matrix_preview"
+    android:initialLayout="@layout/glance_default_loading_layout"
     android:previewImage="@drawable/widget_countdown_matrix_preview"
     android:minWidth="140dp"
     android:minHeight="140dp"

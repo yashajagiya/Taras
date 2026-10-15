@@ -475,48 +475,65 @@ private fun WeekendTimelineStrip(
         horizontalAlignment = Alignment.Horizontal.CenterHorizontally
     ) {
         timeline.forEachIndexed { index, item ->
-            val bg = when {
-                item.isCurrent -> GlanceTheme.colors.primaryContainer
-                item.isCompleted -> GlanceTheme.colors.surfaceVariant
-                else -> GlanceTheme.colors.surface
-            }
-            val textColor = when {
-                item.isCurrent -> GlanceTheme.colors.onPrimaryContainer
-                item.isCompleted -> GlanceTheme.colors.onSurfaceVariant
-                else -> GlanceTheme.colors.outline
-            }
-            val prefix = when {
-                item.isCompleted -> "✓ "
-                item.isCurrent -> "● "
-                else -> ""
-            }
+            TimelineStageItem(
+                item = item,
+                hasConnectorAfter = index < timeline.size - 1,
+                isNarrow = isNarrow
+            )
+        }
+    }
+}
 
+@Composable
+private fun TimelineStageItem(
+    item: SessionTimelineItem,
+    hasConnectorAfter: Boolean,
+    isNarrow: Boolean
+) {
+    Row(
+        verticalAlignment = Alignment.Vertical.CenterVertically
+    ) {
+        val bg = when {
+            item.isCurrent -> GlanceTheme.colors.primaryContainer
+            item.isCompleted -> GlanceTheme.colors.surfaceVariant
+            else -> GlanceTheme.colors.surface
+        }
+        val textColor = when {
+            item.isCurrent -> GlanceTheme.colors.onPrimaryContainer
+            item.isCompleted -> GlanceTheme.colors.onSurfaceVariant
+            else -> GlanceTheme.colors.outline
+        }
+        val prefix = when {
+            item.isCompleted -> "✓ "
+            item.isCurrent -> "● "
+            else -> ""
+        }
+
+        Box(
+            modifier = GlanceModifier
+                .cornerRadius(4.dp)
+                .background(bg)
+                .padding(horizontal = if (isNarrow) 3.dp else 4.dp, vertical = 2.dp)
+        ) {
+            Text(
+                text = "$prefix${item.shortCode}",
+                style = TextStyle(
+                    color = textColor,
+                    fontWeight = if (item.isCurrent) FontWeight.Bold else FontWeight.Medium,
+                    fontSize = if (isNarrow) 7.sp else 7.5.sp
+                )
+            )
+        }
+
+        if (hasConnectorAfter) {
+            Spacer(modifier = GlanceModifier.width(if (isNarrow) 1.5.dp else 2.5.dp))
             Box(
                 modifier = GlanceModifier
-                    .cornerRadius(4.dp)
-                    .background(bg)
-                    .padding(horizontal = if (isNarrow) 3.dp else 4.dp, vertical = 2.dp)
-            ) {
-                Text(
-                    text = "$prefix${item.shortCode}",
-                    style = TextStyle(
-                        color = textColor,
-                        fontWeight = if (item.isCurrent) FontWeight.Bold else FontWeight.Medium,
-                        fontSize = if (isNarrow) 7.sp else 7.5.sp
-                    )
-                )
-            }
-
-            if (index < timeline.size - 1) {
-                Spacer(modifier = GlanceModifier.width(if (isNarrow) 1.5.dp else 2.5.dp))
-                Box(
-                    modifier = GlanceModifier
-                        .width(if (isNarrow) 3.dp else 4.dp)
-                        .height(1.dp)
-                        .background(GlanceTheme.colors.outline)
-                ) {}
-                Spacer(modifier = GlanceModifier.width(if (isNarrow) 1.5.dp else 2.5.dp))
-            }
+                    .width(if (isNarrow) 3.dp else 4.dp)
+                    .height(1.dp)
+                    .background(GlanceTheme.colors.outline)
+            ) {}
+            Spacer(modifier = GlanceModifier.width(if (isNarrow) 1.5.dp else 2.5.dp))
         }
     }
 }
@@ -539,13 +556,11 @@ private fun F1StartingGantry(
             val isLit = i <= litCount
             Box(
                 modifier = GlanceModifier
+                    .padding(horizontal = 1.75.dp)
                     .size(width = 5.dp, height = 5.dp)
                     .cornerRadius(2.5.dp)
                     .background(if (isLit) litColor else unlitColor)
             ) {}
-            if (i < 5) {
-                Spacer(modifier = GlanceModifier.width(3.5.dp))
-            }
         }
     }
 }

@@ -804,7 +804,8 @@ object CountdownMatrixWidgetUtils {
 
     /**
      * Resolves the weekend progression timeline (5 sessions: FP1, FP2/SQ, FP3/SPR, Q, GP).
-     * Accurately tracks which sessions have completed (✓), which is current/next (●), and which are upcoming.
+     * Accurately tracks which sessions have completed, which is current/next, and which are upcoming.
+     * Guaranteed to always include all 5 weekend sessions without omission.
      */
     fun computeWeekendTimeline(
         sessions: List<ParsedSession>?,
@@ -815,58 +816,77 @@ object CountdownMatrixWidgetUtils {
         now: Instant = Clock.System.now()
     ): List<SessionTimelineItem> {
         val nonNullSessions = sessions.orEmpty()
-        if (nonNullSessions.isNotEmpty()) {
-            return nonNullSessions.map { session ->
-                val code = when (session.sessionType) {
-                    SessionType.FP1 -> "FP1"
-                    SessionType.FP2 -> "FP2"
-                    SessionType.FP3 -> "FP3"
-                    SessionType.SPRINT_QUALIFYING -> "SQ"
-                    SessionType.SPRINT_RACE -> "SPR"
-                    SessionType.QUALIFYING -> "Q"
-                    SessionType.RACE -> "GP"
-                }
-
-                val isCurrent = if (isLive) {
-                    currentSessionName != null && session.name.contains(currentSessionName, ignoreCase = true)
-                } else if (targetInstant != null) {
-                    session.instant == targetInstant
-                } else {
-                    currentSessionName != null && session.name.contains(currentSessionName, ignoreCase = true)
-                }
-
-                val isCompleted = !isCurrent && (session.instant < (targetInstant ?: now))
-                val isUpcoming = !isCurrent && !isCompleted
-
-                SessionTimelineItem(
-                    shortCode = code,
-                    isCompleted = isCompleted,
-                    isCurrent = isCurrent,
-                    isUpcoming = isUpcoming
-                )
-            }
+        val canonicalStages = if (hasSprint) {
+            listOf(
+                SessionType.FP1 to "FP1",
+                SessionType.SPRINT_QUALIFYING to "SQ",
+                SessionType.SPRINT_RACE to "SPR",
+                SessionType.QUALIFYING to "Q",
+                SessionType.RACE to "GP"
+            )
+        } else {
+            listOf(
+                SessionType.FP1 to "FP1",
+                SessionType.FP2 to "FP2",
+                SessionType.FP3 to "FP3",
+                SessionType.QUALIFYING to "Q",
+                SessionType.RACE to "GP"
+            )
         }
 
-        // Fallback standard 5-stage weekend timeline
-        val fallbackCodes = if (hasSprint) {
-            listOf("FP1", "SQ", "SPR", "Q", "GP")
-        } else {
-            listOf("FP1", "FP2", "FP3", "Q", "GP")
+        if (nonNullSessions.isNotEmpty()) {
+            var activeIdx = -1
+            if (isLive && !currentSessionName.isNullOrBlank()) {
+                activeIdx = canonicalStages.indexOfFirst { (type, _) ->
+                    currentSessionName.contains(type.displayName, ignoreCase = true) ||
+                            currentSessionName.contains(type.shortName, ignoreCase = true) ||
+                            currentSessionName.contains(type.name, ignoreCase = true)
+                }
+            }
+            if (activeIdx == -1 && targetInstant != null) {
+                activeIdx = canonicalStages.indexOfFirst { (type, _) ->
+                    val matched = nonNullSessions.firstOrNull { it.sessionType == type }
+                    matched != null && kotlin.math.abs((matched.instant - targetInstant).inWholeSeconds) < 120
+                }
+            }
+            if (activeIdx == -1 && !currentSessionName.isNullOrBlank()) {
+                activeIdx = canonicalStages.indexOfFirst { (type, code) ->
+                    currentSessionName.contains(type.displayName, ignoreCase = true) ||
+                            currentSessionName.contains(type.shortName, ignoreCase = true) ||
+                            currentSessionName.contains(code, ignoreCase = true)
+                }
+            }
+            if (activeIdx == -1) {
+                activeIdx = canonicalStages.indexOfFirst { (type, _) ->
+                    val matched = nonNullSessions.firstOrNull { it.sessionType == type }
+                    matched != null && matched.instant >= now
+                }
+            }
+            if (activeIdx == -1) activeIdx = 0
+
+            return canonicalStages.mapIndexed { index, (_, code) ->
+                SessionTimelineItem(
+                    shortCode = code,
+                    isCompleted = index < activeIdx,
+                    isCurrent = index == activeIdx,
+                    isUpcoming = index > activeIdx
+                )
+            }
         }
 
         val cleanCurrent = currentSessionName?.lowercase().orEmpty()
         val currentIdx = when {
             cleanCurrent.contains("fp1") || cleanCurrent.contains("practice 1") -> 0
-            cleanCurrent.contains("sprint qual") || cleanCurrent.contains("sprint shootout") -> 1
+            cleanCurrent.contains("sprint qual") || cleanCurrent.contains("sprint shootout") || cleanCurrent.contains("sq") -> 1
             cleanCurrent.contains("fp2") || cleanCurrent.contains("practice 2") -> 1
-            cleanCurrent.contains("sprint") -> 2
+            cleanCurrent.contains("sprint") || cleanCurrent.contains("spr") -> 2
             cleanCurrent.contains("fp3") || cleanCurrent.contains("practice 3") -> 2
-            cleanCurrent.contains("qual") -> 3
-            cleanCurrent.contains("race") || cleanCurrent.contains("grand prix") -> 4
+            cleanCurrent.contains("qual") || cleanCurrent.contains("q") -> 3
+            cleanCurrent.contains("race") || cleanCurrent.contains("grand prix") || cleanCurrent.contains("gp") -> 4
             else -> 0
         }
 
-        return fallbackCodes.mapIndexed { index, code ->
+        return canonicalStages.mapIndexed { index, (_, code) ->
             SessionTimelineItem(
                 shortCode = code,
                 isCompleted = index < currentIdx,

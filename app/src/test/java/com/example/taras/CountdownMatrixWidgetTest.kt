@@ -1,10 +1,12 @@
 package com.example.taras
 
 import androidx.compose.ui.graphics.Color
+import com.example.taras.core.common.SessionType
 import com.example.taras.core.widgets.CountdownMatrixWidgetUtils
 import com.example.taras.core.widgets.SeasonRoundItem
 import com.example.taras.network_calls.NetworkModule
 import com.example.taras.network_calls.taras.model.v2.CalendarRaceEvent
+import com.example.taras.viewmodel.ParsedSession
 import kotlinx.datetime.TimeZone
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -278,6 +280,53 @@ class CountdownMatrixWidgetTest {
         assertEquals("BELGIAN", CountdownMatrixWidgetUtils.getDisplayCountryName(null, "Belgian GP"))
         assertEquals("MONACO", CountdownMatrixWidgetUtils.getDisplayCountryName("", "Monaco Grand Prix"))
         assertEquals("GRAND PRIX", CountdownMatrixWidgetUtils.getDisplayCountryName(null, null))
+    }
+
+    @Test
+    fun computeWeekendTimeline_withPartialSessionsList_alwaysReturnsAll5Sessions() {
+        val now = Instant.parse("2026-05-20T10:00:00Z")
+        // API only returned FP1 and FP2 (e.g. before qualifying or race dates are published)
+        val partialSessions = listOf(
+            ParsedSession(SessionType.FP1, now - 2.hours),
+            ParsedSession(SessionType.FP2, now + 2.hours)
+        )
+
+        val timeline = CountdownMatrixWidgetUtils.computeWeekendTimeline(
+            sessions = partialSessions,
+            currentSessionName = "Practice 2",
+            targetInstant = now + 2.hours,
+            isLive = false,
+            hasSprint = false,
+            now = now
+        )
+
+        // Must still have exactly 5 sessions: FP1, FP2, FP3, Q, GP
+        assertEquals(5, timeline.size)
+        assertEquals("FP1", timeline[0].shortCode)
+        assertTrue(timeline[0].isCompleted)
+        assertEquals("FP2", timeline[1].shortCode)
+        assertTrue(timeline[1].isCurrent)
+        assertEquals("FP3", timeline[2].shortCode)
+        assertTrue(timeline[2].isUpcoming)
+        assertEquals("Q", timeline[3].shortCode)
+        assertTrue(timeline[3].isUpcoming)
+        assertEquals("GP", timeline[4].shortCode)
+        assertTrue(timeline[4].isUpcoming)
+    }
+
+    @Test
+    fun computeWeekendTimeline_shortCodesArePureWithoutUnicodePrefixes() {
+        val timeline = CountdownMatrixWidgetUtils.computeWeekendTimeline(
+            sessions = null,
+            currentSessionName = "Practice 1",
+            targetInstant = null,
+            isLive = false,
+            hasSprint = false
+        )
+
+        for (item in timeline) {
+            assertTrue("Code should not contain checkmark or dot unicode symbols: ${item.shortCode}", !item.shortCode.contains("✓") && !item.shortCode.contains("●"))
+        }
     }
 }
 

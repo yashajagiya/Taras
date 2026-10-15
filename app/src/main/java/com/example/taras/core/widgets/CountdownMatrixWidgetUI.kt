@@ -569,33 +569,34 @@ private fun F1StartingGantry(
 ) {
     val size = LocalSize.current
     val isTall = size.height >= 170.dp
+    val dotSize = if (isTall) 6.dp else 5.dp
+    val dotSpacing = if (isTall) 5.dp else 4.dp
 
-    Box(
+    Row(
         modifier = modifier
             .cornerRadius(999.dp)
             .background(GlanceTheme.colors.surface)
-            .padding(horizontal = if (isTall) 10.dp else 8.dp, vertical = if (isTall) 3.5.dp else 2.5.dp),
-        contentAlignment = Alignment.Center
+            .padding(
+                horizontal = if (isTall) 10.dp else 8.dp,
+                vertical = if (isTall) 3.5.dp else 2.5.dp
+            ),
+        verticalAlignment = Alignment.Vertical.CenterVertically,
+        horizontalAlignment = Alignment.Horizontal.CenterHorizontally
     ) {
-        Row(
-            verticalAlignment = Alignment.Vertical.CenterVertically,
-            horizontalAlignment = Alignment.Horizontal.CenterHorizontally
-        ) {
-            val litColor = GlanceTheme.colors.primary
-            val unlitColor = GlanceTheme.colors.outline
+        val litColor = GlanceTheme.colors.primary
+        val unlitColor = GlanceTheme.colors.outline
 
-            for (i in 1..5) {
-                val isLit = i <= litCount
-                if (i > 1) {
-                    Spacer(modifier = GlanceModifier.width(if (isTall) 5.dp else 4.dp))
-                }
-                Box(
-                    modifier = GlanceModifier
-                        .size(width = if (isTall) 6.dp else 5.dp, height = if (isTall) 6.dp else 5.dp)
-                        .cornerRadius(3.dp)
-                        .background(if (isLit) litColor else unlitColor)
-                ) {}
+        for (i in 1..5) {
+            val isLit = i <= litCount
+            if (i > 1) {
+                Spacer(modifier = GlanceModifier.width(dotSpacing))
             }
+            Box(
+                modifier = GlanceModifier
+                    .size(dotSize)
+                    .cornerRadius(999.dp)
+                    .background(if (isLit) litColor else unlitColor)
+            ) {}
         }
     }
 }
@@ -609,24 +610,21 @@ private fun CountdownPill(
     isExtended: Boolean,
     isTall: Boolean
 ) {
-    Box(
+    Column(
         modifier = GlanceModifier
             .fillMaxWidth()
             .cornerRadius(18.dp)
             .background(GlanceTheme.colors.surfaceVariant)
             .padding(vertical = if (isTall) 8.dp else 5.5.dp, horizontal = if (isTall) 12.dp else 10.dp),
-        contentAlignment = Alignment.Center
+        horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+        verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
-        Column(
-            modifier = GlanceModifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.Horizontal.CenterHorizontally
-        ) {
-            // Authentic 5-Lights FIA Starting Gantry inside sculpted housing with un-congested spacing
-            F1StartingGantry(
-                litCount = litLights,
-                isLive = isLive,
-                modifier = GlanceModifier.padding(bottom = if (isTall) 5.5.dp else 4.dp)
-            )
+        // Authentic 5-Lights FIA Starting Gantry inside sculpted housing with un-congested spacing
+        F1StartingGantry(
+            litCount = litLights,
+            isLive = isLive,
+            modifier = GlanceModifier.padding(bottom = if (isTall) 5.5.dp else 4.dp)
+        )
 
             if (isLive) {
                 Box(
@@ -714,7 +712,6 @@ private fun CountdownPill(
             }
         }
     }
-}
 
 @Composable
 private fun FooterRow(

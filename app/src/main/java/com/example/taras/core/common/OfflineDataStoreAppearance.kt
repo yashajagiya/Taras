@@ -48,8 +48,12 @@ class OfflineDataStoreAppearance(private val context: Context) {
     suspend fun triggerAllWidgetUpdates() {
         val appContext = context.applicationContext
 
-        // 1. Update CountdownMatrixWidget with error handling
-        try { CountdownMatrixWidget().updateAll(appContext) } catch (e: Exception) { Log.e(TAG, "Error updating CountdownMatrixWidget", e) }
+        // 1. Update CountdownMatrixWidget safely (only for active widgets with valid AppWidgetInfo)
+        try {
+            CountdownMatrixWidget().safeUpdateAll(appContext)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error updating CountdownMatrixWidget", e)
+        }
 
         // 2. Broadcast APPWIDGET_UPDATE to notify Android AppWidget host
         val receivers = listOf(

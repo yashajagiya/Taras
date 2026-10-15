@@ -112,7 +112,13 @@ class F1TimelineWebSocketClient(
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                Log.e(tag, "Timeline WebSocket error: ${t.message}")
+                if (t is java.net.UnknownHostException) {
+                    if (reconnectAttempts <= 1) {
+                        Log.w(tag, "Timeline WebSocket unreachable (Host cannot be resolved: ${t.message})")
+                    }
+                } else {
+                    Log.e(tag, "Timeline WebSocket error: ${t.message}")
+                }
                 _connectionState.value = LiveConnectionState.DISCONNECTED
                 if (!isIntentionalDisconnect) {
                     scheduleReconnect()

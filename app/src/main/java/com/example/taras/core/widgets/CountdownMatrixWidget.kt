@@ -72,5 +72,31 @@ class CountdownMatrixWidget : GlanceAppWidget() {
             )
         }
     }
+
+    /**
+     * Safely updates all active instances of CountdownMatrixWidget without triggering
+     * crashes or exceptions on orphaned/deleted launcher widget IDs.
+     */
+    suspend fun safeUpdateAll(context: Context) {
+        try {
+            val glanceManager = androidx.glance.appwidget.GlanceAppWidgetManager(context)
+            val appWidgetManager = android.appwidget.AppWidgetManager.getInstance(context)
+            val glanceIds = glanceManager.getGlanceIds(CountdownMatrixWidget::class.java)
+            for (glanceId in glanceIds) {
+                try {
+                    val appWidgetId = glanceManager.getAppWidgetId(glanceId)
+                    if (appWidgetManager.getAppWidgetInfo(appWidgetId) != null) {
+                        this.update(context, glanceId)
+                    }
+                } catch (_: Throwable) {
+                    // Ignore orphaned or deleted widget instances
+                }
+            }
+        } catch (_: Throwable) {
+            // Silently handle widget manager access failure
+        }
+    }
 }
+
+
 

@@ -23,6 +23,20 @@ class CountdownMatrixWidget : GlanceAppWidget() {
     )
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val glanceManager = androidx.glance.appwidget.GlanceAppWidgetManager(context)
+        val appWidgetManager = android.appwidget.AppWidgetManager.getInstance(context)
+        val appWidgetId = try {
+            glanceManager.getAppWidgetId(id)
+        } catch (_: Throwable) {
+            -1
+        }
+        if (appWidgetId != -1 && appWidgetManager.getAppWidgetInfo(appWidgetId) == null) {
+            // Widget was removed or orphaned by launcher while session was starting.
+            // Returning early avoids calling provideContent, preventing Glance from throwing:
+            // IllegalArgumentException: No app widget info for $appWidgetId
+            return
+        }
+
         val repository = RaceRepository()
         val (raceCurrentState, nextSessionInfo, calendarEvents) = repository.getOfflineResilientCalendar(context)
 

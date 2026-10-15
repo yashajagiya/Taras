@@ -48,33 +48,13 @@ class OfflineDataStoreAppearance(private val context: Context) {
     suspend fun triggerAllWidgetUpdates() {
         val appContext = context.applicationContext
 
-        // 1. Update CountdownMatrixWidget safely (only for active widgets with valid AppWidgetInfo)
+        // Update CountdownMatrixWidget safely (only for active widgets with valid AppWidgetInfo)
+        // Glance handles its own session management and DataStore updates.
+        // We must NOT broadcast ACTION_APPWIDGET_UPDATE here as it triggers a duplicate concurrent SessionWorker.
         try {
             CountdownMatrixWidget().safeUpdateAll(appContext)
         } catch (e: Exception) {
             Log.e(TAG, "Error updating CountdownMatrixWidget", e)
-        }
-
-        // 2. Broadcast APPWIDGET_UPDATE to notify Android AppWidget host
-        val receivers = listOf(
-            CountdownMatrixWidgetReceiver::class.java
-        )
-        try {
-            val appWidgetManager = AppWidgetManager.getInstance(appContext)
-            for (receiverClass in receivers) {
-                val componentName = ComponentName(appContext, receiverClass)
-                val widgetIds = appWidgetManager.getAppWidgetIds(componentName)
-                val validWidgetIds = widgetIds.filter { appWidgetManager.getAppWidgetInfo(it) != null }.toIntArray()
-                if (validWidgetIds.isNotEmpty()) {
-                    val updateIntent = Intent(appContext, receiverClass).apply {
-                        action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, validWidgetIds)
-                    }
-                    appContext.sendBroadcast(updateIntent)
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error broadcasting widget update", e)
         }
     }
 }

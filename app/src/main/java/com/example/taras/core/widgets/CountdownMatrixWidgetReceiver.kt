@@ -30,6 +30,16 @@ class CountdownMatrixWidgetReceiver : GlanceAppWidgetReceiver() {
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, validIds)
         }
 
+        // 2. Sanitize single widget ID intents (like OPTIONS_CHANGED / RESIZED)
+        val singleId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
+        if (singleId != AppWidgetManager.INVALID_APPWIDGET_ID &&
+            intent.action != AppWidgetManager.ACTION_APPWIDGET_DELETED &&
+            intent.action != AppWidgetManager.ACTION_APPWIDGET_DISABLED &&
+            appWidgetManager.getAppWidgetInfo(singleId) == null) {
+            // Drop any intent targeting an unconfirmed, removed, or orphaned widget ID
+            return
+        }
+
         if (intent.action == AppWidgetManager.ACTION_APPWIDGET_DELETED ||
             intent.action == AppWidgetManager.ACTION_APPWIDGET_DISABLED) {
             try {

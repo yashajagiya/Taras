@@ -578,7 +578,7 @@ private fun F1StartingGantry(
             .background(GlanceTheme.colors.surface)
             .padding(
                 horizontal = if (isTall) 10.dp else 8.dp,
-                vertical = if (isTall) 3.5.dp else 2.5.dp
+                vertical = if (isTall) 3.5.dp else 3.dp
             ),
         verticalAlignment = Alignment.Vertical.CenterVertically,
         horizontalAlignment = Alignment.Horizontal.CenterHorizontally
@@ -619,36 +619,37 @@ private fun CountdownPill(
         horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
         verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
-        // Authentic 5-Lights FIA Starting Gantry inside sculpted housing with un-congested spacing
+        // Authentic 5-Lights FIA Starting Gantry inside sculpted housing with perfectly centered alignment
         F1StartingGantry(
             litCount = litLights,
-            isLive = isLive,
-            modifier = GlanceModifier.padding(bottom = if (isTall) 5.5.dp else 4.dp)
+            isLive = isLive
         )
 
-            if (isLive) {
-                Box(
-                    modifier = GlanceModifier
-                        .cornerRadius(999.dp)
-                        .background(GlanceTheme.colors.primary)
-                        .padding(horizontal = 10.dp, vertical = 2.5.dp)
-                ) {
-                    Text(
-                        text = "LIGHTS OUT • TRACK ACTIVE",
-                        style = TextStyle(
-                            color = GlanceTheme.colors.onPrimary,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = if (isTall) 11.5.sp else 10.sp,
-                            textAlign = TextAlign.Center
-                        )
+        Spacer(modifier = GlanceModifier.height(if (isTall) 5.5.dp else 4.dp))
+
+        if (isLive) {
+            Box(
+                modifier = GlanceModifier
+                    .cornerRadius(999.dp)
+                    .background(GlanceTheme.colors.primary)
+                    .padding(horizontal = 10.dp, vertical = 2.5.dp)
+            ) {
+                Text(
+                    text = "LIGHTS OUT • TRACK ACTIVE",
+                    style = TextStyle(
+                        color = GlanceTheme.colors.onPrimary,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = if (isTall) 11.5.sp else 10.sp,
+                        textAlign = TextAlign.Center
                     )
-                }
-            } else {
-                Row(
-                    modifier = GlanceModifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.Vertical.CenterVertically,
-                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally
-                ) {
+                )
+            }
+        } else {
+            Row(
+                modifier = GlanceModifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Vertical.CenterVertically,
+                horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+            ) {
                     // Column 1: Days
                     Column(
                         modifier = GlanceModifier.defaultWeight(),

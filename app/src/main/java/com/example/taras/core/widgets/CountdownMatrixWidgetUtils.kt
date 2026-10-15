@@ -740,6 +740,57 @@ object CountdownMatrixWidgetUtils {
     }
 
     /**
+     * Renders a skeleton season matrix bitmap for first install or cold loading states.
+     */
+    fun renderSkeletonMatrixBitmap(
+        widthPx: Int,
+        heightPx: Int,
+        outlineColorArgb: Int
+    ): Bitmap {
+        val safeWidth = widthPx.coerceAtLeast(140)
+        val safeHeight = heightPx.coerceAtLeast(90)
+        val cacheKey = "matrix_skeleton:${safeWidth}x$safeHeight:$outlineColorArgb"
+        bitmapCache.get(cacheKey)?.let { return it }
+
+        val bitmap = Bitmap.createBitmap(safeWidth, safeHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        // Subtle placeholder progress bar
+        val barHeight = (safeHeight * 0.025f).coerceIn(2.5f, 4f)
+        val barTop = 1.5f
+        val bgBarPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.FILL
+            color = (outlineColorArgb and 0x00FFFFFF) or 0x22000000
+        }
+        canvas.drawRoundRect(0f, barTop, safeWidth.toFloat(), barTop + barHeight, barHeight / 2f, barHeight / 2f, bgBarPaint)
+
+        // 24 Skeleton dots
+        val cols = 8
+        val rows = 3
+        val matrixTop = barTop + barHeight + 6f
+        val availableH = safeHeight - matrixTop
+        val cellW = safeWidth.toFloat() / cols
+        val cellH = availableH / rows
+        val dotRadius = (cellH * 0.16f).coerceIn(2f, 4f)
+
+        val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.FILL
+            color = (outlineColorArgb and 0x00FFFFFF) or 0x33000000
+        }
+
+        for (i in 0 until 24) {
+            val c = i % cols
+            val r = i / cols
+            val cx = c * cellW + cellW / 2f
+            val cy = matrixTop + r * cellH + cellH / 2f
+            canvas.drawCircle(cx, cy, dotRadius, dotPaint)
+        }
+
+        bitmapCache.put(cacheKey, bitmap)
+        return bitmap
+    }
+
+    /**
      * Schedules a single exact milestone alarm for the upcoming session start
      * so the widget transitions to "LIVE NOW" at the exact minute with 0% idle battery drain.
      */

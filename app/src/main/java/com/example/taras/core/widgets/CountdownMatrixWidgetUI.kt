@@ -84,77 +84,316 @@ fun CountdownMatrixWidgetUI(
                     else 10.dp
                 )
         ) {
-            when (raceCurrentState) {
-                is UiState.Loading -> {
-                    LoadingView()
-                }
-                is UiState.Error -> {
-                    ErrorView(raceCurrentState.message)
-                }
-                is UiState.Success -> {
-                    SuccessContentView(
-                        raceCurrent = raceCurrentState.data,
-                        nextSession = nextSessionInfo,
-                        seasonRounds = seasonRounds,
-                        currentRoundNumber = currentRoundNumber,
-                        totalRounds = totalRounds,
-                        hasSprint = hasSprint,
-                        laps = laps,
-                        countryName = countryName,
-                        circuitBitmap = circuitBitmap
-                    )
-                }
+            val hasNoData = raceCurrentState is UiState.Loading ||
+                    raceCurrentState is UiState.Error ||
+                    (raceCurrentState is UiState.Success && raceCurrentState.data == null && nextSessionInfo == null && seasonRounds.isEmpty())
+
+            if (hasNoData) {
+                SkeletonContentView()
+            } else if (raceCurrentState is UiState.Success) {
+                SuccessContentView(
+                    raceCurrent = raceCurrentState.data,
+                    nextSession = nextSessionInfo,
+                    seasonRounds = seasonRounds,
+                    currentRoundNumber = currentRoundNumber,
+                    totalRounds = totalRounds,
+                    hasSprint = hasSprint,
+                    laps = laps,
+                    countryName = countryName,
+                    circuitBitmap = circuitBitmap
+                )
             }
         }
     }
 }
 
 @Composable
-private fun LoadingView() {
-    Column(
-        modifier = GlanceModifier.fillMaxSize(),
-        verticalAlignment = Alignment.Vertical.CenterVertically,
-        horizontalAlignment = Alignment.Horizontal.CenterHorizontally
-    ) {
-        CircularProgressIndicator(
-            color = GlanceTheme.colors.primary,
-            modifier = GlanceModifier.size(24.dp)
-        )
-        Spacer(modifier = GlanceModifier.height(6.dp))
-        Text(
-            text = "Loading…",
-            style = TextStyle(
-                color = GlanceTheme.colors.onSurfaceVariant,
-                fontSize = 11.sp
-            )
-        )
+private fun SkeletonContentView() {
+    val size = LocalSize.current
+    val isExtended = size.width >= 230.dp
+    val isTall = size.height >= 170.dp
+    val context = LocalContext.current
+
+    if (isExtended) {
+        // Extended 4×2 or 4×3 Dual Pane Skeleton
+        Row(
+            modifier = GlanceModifier.fillMaxSize(),
+            verticalAlignment = Alignment.Vertical.CenterVertically
+        ) {
+            // Left Pane: Skeleton Season Grid
+            Column(
+                modifier = GlanceModifier
+                    .defaultWeight()
+                    .fillMaxHeight(),
+                verticalAlignment = Alignment.Vertical.CenterVertically
+            ) {
+                Row(
+                    modifier = GlanceModifier.fillMaxWidth().padding(bottom = 4.dp),
+                    verticalAlignment = Alignment.Vertical.CenterVertically
+                ) {
+                    Box(
+                        modifier = GlanceModifier
+                            .width(3.dp)
+                            .height(10.dp)
+                            .cornerRadius(1.5.dp)
+                            .background(GlanceTheme.colors.primary)
+                    ) {}
+                    Spacer(modifier = GlanceModifier.width(5.dp))
+                    Text(
+                        text = "SEASON GRID • SYNCING…",
+                        style = TextStyle(
+                            color = GlanceTheme.colors.onSurfaceVariant,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 8.5.sp
+                        )
+                    )
+                }
+
+                Box(
+                    modifier = GlanceModifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val outlineArgb = GlanceTheme.colors.outline.getColor(context).toArgb()
+                    val skeletonMatrixBitmap = CountdownMatrixWidgetUtils.renderSkeletonMatrixBitmap(
+                        widthPx = if (isTall) 300 else 260,
+                        heightPx = if (isTall) 190 else 150,
+                        outlineColorArgb = outlineArgb
+                    )
+                    Image(
+                        provider = ImageProvider(skeletonMatrixBitmap),
+                        contentDescription = "Season Matrix Skeleton",
+                        modifier = GlanceModifier.fillMaxSize()
+                    )
+                }
+            }
+
+            Spacer(modifier = GlanceModifier.width(12.dp))
+
+            // Right Pane: Skeleton Countdown Module
+            Box(
+                modifier = GlanceModifier
+                    .defaultWeight()
+                    .fillMaxHeight()
+            ) {
+                SkeletonCountdownModule(isExtended = true, isTall = isTall)
+            }
+        }
+    } else {
+        // Compact 2×2 or 2×3 Card Skeleton
+        SkeletonCountdownModule(isExtended = false, isTall = isTall)
     }
 }
 
 @Composable
-private fun ErrorView(message: String) {
+private fun SkeletonCountdownModule(
+    isExtended: Boolean,
+    isTall: Boolean
+) {
     Column(
         modifier = GlanceModifier.fillMaxSize(),
-        verticalAlignment = Alignment.Vertical.CenterVertically,
-        horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+        verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
-        Text(
-            text = "No Session Data",
-            style = TextStyle(
-                color = GlanceTheme.colors.error,
-                fontWeight = FontWeight.Bold,
-                fontSize = 12.sp
+        // 1. Header: Telemetry Bar + R-- badge + "GRAND PRIX" placeholder
+        Row(
+            modifier = GlanceModifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Vertical.CenterVertically
+        ) {
+            Box(
+                modifier = GlanceModifier
+                    .width(3.dp)
+                    .height(if (isTall) 13.dp else 11.5.dp)
+                    .cornerRadius(1.5.dp)
+                    .background(GlanceTheme.colors.primary)
+            ) {}
+
+            Spacer(modifier = GlanceModifier.width(5.dp))
+
+            Box(
+                modifier = GlanceModifier
+                    .cornerRadius(999.dp)
+                    .background(GlanceTheme.colors.surfaceVariant)
+                    .padding(horizontal = 6.dp, vertical = 2.dp)
+            ) {
+                Text(
+                    text = "R--",
+                    style = TextStyle(
+                        color = GlanceTheme.colors.onSurfaceVariant,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 8.5.sp
+                    )
+                )
+            }
+
+            Spacer(modifier = GlanceModifier.width(6.dp))
+
+            Text(
+                text = "GRAND PRIX",
+                modifier = GlanceModifier.defaultWeight(),
+                style = TextStyle(
+                    color = GlanceTheme.colors.onSurfaceVariant,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = if (isTall) 13.5.sp else 12.sp
+                ),
+                maxLines = 1
             )
+        }
+
+        Spacer(modifier = GlanceModifier.height(if (isTall) 5.dp else 3.dp))
+
+        // Placeholder Timeline Strip: FP1 • FP2 • FP3 • Q • RACE
+        val skeletonTimeline = listOf(
+            SessionTimelineItem(shortCode = "FP1", isCompleted = false, isCurrent = false, isUpcoming = false),
+            SessionTimelineItem(shortCode = "FP2", isCompleted = false, isCurrent = false, isUpcoming = false),
+            SessionTimelineItem(shortCode = "FP3", isCompleted = false, isCurrent = false, isUpcoming = false),
+            SessionTimelineItem(shortCode = "Q", isCompleted = false, isCurrent = false, isUpcoming = false),
+            SessionTimelineItem(shortCode = "RACE", isCompleted = false, isCurrent = false, isUpcoming = false)
         )
-        Spacer(modifier = GlanceModifier.height(4.dp))
-        Text(
-            text = message,
-            style = TextStyle(
-                color = GlanceTheme.colors.onSurfaceVariant,
-                fontSize = 10.sp
-            ),
-            maxLines = 2
-        )
+        WeekendTimelineStrip(timeline = skeletonTimeline)
+
+        Spacer(modifier = GlanceModifier.defaultWeight())
+
+        // 2. Center: Skeleton Countdown Pod (5 unlit lights gantry + -- DAYS | -- HOURS)
+        Column(
+            modifier = GlanceModifier
+                .fillMaxWidth()
+                .cornerRadius(18.dp)
+                .background(GlanceTheme.colors.surfaceVariant)
+                .padding(vertical = if (isTall) 8.dp else 5.5.dp, horizontal = if (isTall) 12.dp else 10.dp),
+            horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
+            verticalAlignment = Alignment.Vertical.CenterVertically
+        ) {
+            F1StartingGantry(
+                litCount = 0,
+                isLive = false
+            )
+
+            Spacer(modifier = GlanceModifier.height(if (isTall) 5.5.dp else 4.dp))
+
+            Row(
+                modifier = GlanceModifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Vertical.CenterVertically,
+                horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+            ) {
+                // Column 1: Days
+                Column(
+                    modifier = GlanceModifier.defaultWeight(),
+                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+                ) {
+                    Text(
+                        text = "--",
+                        style = TextStyle(
+                            color = GlanceTheme.colors.onSurfaceVariant,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = if (isTall) 21.sp else 18.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    )
+                    Spacer(modifier = GlanceModifier.height(1.dp))
+                    Text(
+                        text = "DAYS",
+                        style = TextStyle(
+                            color = GlanceTheme.colors.outline,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = if (isTall) 8.sp else 7.5.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    )
+                }
+
+                // Precision Chronograph Hairline Separator
+                Box(
+                    modifier = GlanceModifier
+                        .width(1.dp)
+                        .height(if (isTall) 22.dp else 18.dp)
+                        .background(GlanceTheme.colors.outline)
+                ) {}
+
+                // Column 2: Hours
+                Column(
+                    modifier = GlanceModifier.defaultWeight(),
+                    horizontalAlignment = Alignment.Horizontal.CenterHorizontally
+                ) {
+                    Text(
+                        text = "--",
+                        style = TextStyle(
+                            color = GlanceTheme.colors.onSurfaceVariant,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = if (isTall) 21.sp else 18.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    )
+                    Spacer(modifier = GlanceModifier.height(1.dp))
+                    Text(
+                        text = "HOURS",
+                        style = TextStyle(
+                            color = GlanceTheme.colors.outline,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = if (isTall) 8.sp else 7.5.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = GlanceModifier.defaultWeight())
+
+        // 3. Footer Row: Silhouette Placeholder + Syncing Date & Time
+        Row(
+            modifier = GlanceModifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Vertical.Bottom
+        ) {
+            Column(
+                modifier = GlanceModifier.defaultWeight(),
+                verticalAlignment = Alignment.Vertical.Bottom,
+                horizontalAlignment = Alignment.Horizontal.Start
+            ) {
+                Box(
+                    modifier = GlanceModifier
+                        .size(
+                            width = if (isTall) 62.dp else 48.dp,
+                            height = if (isTall) 36.dp else 26.dp
+                        )
+                        .cornerRadius(6.dp)
+                        .background(GlanceTheme.colors.surfaceVariant)
+                ) {}
+                Spacer(modifier = GlanceModifier.height(2.dp))
+                Text(
+                    text = "CIRCUIT • --L",
+                    style = TextStyle(
+                        color = GlanceTheme.colors.outline,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = if (isTall) 9.5.sp else 8.5.sp
+                    ),
+                    maxLines = 1
+                )
+            }
+
+            Column(
+                horizontalAlignment = Alignment.Horizontal.End,
+                verticalAlignment = Alignment.Vertical.Bottom
+            ) {
+                Text(
+                    text = "SYNCING DATA…",
+                    style = TextStyle(
+                        color = GlanceTheme.colors.primary,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = if (isTall) 10.5.sp else 9.sp,
+                        textAlign = TextAlign.End
+                    )
+                )
+                Spacer(modifier = GlanceModifier.height(1.dp))
+                Text(
+                    text = "--:--",
+                    style = TextStyle(
+                        color = GlanceTheme.colors.onSurfaceVariant,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = if (isTall) 18.sp else 16.sp,
+                        textAlign = TextAlign.End
+                    )
+                )
+            }
+        }
     }
 }
 

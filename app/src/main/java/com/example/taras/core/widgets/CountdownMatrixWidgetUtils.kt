@@ -875,5 +875,26 @@ object CountdownMatrixWidgetUtils {
             )
         }
     }
+
+    /**
+     * Resolves the country or Grand Prix name for the widget header.
+     * Example: "BELGIUM", "AUSTRALIA", "ITALY", "ABU DHABI", "UNITED STATES"
+     */
+    fun getDisplayCountryName(country: String?, gpTitle: String?): String {
+        val cleanCountry = country?.trim().orEmpty()
+        val cleanGp = gpTitle?.trim().orEmpty()
+        return when {
+            cleanCountry.contains("united arab emirates", ignoreCase = true) || cleanCountry.contains("uae", ignoreCase = true) -> "ABU DHABI"
+            cleanCountry.isNotBlank() -> cleanCountry.uppercase()
+            cleanGp.isNotBlank() -> {
+                val stripped = cleanGp
+                    .replace("Grand Prix", "", ignoreCase = true)
+                    .replace("GP", "", ignoreCase = true)
+                    .trim()
+                if (stripped.isNotBlank()) stripped.uppercase() else cleanGp.uppercase()
+            }
+            else -> "GRAND PRIX"
+        }
+    }
 }
 

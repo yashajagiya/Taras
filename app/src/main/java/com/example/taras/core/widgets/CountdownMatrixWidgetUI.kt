@@ -58,6 +58,7 @@ fun CountdownMatrixWidgetUI(
     totalRounds: Int = 24,
     hasSprint: Boolean = false,
     laps: Int? = null,
+    countryName: String? = null,
     circuitBitmap: Bitmap? = null,
     colors: ColorProviders = rememberWidgetThemeColors(),
     modifier: GlanceModifier = GlanceModifier
@@ -95,6 +96,7 @@ fun CountdownMatrixWidgetUI(
                         totalRounds = totalRounds,
                         hasSprint = hasSprint,
                         laps = laps,
+                        countryName = countryName,
                         circuitBitmap = circuitBitmap
                     )
                 }
@@ -161,6 +163,7 @@ private fun SuccessContentView(
     totalRounds: Int,
     hasSprint: Boolean,
     laps: Int?,
+    countryName: String?,
     circuitBitmap: Bitmap?
 ) {
     val size = LocalSize.current
@@ -233,6 +236,7 @@ private fun SuccessContentView(
                     currentRoundNumber = currentRoundNumber,
                     hasSprint = hasSprint,
                     laps = laps,
+                    countryName = countryName,
                     circuitBitmap = circuitBitmap,
                     isExtended = true,
                     isTall = isTall
@@ -247,6 +251,7 @@ private fun SuccessContentView(
             currentRoundNumber = currentRoundNumber,
             hasSprint = hasSprint,
             laps = laps,
+            countryName = countryName,
             circuitBitmap = circuitBitmap,
             isExtended = false,
             isTall = isTall
@@ -271,6 +276,7 @@ private fun CountdownModule(
     currentRoundNumber: Int,
     hasSprint: Boolean,
     laps: Int?,
+    countryName: String?,
     circuitBitmap: Bitmap?,
     isExtended: Boolean,
     isTall: Boolean
@@ -287,6 +293,7 @@ private fun CountdownModule(
             nextSession?.countdown?.contains("started", ignoreCase = true) == true
 
     val gpTitle = CountdownMatrixWidgetUtils.getShortGpTitle(raceName, nextSession?.circuitName ?: raceCurrent?.circuitName)
+    val countryTitle = CountdownMatrixWidgetUtils.getDisplayCountryName(countryName, gpTitle)
     val shortCircuitName = CountdownMatrixWidgetUtils.getShortCircuitName(circuitName)
     val formattedDate = CountdownMatrixWidgetUtils.formatLocalSessionDate(targetInstant)
     val localTime = CountdownMatrixWidgetUtils.formatLocalSessionTime(targetInstant)
@@ -324,27 +331,26 @@ private fun CountdownModule(
         modifier = GlanceModifier.fillMaxSize(),
         verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
-        // 1. Header: Telemetry Round Tag + Sprint Tag + Session + Grand Prix Title
+        // 1. Header: Telemetry Round Tag + Sprint Tag + Country Name
         HeaderRow(
-            gpTitle = gpTitle,
-            sessionName = sessionName,
+            countryName = countryTitle,
             roundNumber = currentRoundNumber,
             hasSprint = hasSprint,
             isLive = isLive,
             isTall = isTall
         )
 
-        if (isExtended || isTall) {
-            Spacer(modifier = GlanceModifier.height(4.dp))
-            val timeline = CountdownMatrixWidgetUtils.computeWeekendTimeline(
-                sessions = raceCurrent?.parsedSessions,
-                currentSessionName = sessionName,
-                targetInstant = targetInstant,
-                isLive = isLive,
-                hasSprint = hasSprint
-            )
-            WeekendTimelineStrip(timeline = timeline)
-        }
+        Spacer(modifier = GlanceModifier.height(4.dp))
+
+        // Session progression timeline directly above the countdown pod
+        val timeline = CountdownMatrixWidgetUtils.computeWeekendTimeline(
+            sessions = raceCurrent?.parsedSessions,
+            currentSessionName = sessionName,
+            targetInstant = targetInstant,
+            isLive = isLive,
+            hasSprint = hasSprint
+        )
+        WeekendTimelineStrip(timeline = timeline)
 
         Spacer(modifier = GlanceModifier.defaultWeight())
 
@@ -375,95 +381,80 @@ private fun CountdownModule(
 
 @Composable
 private fun HeaderRow(
-    gpTitle: String,
-    sessionName: String,
+    countryName: String,
     roundNumber: Int,
     hasSprint: Boolean,
     isLive: Boolean,
     isTall: Boolean
 ) {
-    Column(
-        modifier = GlanceModifier.fillMaxWidth()
+    Row(
+        modifier = GlanceModifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Vertical.CenterVertically
     ) {
-        Row(
-            modifier = GlanceModifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Vertical.CenterVertically
+        // Precision Round Badge (e.g. "R14")
+        Box(
+            modifier = GlanceModifier
+                .cornerRadius(5.dp)
+                .background(GlanceTheme.colors.primaryContainer)
+                .padding(horizontal = 5.dp, vertical = 2.dp)
         ) {
-            // Precision Round Badge (e.g. "R14")
+            Text(
+                text = "R${roundNumber.toString().padStart(2, '0')}",
+                style = TextStyle(
+                    color = GlanceTheme.colors.onPrimaryContainer,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 8.5.sp
+                )
+            )
+        }
+
+        if (hasSprint) {
+            Spacer(modifier = GlanceModifier.width(4.dp))
             Box(
                 modifier = GlanceModifier
-                    .cornerRadius(5.dp)
-                    .background(GlanceTheme.colors.primaryContainer)
-                    .padding(horizontal = 5.dp, vertical = 2.dp)
+                    .cornerRadius(4.dp)
+                    .background(GlanceTheme.colors.secondaryContainer)
+                    .padding(horizontal = 4.dp, vertical = 2.dp)
             ) {
                 Text(
-                    text = "R${roundNumber.toString().padStart(2, '0')}",
+                    text = "⚡ SPRINT",
                     style = TextStyle(
-                        color = GlanceTheme.colors.onPrimaryContainer,
+                        color = GlanceTheme.colors.onSecondaryContainer,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 8.5.sp
+                        fontSize = 7.5.sp
                     )
-                )
-            }
-
-            if (hasSprint) {
-                Spacer(modifier = GlanceModifier.width(4.dp))
-                Box(
-                    modifier = GlanceModifier
-                        .cornerRadius(4.dp)
-                        .background(GlanceTheme.colors.secondaryContainer)
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = "⚡ SPRINT",
-                        style = TextStyle(
-                            color = GlanceTheme.colors.onSecondaryContainer,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 7.5.sp
-                        )
-                    )
-                }
-            }
-
-            Spacer(modifier = GlanceModifier.width(6.dp))
-
-            if (isLive) {
-                Box(
-                    modifier = GlanceModifier
-                        .cornerRadius(5.dp)
-                        .background(GlanceTheme.colors.primary)
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = "LIVE ON TRACK",
-                        style = TextStyle(
-                            color = GlanceTheme.colors.onPrimary,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 8.5.sp
-                        )
-                    )
-                }
-            } else {
-                Text(
-                    text = sessionName.uppercase(),
-                    style = TextStyle(
-                        color = GlanceTheme.colors.onSurfaceVariant,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 9.sp
-                    ),
-                    maxLines = 1
                 )
             }
         }
 
-        Spacer(modifier = GlanceModifier.height(2.dp))
+        if (isLive) {
+            Spacer(modifier = GlanceModifier.width(4.dp))
+            Box(
+                modifier = GlanceModifier
+                    .cornerRadius(4.dp)
+                    .background(GlanceTheme.colors.primary)
+                    .padding(horizontal = 4.dp, vertical = 2.dp)
+            ) {
+                Text(
+                    text = "LIVE",
+                    style = TextStyle(
+                        color = GlanceTheme.colors.onPrimary,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 7.5.sp
+                    )
+                )
+            }
+        }
 
+        Spacer(modifier = GlanceModifier.width(6.dp))
+
+        // Country name on the round number row
         Text(
-            text = gpTitle,
+            text = countryName.uppercase(),
             style = TextStyle(
                 color = GlanceTheme.colors.onSurface,
                 fontWeight = FontWeight.Bold,
-                fontSize = if (isTall) 14.sp else 13.sp
+                fontSize = if (isTall) 13.5.sp else 12.sp
             ),
             maxLines = 1
         )
@@ -475,6 +466,9 @@ private fun WeekendTimelineStrip(
     timeline: List<SessionTimelineItem>,
     modifier: GlanceModifier = GlanceModifier
 ) {
+    val size = LocalSize.current
+    val isNarrow = size.width < 190.dp
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Vertical.CenterVertically,
@@ -501,27 +495,27 @@ private fun WeekendTimelineStrip(
                 modifier = GlanceModifier
                     .cornerRadius(4.dp)
                     .background(bg)
-                    .padding(horizontal = 4.dp, vertical = 2.dp)
+                    .padding(horizontal = if (isNarrow) 3.dp else 4.dp, vertical = 2.dp)
             ) {
                 Text(
                     text = "$prefix${item.shortCode}",
                     style = TextStyle(
                         color = textColor,
                         fontWeight = if (item.isCurrent) FontWeight.Bold else FontWeight.Medium,
-                        fontSize = 7.5.sp
+                        fontSize = if (isNarrow) 7.sp else 7.5.sp
                     )
                 )
             }
 
             if (index < timeline.size - 1) {
-                Spacer(modifier = GlanceModifier.width(2.5.dp))
+                Spacer(modifier = GlanceModifier.width(if (isNarrow) 1.5.dp else 2.5.dp))
                 Box(
                     modifier = GlanceModifier
-                        .width(4.dp)
+                        .width(if (isNarrow) 3.dp else 4.dp)
                         .height(1.dp)
                         .background(GlanceTheme.colors.outline)
                 ) {}
-                Spacer(modifier = GlanceModifier.width(2.5.dp))
+                Spacer(modifier = GlanceModifier.width(if (isNarrow) 1.5.dp else 2.5.dp))
             }
         }
     }

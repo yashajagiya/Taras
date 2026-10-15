@@ -34,6 +34,7 @@ class CountdownMatrixWidget : GlanceAppWidget() {
             ?: 24
         val hasSprint = currentEvent?.hasSprint == true
         val laps = currentEvent?.laps
+        val countryName = currentEvent?.circuit?.country?.trim()?.ifBlank { null }
 
         val seasonRounds = calendarEvents.map { event ->
             SeasonRoundItem(
@@ -65,6 +66,7 @@ class CountdownMatrixWidget : GlanceAppWidget() {
                 totalRounds = totalRounds,
                 hasSprint = hasSprint,
                 laps = laps,
+                countryName = countryName,
                 circuitBitmap = circuitBitmap,
                 colors = colors
             )

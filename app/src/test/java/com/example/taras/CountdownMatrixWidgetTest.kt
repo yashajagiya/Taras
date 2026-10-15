@@ -267,6 +267,18 @@ class CountdownMatrixWidgetTest {
         assertEquals("GP", sprint[4].shortCode)
         assertTrue(sprint[4].isUpcoming)
     }
+
+    @Test
+    fun getDisplayCountryName_formatsCountryAndFallbackAccurately() {
+        assertEquals("BELGIUM", CountdownMatrixWidgetUtils.getDisplayCountryName("Belgium", "Belgian GP"))
+        assertEquals("ABU DHABI", CountdownMatrixWidgetUtils.getDisplayCountryName("United Arab Emirates", "Abu Dhabi GP"))
+        assertEquals("ABU DHABI", CountdownMatrixWidgetUtils.getDisplayCountryName("UAE", "Abu Dhabi GP"))
+        assertEquals("ITALY", CountdownMatrixWidgetUtils.getDisplayCountryName("Italy", "Italian GP"))
+        assertEquals("AUSTRALIA", CountdownMatrixWidgetUtils.getDisplayCountryName("Australia", "Australian GP"))
+        assertEquals("BELGIAN", CountdownMatrixWidgetUtils.getDisplayCountryName(null, "Belgian GP"))
+        assertEquals("MONACO", CountdownMatrixWidgetUtils.getDisplayCountryName("", "Monaco Grand Prix"))
+        assertEquals("GRAND PRIX", CountdownMatrixWidgetUtils.getDisplayCountryName(null, null))
+    }
 }
 
 

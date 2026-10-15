@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.taras.core.common.OfflineDataStoreAppearance
@@ -59,6 +60,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         WeeklyPackWorker.scheduleWeeklyPack(this)
         navTargetState.value = intent?.getStringExtra("nav_target")
+
+        lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                com.example.taras.core.widgets.CountdownMatrixWidget().safeUpdateAll(applicationContext)
+            } catch (_: Throwable) {}
+        }
 
         setContent {
             val navTarget by navTargetState.collectAsStateWithLifecycle()
@@ -222,6 +229,15 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                com.example.taras.core.widgets.CountdownMatrixWidget().safeUpdateAll(applicationContext)
+            } catch (_: Throwable) {}
         }
     }
 

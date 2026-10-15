@@ -25,7 +25,7 @@ class UserViewModel(
     )
     val userName = userPreferences.userNameFlow.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = WhileSubscribed(5000),
         initialValue = "Guest"
     )
 
@@ -42,7 +42,7 @@ class UserViewModel(
 
     val favoriteDriverNumber = userPreferences.favoriteDriverNumberFlow.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = WhileSubscribed(5000),
         initialValue = null
     )
 

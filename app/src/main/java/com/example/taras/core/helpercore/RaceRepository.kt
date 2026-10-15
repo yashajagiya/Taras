@@ -58,8 +58,8 @@ class RaceRepository(
     /**
      * Retrieves calendar data with 3-tier offline resilience:
      * 1. Persistent DataStore cache (instant 0ms)
-     * 2. Bundled seed asset fallback (for cold install before app ever opened)
-     * 3. Opportunistic background network refresh
+     * 2. Returns empty state if app has never been opened (triggers default onboarding screen)
+     * 3. Opportunistic background network refresh if app has been opened
      */
     suspend fun getOfflineResilientCalendar(context: Context): Triple<UiState<CurrentRace?>, SessionInfo?, List<CalendarRaceEvent>> {
         var calendarData: List<CalendarRaceEvent>? = try {
@@ -73,18 +73,12 @@ class RaceRepository(
             null
         }
 
+        // If app has never been opened or synced by the user, return empty to display default onboarding screen
         if (calendarData.isNullOrEmpty()) {
-            calendarData = try {
-                context.assets.open("default_season_calendar.json").bufferedReader().use { reader ->
-                    val assetJson = reader.readText()
-                    NetworkModule.json.decodeFromString<List<CalendarRaceEvent>>(assetJson)
-                }
-            } catch (e: Exception) {
-                Log.e("RaceRepository", "Error reading bundled asset calendar", e)
-                emptyList()
-            }
+            return Triple(UiState.Success(null), null, emptyList())
         }
 
+        // Opportunistic background network refresh if app has synced before
         try {
             val liveData = racesDataService.getCalendar()
             if (liveData.isNotEmpty()) {
@@ -98,7 +92,7 @@ class RaceRepository(
                 }
             }
         } catch (_: Exception) {
-            // Offline or network error: gracefully keep cached / seed calendar
+            // Offline or network error: gracefully keep cached calendar
         }
 
         val upcomingRaces = RaceStateEngine.findCurrentOrUpcomingRaces(calendarData)

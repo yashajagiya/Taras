@@ -36,7 +36,18 @@ class RaceRepositoryImpl(
             if (!cachedJson.isNullOrBlank()) {
                 NetworkModule.json.decodeFromString<List<CalendarRaceEvent>>(cachedJson)
             } else {
-                throw e
+                try {
+                    com.example.taras.core.common.TarasApplication.instance.assets
+                        .open("default_season_calendar.json")
+                        .bufferedReader()
+                        .use { reader ->
+                            val assetJson = reader.readText()
+                            currentData.saveRacesData(assetJson)
+                            NetworkModule.json.decodeFromString<List<CalendarRaceEvent>>(assetJson)
+                        }
+                } catch (_: Exception) {
+                    throw e
+                }
             }
         }
     }

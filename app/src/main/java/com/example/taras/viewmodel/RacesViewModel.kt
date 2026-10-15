@@ -64,6 +64,9 @@ class RacesViewModel(
                         _races.value = UiState.Success(cachedData)
                     }
                     preloadTrackImages(cachedData)
+                    try {
+                        com.example.taras.core.widgets.CountdownMatrixWidget().safeUpdateAll(TarasApplication.instance)
+                    } catch (_: Throwable) {}
                 }
             } catch (e: Exception) {
                 Log.e(logTag, "Error loading initial races cache", e)
@@ -86,6 +89,9 @@ class RacesViewModel(
                 val calendarData = raceRepository.getCalendar(forceRefresh = isRefresh)
                 _races.value = UiState.Success(calendarData)
                 preloadTrackImages(calendarData)
+                try {
+                    com.example.taras.core.widgets.CountdownMatrixWidget().safeUpdateAll(TarasApplication.instance)
+                } catch (_: Throwable) {}
             } catch (e: Exception) {
                 Log.e(logTag, "Error fetching races data", e)
 
@@ -95,6 +101,9 @@ class RacesViewModel(
                     if (cachedData != null) {
                         _races.value = UiState.Success(cachedData)
                         preloadTrackImages(cachedData)
+                        try {
+                            com.example.taras.core.widgets.CountdownMatrixWidget().safeUpdateAll(TarasApplication.instance)
+                        } catch (_: Throwable) {}
                     } else if (_races.value !is UiState.Success) {
                         _races.value = UiState.Error(e.toAppError())
                     }

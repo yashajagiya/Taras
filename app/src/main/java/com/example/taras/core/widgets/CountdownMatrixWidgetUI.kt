@@ -78,7 +78,11 @@ fun CountdownMatrixWidgetUI(
                 .cornerRadius(24.dp)
                 .background(GlanceTheme.colors.surface)
                 .clickable(actionStartActivity(launchIntent))
-                .padding(if (LocalSize.current.width >= 230.dp) 14.dp else 12.dp)
+                .padding(
+                    if (LocalSize.current.width >= 230.dp) 14.dp
+                    else if (LocalSize.current.height >= 170.dp) 12.dp
+                    else 10.dp
+                )
         ) {
             when (raceCurrentState) {
                 is UiState.Loading -> {
@@ -348,7 +352,7 @@ private fun CountdownModule(
             isTall = isTall
         )
 
-        Spacer(modifier = GlanceModifier.height(4.dp))
+        Spacer(modifier = GlanceModifier.height(if (isTall) 5.dp else 3.dp))
 
         // Session progression timeline directly above the countdown pod
         val timeline = CountdownMatrixWidgetUtils.computeWeekendTimeline(
@@ -470,6 +474,7 @@ private fun HeaderRow(
         // Country name with broadcast typography
         Text(
             text = countryName.uppercase(),
+            modifier = GlanceModifier.defaultWeight(),
             style = TextStyle(
                 color = GlanceTheme.colors.onSurface,
                 fontWeight = FontWeight.Bold,
@@ -488,24 +493,17 @@ private fun WeekendTimelineStrip(
     val size = LocalSize.current
     val isNarrow = size.width < 190.dp
 
-    Box(
-        modifier = modifier
-            .cornerRadius(999.dp)
-            .background(GlanceTheme.colors.surface)
-            .padding(horizontal = if (isNarrow) 3.dp else 4.dp, vertical = 2.5.dp)
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Vertical.CenterVertically,
+        horizontalAlignment = Alignment.Horizontal.CenterHorizontally
     ) {
-        Row(
-            modifier = GlanceModifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Vertical.CenterVertically,
-            horizontalAlignment = Alignment.Horizontal.CenterHorizontally
-        ) {
-            timeline.forEachIndexed { index, item ->
-                TimelineStageItem(
-                    item = item,
-                    hasConnectorAfter = index < timeline.size - 1,
-                    isNarrow = isNarrow
-                )
-            }
+        timeline.forEachIndexed { index, item ->
+            TimelineStageItem(
+                item = item,
+                hasConnectorAfter = index < timeline.size - 1,
+                isNarrow = isNarrow
+            )
         }
     }
 }
@@ -535,8 +533,8 @@ private fun TimelineStageItem(
                 .cornerRadius(999.dp)
                 .background(bg)
                 .padding(
-                    horizontal = if (item.isCurrent) (if (isNarrow) 5.dp else 6.5.dp) else (if (isNarrow) 3.5.dp else 4.5.dp),
-                    vertical = 2.dp
+                    horizontal = if (item.isCurrent) (if (isNarrow) 4.5.dp else 6.dp) else (if (isNarrow) 3.dp else 4.dp),
+                    vertical = 1.5.dp
                 )
         ) {
             Text(
@@ -550,7 +548,7 @@ private fun TimelineStageItem(
         }
 
         if (hasConnectorAfter) {
-            Spacer(modifier = GlanceModifier.width(if (isNarrow) 1.5.dp else 2.dp))
+            Spacer(modifier = GlanceModifier.width(if (isNarrow) 1.dp else 2.dp))
             Box(
                 modifier = GlanceModifier
                     .width(if (isNarrow) 2.5.dp else 3.5.dp)
@@ -558,7 +556,7 @@ private fun TimelineStageItem(
                     .cornerRadius(0.5.dp)
                     .background(GlanceTheme.colors.outline)
             ) {}
-            Spacer(modifier = GlanceModifier.width(if (isNarrow) 1.5.dp else 2.dp))
+            Spacer(modifier = GlanceModifier.width(if (isNarrow) 1.dp else 2.dp))
         }
     }
 }
@@ -569,11 +567,14 @@ private fun F1StartingGantry(
     isLive: Boolean,
     modifier: GlanceModifier = GlanceModifier
 ) {
+    val size = LocalSize.current
+    val isTall = size.height >= 170.dp
+
     Box(
         modifier = modifier
             .cornerRadius(999.dp)
             .background(GlanceTheme.colors.surface)
-            .padding(horizontal = 6.dp, vertical = 2.5.dp),
+            .padding(horizontal = if (isTall) 10.dp else 8.dp, vertical = if (isTall) 3.5.dp else 2.5.dp),
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -585,10 +586,12 @@ private fun F1StartingGantry(
 
             for (i in 1..5) {
                 val isLit = i <= litCount
+                if (i > 1) {
+                    Spacer(modifier = GlanceModifier.width(if (isTall) 5.dp else 4.dp))
+                }
                 Box(
                     modifier = GlanceModifier
-                        .padding(horizontal = 2.dp)
-                        .size(width = 5.5.dp, height = 5.5.dp)
+                        .size(width = if (isTall) 6.dp else 5.dp, height = if (isTall) 6.dp else 5.dp)
                         .cornerRadius(3.dp)
                         .background(if (isLit) litColor else unlitColor)
                 ) {}
@@ -611,18 +614,18 @@ private fun CountdownPill(
             .fillMaxWidth()
             .cornerRadius(18.dp)
             .background(GlanceTheme.colors.surfaceVariant)
-            .padding(vertical = if (isTall) 8.5.dp else 7.dp, horizontal = 12.dp),
+            .padding(vertical = if (isTall) 8.dp else 5.5.dp, horizontal = if (isTall) 12.dp else 10.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = GlanceModifier.fillMaxWidth(),
             horizontalAlignment = Alignment.Horizontal.CenterHorizontally
         ) {
-            // Authentic 5-Lights FIA Starting Gantry inside sculpted housing
+            // Authentic 5-Lights FIA Starting Gantry inside sculpted housing with un-congested spacing
             F1StartingGantry(
                 litCount = litLights,
                 isLive = isLive,
-                modifier = GlanceModifier.padding(bottom = 3.5.dp)
+                modifier = GlanceModifier.padding(bottom = if (isTall) 5.5.dp else 4.dp)
             )
 
             if (isLive) {
@@ -630,14 +633,14 @@ private fun CountdownPill(
                     modifier = GlanceModifier
                         .cornerRadius(999.dp)
                         .background(GlanceTheme.colors.primary)
-                        .padding(horizontal = 10.dp, vertical = 3.dp)
+                        .padding(horizontal = 10.dp, vertical = 2.5.dp)
                 ) {
                     Text(
                         text = "LIGHTS OUT • TRACK ACTIVE",
                         style = TextStyle(
                             color = GlanceTheme.colors.onPrimary,
                             fontWeight = FontWeight.Bold,
-                            fontSize = if (isTall) 11.5.sp else 10.5.sp,
+                            fontSize = if (isTall) 11.5.sp else 10.sp,
                             textAlign = TextAlign.Center
                         )
                     )
@@ -658,7 +661,7 @@ private fun CountdownPill(
                             style = TextStyle(
                                 color = GlanceTheme.colors.onSurface,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = if (isTall) 22.sp else 19.sp,
+                                fontSize = if (isTall) 21.sp else 18.sp,
                                 textAlign = TextAlign.Center
                             )
                         )
@@ -668,7 +671,7 @@ private fun CountdownPill(
                             style = TextStyle(
                                 color = GlanceTheme.colors.onSurfaceVariant,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 8.5.sp,
+                                fontSize = if (isTall) 8.sp else 7.5.sp,
                                 textAlign = TextAlign.Center
                             )
                         )
@@ -678,7 +681,7 @@ private fun CountdownPill(
                     Box(
                         modifier = GlanceModifier
                             .width(1.dp)
-                            .height(22.dp)
+                            .height(if (isTall) 22.dp else 18.dp)
                             .background(GlanceTheme.colors.outline)
                     ) {}
 
@@ -692,7 +695,7 @@ private fun CountdownPill(
                             style = TextStyle(
                                 color = GlanceTheme.colors.onSurface,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = if (isTall) 22.sp else 19.sp,
+                                fontSize = if (isTall) 21.sp else 18.sp,
                                 textAlign = TextAlign.Center
                             )
                         )
@@ -702,7 +705,7 @@ private fun CountdownPill(
                             style = TextStyle(
                                 color = GlanceTheme.colors.onSurfaceVariant,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 8.5.sp,
+                                fontSize = if (isTall) 8.sp else 7.5.sp,
                                 textAlign = TextAlign.Center
                             )
                         )
@@ -737,8 +740,8 @@ private fun FooterRow(
                 provider = ImageProvider(trackBitmap),
                 contentDescription = "Track Map",
                 modifier = GlanceModifier.size(
-                    width = if (isTall) 66.dp else 56.dp,
-                    height = if (isTall) 38.dp else 32.dp
+                    width = if (isTall) 62.dp else 48.dp,
+                    height = if (isTall) 36.dp else 26.dp
                 )
             )
             Spacer(modifier = GlanceModifier.height(2.dp))
@@ -764,7 +767,7 @@ private fun FooterRow(
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurfaceVariant,
                     fontWeight = FontWeight.Medium,
-                    fontSize = if (isTall) 10.5.sp else 9.5.sp,
+                    fontSize = if (isTall) 10.5.sp else 9.sp,
                     textAlign = TextAlign.End
                 )
             )
@@ -774,7 +777,7 @@ private fun FooterRow(
                 style = TextStyle(
                     color = GlanceTheme.colors.onSurface,
                     fontWeight = FontWeight.Bold,
-                    fontSize = if (isTall) 19.sp else 17.sp,
+                    fontSize = if (isTall) 18.sp else 16.sp,
                     textAlign = TextAlign.End
                 )
             )

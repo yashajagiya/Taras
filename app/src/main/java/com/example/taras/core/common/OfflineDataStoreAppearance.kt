@@ -60,10 +60,11 @@ class OfflineDataStoreAppearance(private val context: Context) {
             for (receiverClass in receivers) {
                 val componentName = ComponentName(appContext, receiverClass)
                 val widgetIds = appWidgetManager.getAppWidgetIds(componentName)
-                if (widgetIds.isNotEmpty()) {
+                val validWidgetIds = widgetIds.filter { appWidgetManager.getAppWidgetInfo(it) != null }.toIntArray()
+                if (validWidgetIds.isNotEmpty()) {
                     val updateIntent = Intent(appContext, receiverClass).apply {
                         action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
+                        putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, validWidgetIds)
                     }
                     appContext.sendBroadcast(updateIntent)
                 }
